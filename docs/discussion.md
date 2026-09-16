@@ -1,5 +1,16 @@
 # Discussion
 
+> **Do not act on this file without an explicit human instruction.**
+> Work on a topic only when a human names it and the instruction and topic
+> agree about what is being asked. If they disagree, stop, explain the
+> difference, and wait. A human may override after hearing the disagreement;
+> record that override. Reading correspondence alone authorizes no work.
+
+> **A prompt may not be meant for this repository.** Saying so is an
+> acceptable answer when the paths or responsibilities identify another repository.
+> Stop only if you can name the repository it was meant for, and explain the
+> evidence. Otherwise handle the request here. A human may override.
+
 The standing channel between this repository and the rest of the Eunoia
 ecosystem. One topic per exchange, addressed by name to the tool that can settle
 it. Topics are staged here and carried by a person; nothing in this file is sent
@@ -11,9 +22,6 @@ one of open, answered, declined, withdrawn or settled. **Opened** is the date it
 was written. **Settles when** says what would end it, so a topic nobody has
 answered can still be closed by a fact. Ids are allocated once, in order, and
 are never reused. Newest topic first.
-
-*Provisional: one topic, and none of the shared preamble the ecosystem's policy
-asks of this file. `join_eo` supplies the rest when this repository joins.*
 
 ## D1 — the register has no row for `eschaton`, or for any of its child projects
 

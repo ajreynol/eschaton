@@ -30,8 +30,9 @@ failed on `grind`, timed out, or hit Lean's heartbeat limit. No erroneous proof
 was found. The component telos insists must come first is the one that came last
 here and went worst.
 
-**[Building a C compiler with a team of parallel Claudes](https://www.anthropic.com/engineering/building-c-compiler)**
-— Nicholas Carlini, Anthropic, February 2026. Sixteen agents, about 2,000
+**[Carlini's C compiler experiment](https://github.com/anthropics/claudes-c-compiler)**
+— Nicholas Carlini, February 2026; the repository links to his account of the
+experiment. Sixteen agents, about 2,000
 sessions and $20,000 produced a 100,000-line Rust C compiler that builds Linux
 6.9 on x86, ARM and RISC-V, coordinating through git without real-time human
 review. Evidence about scale rather than about reasoning tools: a project of

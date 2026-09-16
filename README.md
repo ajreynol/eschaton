@@ -31,7 +31,8 @@ The full comparison and tradeoffs are in
 [`tools/telos/docs/design.md`](tools/telos/docs/design.md), and existing public
 work is in [`docs/related-work.md`](docs/related-work.md).
 
-*Status: nothing is built. This repository contains prose and no program.*
+*Status: no solver is built. This repository contains research notes and
+repository checks.*
 
 ## The question it does not answer
 
@@ -46,8 +47,13 @@ for a bet and not a pitch to anybody.
 
 ## What it takes to run it
 
-Nothing, because nothing runs: no code, no build, no test suite, no command, no
-dependency. `git clone` is the whole setup and reading is the whole interface.
+Reading the research notes requires no build or dependencies. There is no solver
+to run yet.
+
+The [Anoieu policy workflow](.github/workflows/anoieu.yml) checks repository
+conventions on every push and pull request, using a pinned checker commit.
+The [maintenance guide](docs/maintenance.md) explains how to run it locally;
+the [documentation index](docs/README.md) lists the rest of the written work.
 
 One directory per bet. [`tools/telos/`](tools/telos/README.md) is the only one
 with any depth — research notes carried over from the child project of the same
@@ -64,3 +70,17 @@ folder of reading notes.
 It should mean the **beginning** of times: nothing here is ending, the subject
 is new solvers. The word does one honest day's work besides — the last thing is
 the finished proof, and the design question is asked backwards from it.
+
+## How this repository is maintained
+
+This repository is part of the **Eunoia ecosystem** and follows its shared
+[repository policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md).
+
+**Written by AI agents, under light human supervision.** A human directs the
+work and decides what is published; that supervision does not vet the internal
+design or establish the correctness of the research claims.
+
+The human maintainer is the authority here. The agents are tools, and the
+proposals remain untested until there is evidence from an implementation.
+
+There is no paper planned yet: these are research notes without a result.
