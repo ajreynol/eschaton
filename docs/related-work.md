@@ -4,12 +4,12 @@ Public work bearing on the three bets in [`approaches.md`](approaches.md),
 arranged by which one it helps or hurts. Searched 2026-09-16 and a first pass
 rather than a survey, so absence from this page is weak evidence of absence.
 
-## hawkeye — already done once, at the easy end
+## Agent-built solvers — already done once, at the easy end
 
 **[LLM2SMT: Building an SMT Solver with Zero Human-Written Code](https://arxiv.org/abs/2603.06931)**
 — Mikoláš Janota and Mirek Olšák, arXiv:2603.06931, March 2026; code at
-[`MikolasJanota/llm2smt`](https://github.com/MikolasJanota/llm2smt). Hawkeye's
-bet, run: an LLM coding agent builds a DPLL(T) solver for QF_UF —
+[`MikolasJanota/llm2smt`](https://github.com/MikolasJanota/llm2smt). An LLM
+coding agent builds a DPLL(T) solver for QF_UF —
 Nieuwenhuis–Oliveras congruence closure, CaDiCaL 3.x through IPASIR-UP — with no
 human-written code.
 
@@ -27,7 +27,7 @@ their verdict is a qualified yes.
 unsat instances, and proof generation is named the hardest thing to get out of
 the agent. Only 285 of 7,468 instances ended with a certified proof; the rest
 failed on `grind`, timed out, or hit Lean's heartbeat limit. No erroneous proof
-was found. The component telos insists must come first is the one that came last
+was found. The component proof-first design puts first is the one that came last
 here and went worst.
 
 **[Carlini's C compiler experiment](https://github.com/anthropics/claudes-c-compiler)**
@@ -38,39 +38,37 @@ sessions and $20,000 produced a 100,000-line Rust C compiler that builds Linux
 review. Evidence about scale rather than about reasoning tools: a project of
 solver size is not off the table.
 
-## cvc6 — the thesis is published, the hard part is not solved
+## Automated maintenance — the thesis is published, the hard part is not solved
 
 **[Continuous Autonomous Refactoring: A Research Roadmap](https://arxiv.org/html/2609.01236)**
-— Sun, Ståhl, Sandahl and Kessler, Linköping, September 2026. cvc6's premise as
-an agenda: refactoring as a continuous process in which agents monitor and
-improve a codebase against an evolving specification. It proposes rather than
-demonstrates, and the open problems it lists are the ones cvc6 inherits — local
+— Sun, Ståhl, Sandahl and Kessler, Linköping, September 2026. Automated
+maintenance as an agenda: refactoring as a continuous process in which agents
+monitor and improve a codebase against an evolving specification. It proposes rather than
+demonstrates, and the open problems it lists apply to solver maintenance — local
 improvements damaging global properties, and test suites being a guardrail
 rather than a proof of behaviour preservation.
 
 **[CodeTaste: Can LLMs Generate Human-Level Code Refactorings?](https://arxiv.org/pdf/2603.04177)**
-— Thillen, Mündler, Raychev and Vechev, 2026. The gap cvc6 lives in: agents
+— Thillen, Mündler, Raychev and Vechev, 2026. A gap in automated maintenance: agents
 produce functional patches well and comprehensible, extensible structure badly.
 
 **[A Differential Fuzzing-Based Evaluation of Functional Equivalence in LLM-Generated Code Refactorings](https://arxiv.org/pdf/2602.15761)**
-— Dristi and Dwyer, February 2026. cvc6's real question — did the refactor
-preserve behaviour? — asked on Python. *Numbers not extracted; the PDF read
+— Dristi and Dwyer, February 2026. The central maintenance question — did the
+refactor preserve behaviour? — asked on Python. *Numbers not extracted; the PDF read
 returned metadata only, so read it before citing it for a result.* See also
 **[Articulate but Wrong](https://arxiv.org/pdf/2605.21537)** on self-review
 failures in modernization, and
 **[Environment-in-the-Loop](https://arxiv.org/html/2602.09944v1)** on migration
 agents that have to drive a build.
 
-**What is missing is the part cvc6 is about.** None of it is a C++ base of
-cvc5's size — 521,073 lines in `src/` — and none of it treats behaviour
+**What is missing is evidence about solver maintenance.** None of it is a C++
+base of cvc5's size — 521,073 lines in `src/` — and none of it treats behaviour
 preservation for a *solver*, where the specification is a logic and a wrong
 answer is silent.
 
-## telos — the crowded half
+## Proof-first design — the crowded half
 
-The verified-checker side already has tools, tabulated with what each guarantee
-actually is in
-[`kernel-of-cvc5.md`](../tools/telos/docs/kernel-of-cvc5.md#prior-art-and-what-each-guarantee-actually-is):
+The verified-checker side already has tools with differing guarantees:
 IsaSAT, versat, `cake_lpr`, SMTCoq, `bv_decide`, lean-smt and Carcara. Two
 additions from this pass: **[Lean-SMT](https://arxiv.org/pdf/2505.15796)**
 ([Springer](https://link.springer.com/chapter/10.1007/978-3-031-98682-6_11)),
@@ -82,7 +80,7 @@ pseudo-Boolean proof certificates for Lean 4.
 
 **Proof-first from line one, built by agents.** LLM2SMT is the near miss: the
 solver came first and the proofs were bolted on afterwards — the build order
-telos says produced cvc5's holes, arrived at again by a project with no legacy
+that proof-first design questions, arrived at again by a project with no legacy
 to blame it on.
 
 **The spine transplant.** Keeping cvc5's core engine as a working artifact and

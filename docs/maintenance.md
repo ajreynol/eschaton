@@ -4,6 +4,11 @@ Keep research claims dated and distinguish proposals from measured results.
 List new documents in [the index](README.md). Use ignored `scratch/` and
 `*.local.md` files for local working material.
 
+All child projects are unadvertised. Keep the standalone declaration
+`**Eunoia listing:** unadvertised` in each child's README introduction, before
+the first section heading. Keep their names and inward links out of the parent
+README, documentation index, reports and other reader-facing documentation.
+
 ## Repository checks
 
 [Anoieu's policy checker](https://github.com/ajreynol/anoieu) checks the

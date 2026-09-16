@@ -9,5 +9,3 @@ research preference. These documents are handwritten, not generated.
 | [Related work](related-work.md) | Record public work relevant to the proposals, with dates and limits on the evidence. |
 | [Maintenance](maintenance.md) | Run the repository checks and update their pinned dependency. |
 | [Discussion](discussion.md) | Keep correspondence with other ecosystem repositories for a person to carry. |
-
-Each proposal's README under [tools/](../tools/) links to its own design notes.

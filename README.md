@@ -10,26 +10,24 @@ worth trying, and what would each cost?**
 
 ## Approaches under consideration
 
-**telos is currently the most promising path.** It can build on the verified
-[Logos proof checker](tools/telos/docs/logos.md), leaving the proof-producing
-solver as the main work. This is a provisional research preference; none of
+**A proof-first solver is currently the most promising path.** It can build on
+the verified [Logos proof checker](https://github.com/ajreynol/logos), leaving
+the proof-producing solver as the main work. This is a provisional research preference; none of
 these approaches has been implemented or tested here.
 
 | Approach | What we would build | Main question |
 | --- | --- | --- |
-| **[telos](tools/telos/README.md)** | A new solver designed around proofs from the start, reusing cvc5's proof calculus and parts of its checker, with Logos as the verified kernel and new, untrusted search. | Can every rewrite carry its proof at an acceptable authoring and runtime cost? |
-| **[cvc6](tools/cvc6/README.md)** | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
-| **[hawkeye](tools/hawkeye/README.md)** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
+| **Proof-first design** | A new solver designed around proofs from the start, reusing cvc5's proof calculus and parts of its checker, with Logos as the verified kernel and new, untrusted search. | Can every rewrite carry its proof at an acceptable authoring and runtime cost? |
+| **Automated maintenance** | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
+| **Agent-built solver** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
 
-**Preferred next step:** telos's [T2 experiment](tools/telos/TODO.md#t2--a-proof-carrying-rewriter-for-one-theory)
-— prototype a proof-carrying rewriter for one theory and measure the manual
-work per rule and runtime overhead. Its outcome determines whether to proceed
-with the solver design.
+**Preferred next step:** prototype a proof-carrying rewriter for one theory and
+measure the manual work per rule and runtime overhead. Its outcome determines
+whether to proceed with the solver design.
 
 The full comparison and tradeoffs are in
-[`docs/approaches.md`](docs/approaches.md), telos's proposed guarantees are in
-[`tools/telos/docs/design.md`](tools/telos/docs/design.md), and existing public
-work is in [`docs/related-work.md`](docs/related-work.md).
+[`docs/approaches.md`](docs/approaches.md), and existing public work is in
+[`docs/related-work.md`](docs/related-work.md).
 
 *Status: no solver is built. This repository contains research notes and
 repository checks.*
@@ -42,8 +40,7 @@ that survives every argument here has been argued for, not demonstrated.
 
 **And nothing about whether an existing solver is correct.** In particular it
 makes no claim about cvc5, asks nothing of cvc5, and should not be quoted as
-though it did — including the directory called `cvc6`, which is a working title
-for a bet and not a pitch to anybody.
+though it did. These approaches are not a pitch to its developers.
 
 ## What it takes to run it
 
@@ -54,12 +51,6 @@ The [Anoieu policy workflow](.github/workflows/anoieu.yml) checks repository
 conventions on every push and pull request, using a pinned checker commit.
 The [maintenance guide](docs/maintenance.md) explains how to run it locally;
 the [documentation index](docs/README.md) lists the rest of the written work.
-
-One directory per bet. [`tools/telos/`](tools/telos/README.md) is the only one
-with any depth — research notes carried over from the child project of the same
-name in [`dokimasia`](https://github.com/ajreynol/dokimasia).
-[`tools/cvc6/`](tools/cvc6/README.md) and
-[`tools/hawkeye/`](tools/hawkeye/README.md) are a page each.
 
 ## The name
 

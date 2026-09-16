@@ -23,14 +23,14 @@ was written. **Settles when** says what would end it, so a topic nobody has
 answered can still be closed by a fact. Ids are allocated once, in order, and
 are never reused. Newest topic first.
 
-## D1 — the register has no row for `eschaton`, or for any of its child projects
+## D1 — the register has no row for `eschaton`
 
 **To:** kanon
 **Kind:** request
 **Status:** open
 **Opened:** 2026-09-16
-**Settles when:** kanon adds rows for the names below to `tools/ynoia/names.md`,
-or declines and says which names it would rather we used.
+**Settles when:** kanon adds a row for `eschaton` to `tools/ynoia/names.md`,
+or declines and says which name it would rather we used.
 
 `tools/ynoia/names.md` at kanon `e65250ea` has no entry for `eschaton`, and the
 string occurs nowhere else in the ecosystem. The register's closing rule is that
@@ -42,15 +42,8 @@ the etymology and a line of scope, and a repository's README is meant to explain
 a name somebody already wrote down. If kanon wants it different, the README
 follows the register and not the other way round.
 
-**Three more names are unregistered.** `telos` has been a child project in
-`dokimasia` for some time and appears in kanon's `actionable.md`, `handover.md`
-and `ecosystem.json` — by the register's own taxonomy an *In use elsewhere, and
-claimed by nobody* row that was never written. `cvc6` and `hawkeye` became child
-projects here on 2026-09-16; both are non-Greek, so the register's exception for
-a program rather than an account is the clause to weigh. `cvc6` also raises a
-question the page does not answer: it is a name we chose by deriving somebody
-else's, and the register says names settled outside this ecosystem never appear
-in it.
+*Edited 2026-09-16 to limit this topic to the parent repository's name after
+the maintainer requested that all child projects be unadvertised.*
 
 The version of the register these claims were read from is kept verbatim in
 `ynoia-brief.local.md`, deliberately out of tree.
