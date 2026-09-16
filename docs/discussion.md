@@ -16,7 +16,7 @@ are never reused. Newest topic first.
 the ecosystem's policy asks of it. `join_eo` supplies the rest when this
 repository joins.*
 
-## D1 — the register has no row for `eschaton`, and none for `telos`
+## D1 — the register has no row for `eschaton`, or for any of its child projects
 
 **To:** kanon
 **Kind:** request
@@ -43,6 +43,14 @@ project in `dokimasia` for some time and is used in kanon's own `actionable.md`,
 `handover.md` and `scripts/ecosystem/ecosystem.json`. By the register's own
 taxonomy that is an *In use elsewhere, and claimed by nobody* row that was never
 written — the failure mode that section exists to catch.
+
+**And two more since.** `cvc6` and `hawkeye` became child projects here on
+2026-09-16 and are not registered either. Both are non-Greek, so the register's
+exception for a program rather than an account is the clause to weigh. `cvc6`
+also raises a question the register does not currently answer: it is a name *we*
+chose, but chosen by deriving somebody else's, and the page says names settled
+outside this ecosystem will never appear in it. Which side of that line it falls
+on is kanon's call and not ours.
 
 The version of the register these claims were read from is kept verbatim in
 `ynoia-brief.local.md`, deliberately out of tree, so the reading can be checked

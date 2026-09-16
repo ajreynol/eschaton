@@ -6,18 +6,23 @@ great deal of software — verifiers, compilers, type checkers — believes what
 it says. This repository is about the solvers that would deserve that, and about
 which of the ways of building one are worth anybody's time.
 
-It asks one question: **which approaches to a statically verified SMT solver are
-worth trying, and what would each cost?** Comparing designs, pricing them
-against prior art, and saying plainly which ones are dead is the work. The
-phrase is used here in exactly one sense, fixed in
-[`tools/telos/docs/design.md`](tools/telos/docs/design.md):
+It asks one question: **which approaches to a better-founded SMT solver are
+worth trying, and what would each cost?** Comparing them, pricing them against
+prior art, and saying plainly which ones are dead is the work. Three bets are
+written down and set against each other in
+[`docs/approaches.md`](docs/approaches.md); none has been tested and nothing
+here ranks them.
+
+The bet with the most behind it takes *statically verified* in exactly one
+sense, fixed in [`tools/telos/docs/design.md`](tools/telos/docs/design.md):
 
 > a solver whose **kernel** is verified, whose **completeness** is a type, and
 > whose **search** is untrusted and free to be as clever and as ugly as it needs
 > to be.
 
 Other readings of "verified solver" exist, and IsaSAT and versat are what they
-cost. Those are on the record here as evidence, not as the road we are taking.
+cost. The other two bets dispute that verification is the thing to buy at all,
+which is the disagreement `approaches.md` exists to hold open.
 
 *Status: nothing is built. This repository contains prose and no program.*
 
@@ -31,8 +36,10 @@ pages has been argued for and not demonstrated, and the two are not close.
 
 **It also says nothing about whether any existing solver is correct.** In
 particular it makes no claim about cvc5, asks nothing of cvc5, and should not be
-quoted as though it did. Where the notes here measure a real system, they are
-measuring it to size a design problem — never to report a defect.
+quoted as though it did — including the directory here called `cvc6`, which is a
+working title for a bet and not a proposal to anybody. Where the notes here
+measure a real system, they are measuring it to size a design problem — never to
+report a defect.
 
 ## What it takes to run it
 
@@ -40,11 +47,13 @@ Nothing, because nothing runs. There is no code, no build, no test suite, no
 command, and no dependency to install. `git clone` is the whole setup and
 reading is the whole interface.
 
-What is here is [`tools/telos/`](tools/telos/README.md) — the research notes
-this question has accumulated so far, carried over from the child project of the
-same name in [`dokimasia`](https://github.com/ajreynol/dokimasia), where they
-were a read-only tenant. They are a starting position rather than a conclusion,
-and the copy here is not yet reconciled with the one there.
+What is here is prose, one directory per bet.
+[`tools/telos/`](tools/telos/README.md) is the only one with any depth — research
+notes carried over from the child project of the same name in
+[`dokimasia`](https://github.com/ajreynol/dokimasia), where they were a read-only
+tenant, and not yet reconciled with the copy still there.
+[`tools/cvc6/`](tools/cvc6/README.md) and
+[`tools/hawkeye/`](tools/hawkeye/README.md) are a page each and nothing more.
 
 ## The name
 
