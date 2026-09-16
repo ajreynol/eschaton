@@ -2,6 +2,8 @@
 
 *What would you build if you started from the answer?*
 
+**Eunoia listing:** unadvertised
+
 **Internal.** This is a research note, not a project announcement. It is not
 linked from the root [`README`](../../README.md), from
 [`docs/kernel.md`](../../docs/kernel.md), or from either register

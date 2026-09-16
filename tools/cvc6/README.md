@@ -1,5 +1,10 @@
 # cvc6
 
+**Eunoia listing:** unadvertised
+
+*Not in the ecosystem's generated listings. Unadvertised means not pointed
+at rather than not visible: this repository is public.*
+
 **A working title for a bet, and not a proposal to anyone.** Nothing here is a
 plan for cvc5, a request of its developers, or a claim that a successor is
 wanted or needed. The name is used because it states the bet in four characters;

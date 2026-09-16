@@ -1,5 +1,10 @@
 # hawkeye
 
+**Eunoia listing:** unadvertised
+
+*Not in the ecosystem's generated listings. Unadvertised means not pointed
+at rather than not visible: this repository is public.*
+
 A new SMT solver, written mostly by autonomous agents.
 
 **The bet: the scarce resource is people, not ideas.** There are few SMT solvers
