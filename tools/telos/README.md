@@ -83,8 +83,8 @@ the accumulated design kept and its upkeep mechanized, rather than the design
 thrown away to fix the order it was built in. **If that were true, the argument
 from build order that this whole directory rests on would matter much less**,
 because holes would close faster than they accumulate. Neither bet has produced
-anything, and [`approaches.md`](../../docs/approaches.md) declines to rank
-them.
+anything. [`approaches.md`](../../docs/approaches.md) compares them, with telos
+as the current, provisional preference.
 
 ## The foothold: Logos
 

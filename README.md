@@ -6,20 +6,30 @@ great deal of software — verifiers, compilers, type checkers — believes what
 it says. This is about the solvers that would deserve that.
 
 It asks one question: **which approaches to a better-founded SMT solver are
-worth trying, and what would each cost?** Three bets are written down and set
-against each other in [`docs/approaches.md`](docs/approaches.md); what already
-exists in public is in [`docs/related-work.md`](docs/related-work.md). None has
-been tested and nothing here ranks them.
+worth trying, and what would each cost?**
 
-The bet with the most behind it takes *statically verified* in one sense, fixed
-in [`tools/telos/docs/design.md`](tools/telos/docs/design.md):
+## Approaches under consideration
 
-> a solver whose **kernel** is verified, whose **completeness** is a type, and
-> whose **search** is untrusted and free to be as clever and as ugly as it needs
-> to be.
+**telos is currently the most promising path.** It can build on the verified
+[Logos proof checker](tools/telos/docs/logos.md), leaving the proof-producing
+solver as the main work. This is a provisional research preference; none of
+these approaches has been implemented or tested here.
 
-The other two dispute that verification is the thing to buy at all, which is the
-disagreement `approaches.md` exists to hold open.
+| Approach | What we would build | Main question |
+| --- | --- | --- |
+| **[telos](tools/telos/README.md)** | A new solver designed around proofs from the start, reusing cvc5's proof calculus and parts of its checker, with Logos as the verified kernel and new, untrusted search. | Can every rewrite carry its proof at an acceptable authoring and runtime cost? |
+| **[cvc6](tools/cvc6/README.md)** | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
+| **[hawkeye](tools/hawkeye/README.md)** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
+
+**Preferred next step:** telos's [T2 experiment](tools/telos/TODO.md#t2--a-proof-carrying-rewriter-for-one-theory)
+— prototype a proof-carrying rewriter for one theory and measure the manual
+work per rule and runtime overhead. Its outcome determines whether to proceed
+with the solver design.
+
+The full comparison and tradeoffs are in
+[`docs/approaches.md`](docs/approaches.md), telos's proposed guarantees are in
+[`tools/telos/docs/design.md`](tools/telos/docs/design.md), and existing public
+work is in [`docs/related-work.md`](docs/related-work.md).
 
 *Status: nothing is built. This repository contains prose and no program.*
 

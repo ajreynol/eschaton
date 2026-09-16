@@ -1,8 +1,10 @@
 # Competing approaches
 
-Three bets on how to get a better SMT solver than the ones we have. **None has
-been tested and nothing here ranks them.** They differ on what they keep from
-cvc5 and on who does the writing; what already exists in public for each is
+Three bets on how to get a better SMT solver than the ones we have. **telos is
+the current preference; none has been tested here.** Its existing verified
+kernel in Logos and concrete next experiment make it the most promising path
+to explore. They differ on what they keep from cvc5 and on who does the writing;
+what already exists in public for each is
 [`related-work.md`](related-work.md).
 
 | | keeps from cvc5 | written by | the bet | dies if |
@@ -50,4 +52,5 @@ Each bet has a cheap experiment that could kill it, and none has been run: for
 telos, `T2`, a proof-carrying rewriter for one theory; for cvc6, one agent-driven
 refactor of one cvc5 subsystem measured against the gaps it was meant to close;
 for hawkeye, the first theory solver that passes somebody else's benchmark set.
-Until one of those returns, the ranking of the rows above is taste.
+The preference for telos remains provisional until those experiments provide
+evidence to judge the approaches.
