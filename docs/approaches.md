@@ -6,7 +6,8 @@ This file exists so the differences are stated somewhere rather than rediscovere
 in every conversation.
 
 They differ on two things: **what they keep from cvc5**, and **who does the
-writing**.
+writing**. What already exists in public for each is
+[`related-work.md`](related-work.md).
 
 | | keeps from cvc5 | written by | the bet | what would kill it |
 | --- | --- | --- | --- | --- |
@@ -24,6 +25,11 @@ bet and declines to rank it, which is the right posture for now.
 willingness to start over, and it is the only one of the three whose bet is
 about *production cost* rather than about correctness. That is also its weakness:
 nothing in it produces a reason to believe the output.
+
+It is also the only one of the three that somebody has already done. LLM2SMT
+built an agent-written QF_UF solver that is competitive on SMT-LIB, so hawkeye's
+question is no longer *whether* — it is scale, theories, and the fact that the
+proof-emission half is exactly where that project struggled most.
 
 ## One thing telos is not
 
