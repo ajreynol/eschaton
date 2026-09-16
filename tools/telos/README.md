@@ -19,28 +19,17 @@ authority on — not the search.
 
 **Eunoia listing:** unadvertised
 
-**Internal.** This is a research note, not a project announcement. It is not
-linked from the root [`README`](../../README.md), from
-[`docs/kernel.md`](../../docs/kernel.md), or from either register
-([`TODO.md`](../../TODO.md), [`docs/issues.md`](../../docs/issues.md)), and it
-should stay that way until there is something to show. Note that
-`ajreynol/dokimasia` is a **public** remote: unadvertised here means
-*not pointed at*, not *not visible*. Nothing in this directory makes a claim
-about cvc5, asks anything of cvc5, or should be quoted as though it did.
+**Internal.** A research note, not a project announcement, and unadvertised
+until there is something to show — not pointed at rather than not visible, since
+this repository is public. Nothing here makes a claim about cvc5, asks anything
+of cvc5, or should be quoted as though it did.
 
-**Read-only member of this repository.** telos consumes dokimasia's analyses.
-Nothing in `dokimasia/` imports it, no test covers it, no baseline ratchets it,
-no CI job runs it. It ships no code. If this directory were deleted the
-repository would be exactly as functional as it is now, which is the property
-that makes it safe to keep here.
+**It ships no code.** Everything in this directory is prose, and deleting it
+would leave the repository exactly as functional as it is now.
 
 ---
 
 ## The charter
-
-Stated here because a research project's charter is the thing a person agreed
-to, and until now it was spread across this file and [`TODO.md`](TODO.md)
-instead of being in one place somebody could hold it to.
 
 **The question.** *If the proof came first, what would the solver look like?*
 The premise below says why that is the complementary question to the parent's
@@ -63,18 +52,10 @@ returns; verifying the search, ever, under the current design; claiming anything
 about cvc5, ethos or logos, since a fact about any of them goes into that
 project's register under its own name; and announcing this directory.
 
-**Is there a paper in it?** Not in the design, and probably never — a set of
-inversions nobody has implemented is a position, not a result. There are two
-candidates and both are measurements rather than arguments: `T3`'s `incomplete`
-census over a CPC corpus run through both checkers, which is a coverage number
-for the specification that nobody has taken, and `T2`'s outcome either way,
-including the negative one. Neither is close, and whether either is worth
-writing up is a decision for a person and not for this file.
-
 ## The premise
 
 dokimasia measures cvc5's proof kernel from the outside, and the arc of that
-measurement is stated in [`docs/kernel.md`](../../docs/kernel.md): make it
+measurement is stated in [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md): make it
 easier to *argue* which part of cvc5 has to be right, along five axes —
 nameable, closed, small, local, mechanized — with mechanized named explicitly as
 **the last axis, not the first**.
@@ -83,9 +64,9 @@ That ordering is correct for cvc5, and it is correct because cvc5 exists. The
 axes are hard there because proofs were added to a solver that already worked,
 and every finding in this repository is a consequence of that order:
 `ProofGenerator* pg = nullptr` is a default argument
-([H6](../../docs/hygiene.md#h6--no-proof-must-be-said-out-loud)), the safe-mode
-disable list is maintained by hand ([i-5](../../docs/issues.md)), and
-completeness depends on a search budget ([i-4](../../docs/issues.md)) because the
+([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h6--no-proof-must-be-said-out-loud)), the safe-mode
+disable list is maintained by hand ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
+completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)) because the
 rewriter was deliberately left uninstrumented.
 
 telos asks the complementary question, and only the complementary question:
@@ -96,17 +77,14 @@ Not a competitor to cvc5, not a replacement, not a proposal to anyone. A
 research vehicle for the one experiment dokimasia cannot run, because dokimasia
 is downstream of a design that is already fixed.
 
-**There is a competing answer, and it is not written down here.** The opposite
-bet is that cvc5's *development procedure* is the thing to automate — the
-accumulated design kept and its upkeep mechanized, rather than the design thrown
-away to fix the order it was built in. It says the artifact is the asset and the
-process around it is the problem. **If that were true, the argument from build
-order that this whole directory rests on would matter much less**, because holes
-would close faster than they accumulate — worth knowing before reading the five
-inversions as settled. Neither bet has produced anything, so nothing here ranks
-them; where the idea is being put on the record is
-[`../../docs/discussion.md`](../../docs/discussion.md), as a proposal to
-somebody else's page rather than a position of ours.
+**There is a competing answer, and it is [`cvc6`](../cvc6/README.md).** The
+opposite bet is that cvc5's *development procedure* is the thing to automate —
+the accumulated design kept and its upkeep mechanized, rather than the design
+thrown away to fix the order it was built in. **If that were true, the argument
+from build order that this whole directory rests on would matter much less**,
+because holes would close faster than they accumulate. Neither bet has produced
+anything, and [`approaches.md`](../../docs/approaches.md) declines to rank
+them.
 
 ## The foothold: Logos
 
@@ -133,7 +111,7 @@ Measured at logos `a5650dad`:
 
 The two CPC rules with no soundness proof are `beta-reduce` and **`trust`** —
 cvc5's declared hole, the one
-[`dokimasia.trust`](../../dokimasia/trust/) censuses 75 ids of. It cannot have
+[`dokimasia.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/trust/) censuses 75 ids of. It cannot have
 one. Which states the relationship between these two projects in a sentence:
 
 > **Every hole dokimasia counts is a proof Logos cannot check.**
@@ -148,20 +126,19 @@ success that is executable rather than rhetorical:
 
 > **telos succeeds when Logos says `correct`.**
 
-## Why here, and not somewhere else
+## Derived from measurements, not from wishes
 
-Because the analysis is the input. Every design decision below is derived from a
-measured finding in this repository, and the derivation is the interesting part —
-a list of things a hypothetical solver could do better is worthless; a list where
-each entry closes a hole somebody measured is a specification.
+Every design decision below comes from a measured finding, and the derivation is
+the point: a list of things a hypothetical solver could do better is worthless;
+a list where each entry closes a hole somebody measured is a specification.
 
 | dokimasia found | telos's answer | where |
 | --- | --- | --- |
-| the proofless call is the *ergonomic* one ([H6](../../docs/hygiene.md#h6--no-proof-must-be-said-out-loud)) | the answer type carries the certificate; there is no proofless return | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
-| the calculus is stated three times and can disagree (`SIG`, [R1](../../docs/coupling.md#r1--emit-the-tables-cvc5-already-has)) | stated once; checker, printer and docs are functions of it | [`design.md`](docs/design.md#i2--one-definition-of-the-calculus) |
-| completeness depends on a search budget ([i-4](../../docs/issues.md)) | the rewriter returns its justification; there is no reconstruction to bound | [`design.md`](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) |
-| safe mode is a hand-maintained list ([i-5](../../docs/issues.md), [R8](../../docs/coupling.md#r8--safe-mode-as-a-build-time-property)) | the feature set is a type parameter; the unsafe configuration does not compile | [`design.md`](docs/design.md#i4--safe-mode-is-a-type-not-a-list) |
-| 8 trust steps have no stated reason ([i-9](../../docs/issues.md)) | a hole must name itself to typecheck | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
+| the proofless call is the *ergonomic* one ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h6--no-proof-must-be-said-out-loud)) | the answer type carries the certificate; there is no proofless return | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
+| the calculus is stated three times and can disagree (`SIG`, [R1](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r1--emit-the-tables-cvc5-already-has)) | stated once; checker, printer and docs are functions of it | [`design.md`](docs/design.md#i2--one-definition-of-the-calculus) |
+| completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)) | the rewriter returns its justification; there is no reconstruction to bound | [`design.md`](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) |
+| safe mode is a hand-maintained list ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md), [R8](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r8--safe-mode-as-a-build-time-property)) | the feature set is a type parameter; the unsafe configuration does not compile | [`design.md`](docs/design.md#i4--safe-mode-is-a-type-not-a-list) |
+| 8 trust steps have no stated reason ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)) | a hole must name itself to typecheck | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
 
 Five inversions, five findings. That is the whole design so far, and it is
 enough to start.
@@ -229,39 +206,15 @@ would change the decision.
 
 ## On the name
 
-`telos` — τέλος — *end, completion, purpose*; Aristotle's final cause, the
-"that for the sake of which". It fits, it is spelled correctly, and it sits in
-the family already in use: `dokimasia` (δοκιμασία, the scrutiny before office),
-`eunoia`, `ethos`, `anoieu`, `alethe`.
-
-The one alternative with a real argument behind it:
-
-| | word | means | the case for it |
-| --- | --- | --- | --- |
-| **telos** | τέλος (noun) | the end, the goal, the purpose | recommended. Correct, recognisable, in the family |
-| teleos | τέλεος (adj.) | **complete**, perfect, having reached its end | the Attic variant of τέλειος. It names the project's actual subject — this repository is about *completeness, not soundness* — and it is the more distinctive string |
-| entelecheia | ἐντελέχεια | having its end *within itself* | Aristotle's coinage, ἐν + τέλος + ἔχειν. Semantically exact for a solver that carries its own certificate. Unusable as a directory name |
-
-Worth knowing that "teleos" is not a misspelling of "telos" — they are two real
-words, and the adjective is arguably the better fit. Worth also knowing that
-both are common in software naming and neither is distinctive; `entelecheia` is
-unique and unpronounceable. Recommendation is to keep `telos`; renaming is one
-`git mv` and nothing depends on the string.
-
-*(Also noted, for a different tool one day: εὔθυνα, `euthyna`, the Athenian
-audit **after** leaving office — the exact counterpart of δοκιμασία, which is
-the scrutiny before. That pair is sitting there unused.)*
+`telos` — τέλος — *end, completion, purpose*; Aristotle's final cause, the "that
+for the sake of which". The design is asked backwards from the end state, which
+is what the word is for.
 
 ## Status
 
 Design notes only. Nothing is written here. The measurements are of other
 people's trees — cvc5, ethos and logos — and no design claim in this directory
 has been tested against an implementation.
-
-There are three endings and a person picks: it graduates into its own
-repository, it is folded into the parent, or it is retired in place with a note
-saying what was learned and why it stopped. Going quiet is not one of them, and
-a directory that has not moved is a claim nobody is standing behind.
 
 - **[`docs/logos.md`](docs/logos.md) — the foothold: what Logos is, what it weighs, what its guarantee is, and eight lessons. Start here**
 - [`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md) — what the kernel is today, what "defining" it means, and what each comparable tool's guarantee actually is

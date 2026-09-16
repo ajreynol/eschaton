@@ -55,7 +55,7 @@ invariance 8,204; top-level checker correctness 4,599; canonicity 1,091.
 | unverified residue | all of it | the parser — 2,653 lines |
 | speed | fast, and the design goal | "not (yet) optimized … significantly slower" |
 
-[`docs/kernel.md`](../../../docs/kernel.md) says the measure that matters is
+[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) says the measure that matters is
 **"how long the argument is and how much of it a reader can check."** Logos
 answers that with a factor of ten, and moves the rest onto Lean's kernel. That
 is the axis this whole repository is organised around, moved further in six
@@ -183,7 +183,7 @@ That is this repository's subject appearing inside a soundness tool. cvc5's
 `incomplete` asks whether the *specification* covers what the proof mentions.
 Two different completeness questions, both answered per-input, both silent about
 everything no input has reached — which is exactly the limitation
-[`docs/contract.md`](../../../docs/contract.md#the-gap-this-exists-to-close)
+[`docs/contract.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#the-gap-this-exists-to-close)
 exists to name.
 
 The static counterpart — *which proofs could logos ever return `incomplete` on*
@@ -199,7 +199,7 @@ constructors. The two rules in the signature with no constructor are:
 
 `trust` is cvc5's declared hole — the rule that proves an arbitrary formula with
 no justification, the one
-[`dokimasia.trust`](../../../dokimasia/trust/) censuses 75 ids of. It cannot
+[`dokimasia.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/trust/) censuses 75 ids of. It cannot
 have a soundness proof, because it is not sound; it appears in the generated
 Lean as a *program*, `__eo_prog_trust`, not as a rule with a correctness
 theorem.
@@ -238,7 +238,7 @@ duplicate:
 - **not linked to the input problem.** `include` and `reference` are ignored, so
   a `correct` verdict is about the assumptions the file states, not about the
   benchmark somebody solved. That is one level down from
-  [contract §3](../../../docs/contract.md#why-3-is-not-a-footnote) — *the solver
+  [contract §3](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#why-3-is-not-a-footnote) — *the solver
   that produced the proof is the solver that solved it* — and it is the same
   shape of gap;
 - **not fast.**

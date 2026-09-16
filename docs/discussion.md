@@ -8,13 +8,12 @@ by a program.
 Every topic carries five fields. **To** names the tool that can settle it.
 **Kind** is one of request, proposal, question, notice or answer. **Status** is
 one of open, answered, declined, withdrawn or settled. **Opened** is the date it
-was written. **Settles when** says what would end it, so that a topic nobody has
+was written. **Settles when** says what would end it, so a topic nobody has
 answered can still be closed by a fact. Ids are allocated once, in order, and
 are never reused. Newest topic first.
 
-*This file is provisional: it carries one topic and none of the shared preamble
-the ecosystem's policy asks of it. `join_eo` supplies the rest when this
-repository joins.*
+*Provisional: one topic, and none of the shared preamble the ecosystem's policy
+asks of this file. `join_eo` supplies the rest when this repository joins.*
 
 ## D1 — the register has no row for `eschaton`, or for any of its child projects
 
@@ -22,36 +21,28 @@ repository joins.*
 **Kind:** request
 **Status:** open
 **Opened:** 2026-09-16
-**Settles when:** kanon adds rows for both names to `tools/ynoia/names.md`, or
-declines and says which name it would rather we used.
+**Settles when:** kanon adds rows for the names below to `tools/ynoia/names.md`,
+or declines and says which names it would rather we used.
 
-`tools/ynoia/names.md` at kanon `e65250ea` ("Initial corrections",
-2026-09-15) contains no entry for `eschaton` in any of its three tables, and the
-string does not occur anywhere else in the ecosystem. The register's own closing
-rule is that a new repository does not edit that file, so this is a request
-rather than a patch.
+`tools/ynoia/names.md` at kanon `e65250ea` has no entry for `eschaton`, and the
+string occurs nowhere else in the ecosystem. The register's closing rule is that
+a new repository does not edit that file, so this is a request and not a patch.
 
-**We did not wait for it.** The README here was written and the etymology stated
-without a row to take it from, which inverts the intended order — the register
-is meant to carry the etymology and a line of scope, and the repository's README
-is meant to explain a name somebody already wrote down. If kanon reads the
-etymology and wants it different, or wants a different name, the README follows
-the register and not the other way round.
+**We did not wait for it.** The README here states an etymology with no row to
+take it from, which inverts the intended order — the register is meant to carry
+the etymology and a line of scope, and a repository's README is meant to explain
+a name somebody already wrote down. If kanon wants it different, the README
+follows the register and not the other way round.
 
-**Second gap, same page.** `telos` has no row either, though it has been a child
-project in `dokimasia` for some time and is used in kanon's own `actionable.md`,
-`handover.md` and `scripts/ecosystem/ecosystem.json`. By the register's own
-taxonomy that is an *In use elsewhere, and claimed by nobody* row that was never
-written — the failure mode that section exists to catch.
-
-**And two more since.** `cvc6` and `hawkeye` became child projects here on
-2026-09-16 and are not registered either. Both are non-Greek, so the register's
-exception for a program rather than an account is the clause to weigh. `cvc6`
-also raises a question the register does not currently answer: it is a name *we*
-chose, but chosen by deriving somebody else's, and the page says names settled
-outside this ecosystem will never appear in it. Which side of that line it falls
-on is kanon's call and not ours.
+**Three more names are unregistered.** `telos` has been a child project in
+`dokimasia` for some time and appears in kanon's `actionable.md`, `handover.md`
+and `ecosystem.json` — by the register's own taxonomy an *In use elsewhere, and
+claimed by nobody* row that was never written. `cvc6` and `hawkeye` became child
+projects here on 2026-09-16; both are non-Greek, so the register's exception for
+a program rather than an account is the clause to weigh. `cvc6` also raises a
+question the page does not answer: it is a name we chose by deriving somebody
+else's, and the register says names settled outside this ecosystem never appear
+in it.
 
 The version of the register these claims were read from is kept verbatim in
-`ynoia-brief.local.md`, deliberately out of tree, so the reading can be checked
-against what the page said on the day rather than against what it says now.
+`ynoia-brief.local.md`, deliberately out of tree.

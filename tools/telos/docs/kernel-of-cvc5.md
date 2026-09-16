@@ -14,7 +14,7 @@ cvc5 checks its own proofs twice, by two mechanisms that share nothing.
 ### The internal checker
 
 `ProofChecker` plus the 13 registered theory rule checkers, run by
-`--check-proofs`. [`dokimasia.tcb`](../../../dokimasia/tcb/) measures what it
+`--check-proofs`. [`dokimasia.tcb`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/tcb/) measures what it
 compiles against:
 
 ```
@@ -27,7 +27,7 @@ $ python3 -m dokimasia.tcb measure ~/cvc5
 Inside that closure are 97 files of `theory/` (22,217 lines), across 10 theory
 subsystems, plus the rewriter. Six rule checkers `#include` the headers of the
 solvers they check
-([`tcb-001`](../../../docs/findings/tcb-001.md)), and `MACRO_REWRITE`'s checker
+([`tcb-001`](https://github.com/ajreynol/dokimasia/blob/main/docs/findings/tcb-001.md)), and `MACRO_REWRITE`'s checker
 replays the rewrite with the same code that produced it — which cvc5 says out
 loud by registering it through `registerTrustedChecker` at pedantic level 4.
 
@@ -189,7 +189,7 @@ something that exists, and telos's job is to read it rather than to redo it.
 
 Four things, in the order they become possible. Each is worth having alone,
 which is the same progressive stance as
-[`docs/kernel.md`](../../../docs/kernel.md).
+[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md).
 
 1. **Describe it.** A precise account of K1–K6, of the kind a paper would carry,
    checkable by a reader against `type_checker.cpp`.
@@ -257,7 +257,7 @@ authors' word."
 specification** and a machine-checked proof of everything else. Same calculus,
 same signature — generated from it, in fact — and roughly a tenth of the reading.
 That is the kernel argument getting shorter in the sense
-[`docs/kernel.md`](../../../docs/kernel.md) means, and it happened while this
+[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) means, and it happened while this
 repository was measuring the C++ side of it.
 
 **Kind C is the road telos explicitly does not take.** IsaSAT and versat prove
@@ -335,5 +335,5 @@ writing anything, with what to read each one *for*.
   is that a different host language changes the cost — a hypothesis, not a
   refutation.
 - Carcara — read the elaborator, not the checker. Turning coarse steps into fine
-  ones is [i-4](../../../docs/issues.md) in another format, solved by a tool
+  ones is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) in another format, solved by a tool
   that does not claim verification and does not need to.

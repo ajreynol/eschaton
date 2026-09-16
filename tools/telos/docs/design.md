@@ -14,7 +14,7 @@ Nothing here has been built. Every claim is a hypothesis.
 **What cvc5 does, and why.** `TheoryInferenceManager` declares
 `ProofGenerator* pg = nullptr` as a default argument, and `conflict(TNode,
 InferenceId)` and `lemma(TNode, InferenceId, LemmaProperty)` take no generator
-at all ([H6](../../../docs/hygiene.md#h6--no-proof-must-be-said-out-loud)). So
+at all ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h6--no-proof-must-be-said-out-loud)). So
 
 ```cpp
 d_im.lemma(lem, InferenceId::ARITH_MY_NEW_INFERENCE);
@@ -26,8 +26,8 @@ added to a solver that already worked, and every one of them would have had to
 be retrofitted at once otherwise.
 
 Downstream: 79 inferences fall through to a trust step by construction
-([i-22](../../../docs/issues.md)), 8 trust steps are built with `TrustId::NONE`
-and so cannot be attributed at all ([i-9](../../../docs/issues.md)), and
+([i-22](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), 8 trust steps are built with `TrustId::NONE`
+and so cannot be attributed at all ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
 `--check-proofs-complete` exists to discover at runtime, one benchmark at a
 time, which of these a given input reached.
 
@@ -54,7 +54,7 @@ Three consequences, in increasing order of how much they matter:
    expressible. Whether the *reason* is honest is still a human question, but
    whether one was given stops being one.
 3. **Proofs cannot be off.** Contract §3 —
-   [*the solver that produces the proof is the solver that solved it*](../../../docs/contract.md#why-3-is-not-a-footnote)
+   [*the solver that produces the proof is the solver that solved it*](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#why-3-is-not-a-footnote)
    — is the subtlest of cvc5's three failure modes, and it exists because
    `--produce-proofs` is a mode. Here it is not a mode. There is one solver.
 
@@ -72,15 +72,15 @@ project should say so rather than argue.
 
 **What cvc5 does, and why.** The calculus is stated three times: as LaTeX
 `\inferrule` blocks in `cvc5_proof_rule.h`
-([H9](../../../docs/hygiene.md#h9--the-rule-documentation-is-a-contract)), as
+([H9](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h9--the-rule-documentation-is-a-contract)), as
 C++ checkers registered with `ProofChecker`, and as 620 `declare-rule`s in the
 Eunoia signature. They are written by different people at different times, and
-[`dokimasia.signature`](../../../dokimasia/signature/) exists precisely because
+[`dokimasia.signature`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/signature/) exists precisely because
 they can disagree — it found one
-([i-21](../../../docs/issues.md): `SUBS`'s documentation omits an argument its
+([i-21](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md): `SUBS`'s documentation omits an argument its
 checker reads).
 
-[R1](../../../docs/coupling.md#r1--emit-the-tables-cvc5-already-has) is this
+[R1](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r1--emit-the-tables-cvc5-already-has) is this
 repository's highest-leverage ask: *emit the tables cvc5 already has*. It is an
 ask because the tables are currently recovered by parsing C++, which produced
 three parser bugs in one afternoon.
@@ -101,7 +101,7 @@ build. Both failures are loud and distinct by design. telos inherits this rather
 than redesigning it.
 
 This is the least novel idea in the document and the most reliably valuable.
-[H11](../../../docs/hygiene.md#h11--the-rare-correspondence-is-stated-not-inferred)
+[H11](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h11--the-rare-correspondence-is-stated-not-inferred)
 already observes the pattern working inside cvc5: the RARE→`ProofRewriteRule`
 correspondence is *exact in both directions, and holds because it is generated*.
 "Nobody maintains it, so it cannot drift" is the whole design principle,
@@ -128,7 +128,7 @@ print — Nötzli et al., FMCAD 2022, §I:
 > original rewriter … instrumenting this code to additionally produce proofs
 > makes it even more complex and makes it harder to add new rewrite rules."*
 
-The consequence is [i-4](../../../docs/issues.md), the sharpest finding in this
+The consequence is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md), the sharpest finding in this
 repository and the one it explicitly cannot fix: reconstruction is a recursive
 search with **no termination guarantee** — applying a rule spawns sub-problems
 (its preconditions, and the gap between its instantiated RHS and the target)
@@ -139,7 +139,7 @@ fine-grained**, because one coarse step spoils a proof.
 
 So: **whether a cvc5 proof is complete depends on how long a search was allowed
 to run.** That is a strange property for a contract to have, and
-[`docs/kernel.md`](../../../docs/kernel.md) is right that a kernel has to
+[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) is right that a kernel has to
 confront it rather than inherit it.
 
 **The inversion.** The rewriter's type is
@@ -161,7 +161,7 @@ justification from one source, so there is no second thing to maintain and no
 second place to get it wrong. Writing a rule stays as cheap as writing a RARE
 rule; the proof is a derived artifact, not a parallel obligation.
 
-That also kills [F1 and F3](../../../docs/rare-correspondence.md) outright — a
+That also kills [F1 and F3](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md) outright — a
 rule that *misstates* the rewrite, and a rule that is dead — which today are
 **invisible failure modes**: F1 never matches and so silently contributes
 nothing, forever.
@@ -192,13 +192,13 @@ cost and the runtime. Small, decisive, and does not require a solver.
 not have full proof and model support", and delivers it at *runtime*:
 `SetDefaults::setDefaultsPre` turns features off by name, and
 `NoOpTheoryRewriter` throws `SafeLogicException` if a disabled theory is reached
-anyway. The list is hand-maintained ([i-5](../../../docs/issues.md)), and
+anyway. The list is hand-maintained ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
 `stringLazyPreproc` already escapes it — it declares `no_support = ["proofs"]`,
 defaults to `true`, and neither mechanism disables it
-([i-2](../../../docs/issues.md)). The unsafe code is compiled, linked, and one
+([i-2](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)). The unsafe code is compiled, linked, and one
 missed guard away.
 
-[R8](../../../docs/coupling.md#r8--safe-mode-as-a-build-time-property) asks for
+[R8](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r8--safe-mode-as-a-build-time-property) asks for
 the build-time version: make the safe build not *contain* the unsafe code, so a
 missed guard is a link error. `ENABLE_SAFE_MODE` exists and prunes almost
 nothing — five files in `src/` mention `CVC5_SAFE_MODE`, two of them only to
@@ -214,7 +214,7 @@ type, and the safe configuration instantiates `Limitation` at the empty type. A
 proofless inference in a safe build is then not a runtime exception, not a link
 error, but a type error at the definition site, before anything is built.
 
-This is the second wishue in [`docs/kernel.md`](../../../docs/kernel.md)
+This is the second wishue in [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)
 — *a safe build that cannot be unsafe* — reached by construction rather than by
 progressive pruning. And it makes the consistency check that document proposes
 (the runtime disable list and the build-time exclusion list must agree)
@@ -223,7 +223,7 @@ vacuous: there is one list and it is the type.
 **What would make it wrong.** Feature configuration in a real solver is not a
 clean lattice. Options interact, some features are partially proof-producing,
 and "does this have proof support" is often *fragment*-dependent rather than
-feature-dependent — which is exactly [i-15](../../../docs/issues.md): the
+feature-dependent — which is exactly [i-15](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md): the
 supported fragment is not expressible as a list of kinds, because two of the
 options safe mode disables gate a *logic* and a *type* rather than a kind. A
 type-level encoding that cannot express that is a worse model than cvc5's list,
@@ -236,7 +236,7 @@ not a better one.
 This is the one that makes the other four affordable, and it is a restatement of
 dokimasia's own stance rather than a new idea.
 
-[`docs/goals.md`](../../../docs/goals.md) is explicit: **completeness, not
+[`docs/goals.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md) is explicit: **completeness, not
 soundness.** Not *is this proof step valid* but *is there a path that produces
 no proof at all*. It can take that stance because something else handles
 soundness — `ethos` checks the proof, so dokimasia does not have to.

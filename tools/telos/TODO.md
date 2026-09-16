@@ -6,7 +6,7 @@ checker in Lean — most of which exists, is finished, and is maintained. What
 follows is what is left.
 
 Ordered by **how fast each one could kill the project**, the same selection rule
-[`docs/goals.md`](../../docs/goals.md) applies to finding holes: optimise for
+[`docs/goals.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md) applies to finding holes: optimise for
 the latency of the answer, not for how much work it represents.
 
 | | task | tests | cost | produces |
@@ -58,7 +58,7 @@ Logos settles the kernel. It says nothing about the *producer*, and
 [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) is the load-
 bearing claim on that side: that a rewriter can return `(t', proof that t = t')`
 at no meaningful cost to the author of a rewrite rule, dissolving
-[i-4](../../docs/issues.md) — the search budget that cvc5's proof completeness
+[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) — the search budget that cvc5's proof completeness
 currently depends on. FMCAD 2022 explicitly declined to do this, for stated
 reasons. The claim is that a dependently typed host changes the arithmetic, and
 **it has never been tested.**
@@ -86,7 +86,7 @@ it is not one in principle.
 Run cvc5 with `--dump-proofs --proof-format=cpc` over a benchmark set, then run
 **both** `ethos` and `logos` over the result. Split the corpus by
 `--safe-mode=safe` against unrestricted, so it divides along the line
-[the contract](../../docs/contract.md) cares about.
+[the contract](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md) cares about.
 
 Three things fall out, and the second and third are measurements nobody has:
 
@@ -107,7 +107,7 @@ T3 answers *how often* per input. The dokimasia question is the other one:
 > **Which CPC proofs could Logos ever return `incomplete` on?**
 
 That is the same shape as everything in
-[`docs/pipeline.md`](../../docs/pipeline.md) — take the code, ask what it could
+[`docs/pipeline.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/pipeline.md) — take the code, ask what it could
 ever produce, with no benchmark in hand — pointed at a Lean development instead
 of at C++. The side conditions are `TranslatableAssumptionList` and
 `CmdListTranslationOk` in `Cpc/Proofs/Assumptions.lean`, and they are
@@ -137,7 +137,7 @@ If they diverge, one of them accepts a proof the other does not, and the Lean
 theorem is about the Lean one. T3's corpus makes this cheap to look for.
 
 **Where it belongs.** This is a *soundness* question about `ethos`, and
-dokimasia is [completeness, not soundness](../../docs/goals.md#the-stance).
+dokimasia is [completeness, not soundness](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md#the-stance).
 Recording it because the gap is real and nobody appears to be looking at it —
 not because this repository should claim it.
 
@@ -149,7 +149,7 @@ by file rather than by dependency closure. Two closures, seeded from
 `TypeChecker` and from the parser entry point.
 
 **A dokimasia task, not a telos one**, and one already implied by
-[`TODO.md` G2](../../TODO.md)'s *"extend the closure to the Eunoia seam."*
+[`TODO.md` G2](https://github.com/ajreynol/dokimasia/blob/main/TODO.md)'s *"extend the closure to the Eunoia seam."*
 Deprioritised: it sharpens a comparison rather than deciding anything.
 
 ---
@@ -203,7 +203,7 @@ own estimate of what the proofs would have cost by hand, and the number in it is
 25 expert person-years, which is worth reading as a statement about how the
 work was done as much as about how large it is.
 
-The progressive stance from [`docs/kernel.md`](../../docs/kernel.md) applies
+The progressive stance from [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) applies
 unchanged: **every degree is worth having, and there is no finish line.** T3
 alone — a corpus through both checkers, with an `incomplete` census — would
 justify the directory.
