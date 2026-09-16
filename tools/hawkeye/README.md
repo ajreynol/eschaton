@@ -1,11 +1,24 @@
 # hawkeye
 
+*What would you build if writing a solver were cheap?*
+
+**Proposal.** Build a new SMT solver from nothing, written mostly by autonomous
+agents.
+
+**Keeps from cvc5:** nothing.
+**Written by:** agents.
+**Dies if:** the hard parts are exactly the parts that do not automate.
+
+**Status:** an intention, one page long. Nothing is built.
+
+**Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
+**Already done in public:** [`related-work.md`](../../docs/related-work.md).
+
 **Eunoia listing:** unadvertised
+*Not in the ecosystem's generated listings: not pointed at rather than not
+visible. This repository is public.*
 
-*Not in the ecosystem's generated listings. Unadvertised means not pointed
-at rather than not visible: this repository is public.*
-
-A new SMT solver, written mostly by autonomous agents.
+---
 
 **The bet: the scarce resource is people, not ideas.** There are few SMT solvers
 because each one costs somebody a decade, and that cost decides everything
@@ -18,6 +31,12 @@ writing it?** Not whether agents can write code — they can — but whether the
 can carry the parts that make solvers hard: the invariants nobody states, the
 performance work that is all context, and the long tail of theory combination
 where being nearly right is being wrong.
+
+**Somebody has already done the small version.** LLM2SMT built an agent-written
+QF_UF solver that is competitive on SMT-LIB, so the question here is not whether
+it can be done — it is scale, theory coverage, and the fact that proof emission
+is where that project needed the most human help. The details are in
+[`related-work.md`](../../docs/related-work.md).
 
 It starts from nothing, which is what separates it from
 [`cvc6`](../cvc6/README.md) — same tooling, opposite premise about whether
@@ -59,5 +78,3 @@ one.
 A sibling name is sitting right there should some competing approach ever want
 one: `cyclone`, Iowa State's mascot. Nothing in this repository holds it, and
 the rest of the joke writes itself.
-
-*Status: an intention, one page long.*

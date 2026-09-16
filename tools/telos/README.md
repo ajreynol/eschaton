@@ -2,6 +2,21 @@
 
 *What would you build if you started from the answer?*
 
+**Proposal.** Keep cvc5's proof calculus and parts of its internal checker,
+throw away the search, and design a solver in which the proof comes first — on a
+kernel that is already verified.
+
+**Keeps from cvc5:** the proof calculus and parts of the internal proof
+checker, which [dokimasia](https://github.com/ajreynol/dokimasia) is the
+authority on — not the search.
+**Written by:** people.
+**Dies if:** a proof-carrying rewriter costs too much.
+
+**Status:** research notes. Nothing is built.
+
+**Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
+**Already done in public:** [`related-work.md`](../../docs/related-work.md).
+
 **Eunoia listing:** unadvertised
 
 **Internal.** This is a research note, not a project announcement. It is not

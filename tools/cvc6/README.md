@@ -1,14 +1,29 @@
 # cvc6
 
+*What if the design is fine, and only the pace of repair is wrong?*
+
+**Proposal.** Keep every line of cvc5 and mechanize its upkeep — an
+auto-refactored development of the solver, driven by autonomous agents.
+
+**Keeps from cvc5:** all of it.
+**Written by:** agents.
+**Dies if:** upkeep does not outrun accumulation.
+
+**Status:** a position, one page long. Nothing is built.
+
+**Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
+**Already done in public:** [`related-work.md`](../../docs/related-work.md).
+
 **Eunoia listing:** unadvertised
+*Not in the ecosystem's generated listings: not pointed at rather than not
+visible. This repository is public.*
 
-*Not in the ecosystem's generated listings. Unadvertised means not pointed
-at rather than not visible: this repository is public.*
+---
 
-**A working title for a bet, and not a proposal to anyone.** Nothing here is a
-plan for cvc5, a request of its developers, or a claim that a successor is
-wanted or needed. The name is used because it states the bet in four characters;
-no one outside this repository has agreed to anything.
+**A working title for a bet, and not a pitch to the cvc5 project.** Nothing
+here is a plan for cvc5, a request of its developers, or a claim that a
+successor is wanted or needed. The name is used because it states the bet in
+four characters; no one outside this repository has agreed to anything.
 
 **The bet: the accumulated design is the asset, and its upkeep is the problem.**
 An auto-refactored development of cvc5 driven by autonomous agents — the
@@ -40,5 +55,3 @@ interesting thing to automate is a claim about scale, not about quality.
 Nothing, because there is nothing. This directory is empty apart from this file:
 no code, no agent, no refactor, and no experiment has been run. The bet is
 written down and untested.
-
-*Status: a position, one page long.*
