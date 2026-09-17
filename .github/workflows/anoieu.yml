@@ -16,9 +16,9 @@ jobs:
       - name: Fetch the pinned Anoieu checker
         env:
           # Adopt only commits where Anoieu's own CI passed.
-          ANOIEU_REV: 442bb679d1b0cbc583c9c9cd3901b132b82f1ea3
+          ANOIEU_REV: 154228a40d21584b95f4029742ccc8f432ea87f5
         run: |
           git clone --quiet https://github.com/ajreynol/anoieu "$RUNNER_TEMP/anoieu"
           git -C "$RUNNER_TEMP/anoieu" checkout --quiet --detach "$ANOIEU_REV"
       - name: Check repository policy
-        run: python3 "$RUNNER_TEMP/anoieu/scripts/policy_check.py" --root "$GITHUB_WORKSPACE"
+        run: python3 "$RUNNER_TEMP/anoieu/scripts/policy_check.py" --policy-version 1 --root "$GITHUB_WORKSPACE"

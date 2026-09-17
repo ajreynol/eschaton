@@ -4,12 +4,15 @@ What has to be right for a cvc5 proof to mean something, measured rather than
 asserted, and what "defining" it would take. This is the learning agenda; the
 design that follows from it is [`design.md`](design.md).
 
-Measured 2026-08-31 against cvc5 `aee8742404` and ethos `b9188b86`. Every number
-here is reproducible with a command; where a number is an estimate it says so.
+The source measurements cover cvc5 `aee8742404` and ethos `b9188b86`;
+they are not committed baselines here. Estimates are marked. The Logos counts
+refer to `a5650dad`; its correctness boundary is described in
+[Logos](logos.md#what-its-guarantee-actually-is).
 
 ## There are two kernels
 
-cvc5 checks its own proofs twice, by two mechanisms that share nothing.
+The internal checker and an external ethos run are distinct checking paths.
+Only the latter uses a separate checker implementation.
 
 ### The internal checker
 
@@ -18,7 +21,7 @@ cvc5 checks its own proofs twice, by two mechanisms that share nothing.
 compiles against:
 
 ```
-$ python3 -m dokimasia.tcb measure ~/cvc5
+$ python3 -m dokimasia.tcb measure /path/to/cvc5
   closure         179 files      41,446 lines
   all of src/    1663 files     521,073 lines
   the checker depends on 8.0% of cvc5 by line count
@@ -32,9 +35,8 @@ replays the rewrite with the same code that produced it — which cvc5 says out
 loud by registering it through `registerTrustedChecker` at pedantic level 4.
 
 **So the internal checker is not an independent check.** It is a very good
-consistency check, and `--check-proofs-complete` riding on it is the oracle this
-whole repository points at. It is not a kernel, because its correctness is not
-independent of the correctness of the thing it checks.
+consistency check, and `--check-proofs-complete` riding on it is a runtime
+oracle used by dokimasia. Its correctness shares dependencies with the solver.
 
 ### The external checker
 
@@ -42,7 +44,7 @@ independent of the correctness of the thing it checks.
 it contains no cvc5 code at all:
 
 ```
-$ find ~/ethos/src -name '*.cpp' -o -name '*.h' | xargs wc -l | tail -1
+$ find /path/to/ethos/src -name '*.cpp' -o -name '*.h' | xargs wc -l | tail -1
   13862 total
 ```
 
@@ -60,11 +62,11 @@ Its weight, by file:
 
 Roughly **4,000 lines of typing and evaluation, 2,300 of state, 3,600 of
 parsing.** That split is by file, not by a dependency closure — a proper
-measurement is a `tcb`-shaped job and is [item 1 in `TODO.md`](../TODO.md).
+measurement is a `tcb`-shaped job and is [T6 in `TODO.md`](../TODO.md#t6--measure-ethoss-real-tcb).
 
 Note that the parser is soundness-critical here in a way it usually is not: a
-checker that mis-parses a proof accepts the wrong thing. 3,600 lines is a third
-of the binary.
+checker that mis-parses a proof accepts the wrong thing. The source count is
+not a measurement of compiled binary size.
 
 ### But the trusted base is not the binary
 
@@ -72,7 +74,7 @@ of the binary.
 specific lives in the signature it is handed:
 
 ```
-$ find ~/cvc5/proofs/eo/cpc -name '*.eo' | xargs wc -l | tail -1
+$ find /path/to/cvc5/proofs/eo/cpc -name '*.eo' | xargs wc -l | tail -1
   12530 total
 ```
 
@@ -96,16 +98,17 @@ The `program`s are the thing to look at. 4,186 lines of them:
 | `programs/Utils.eo` | 156 |
 | six more | 321 |
 
-**That is a second implementation of solver logic**, written in a dynamically
-evaluated DSL, trusted completely, and checked by nothing. `$poly_neg`,
-`$poly_mod_coeffs` and their neighbours in `PolyNorm.eo` re-do what cvc5's
-arithmetic normalisation does in C++. `Bitblasting.eo` re-does the bit-blaster.
-If a `program` is wrong in a way that is *more* permissive than the C++, ethos
-accepts proofs of things that are not true, and no test in either project is
-positioned to notice.
+**That is another implementation of solver logic**, evaluated by ethos.
+`PolyNorm.eo` implements arithmetic normalization and `Bitblasting.eo` implements
+bit-vector reasoning. A permissive side condition can affect soundness, but a
+difference from the solver is not automatically a defect: the rule's meaning
+and a reproducing input matter.
 
-**The honest trusted base of a cvc5 proof is therefore ≈13,900 lines of C++ plus
-≈12,500 lines of Eunoia**, and the second half is the part nobody measures.
+For the ethos checking path, the C++ evaluator and signature are trusted.
+[Logos](logos.md) proves supported rules sound for its compiled semantics;
+that does not establish equivalence with ethos's evaluator. The recorded source
+totals therefore describe one checking path, not the trusted base of every
+cvc5 proof or evidence that nobody tests these programs.
 
 ## What Eunoia actually is
 
@@ -155,7 +158,7 @@ So the kernel's specification, stated as a list of obligations, is:
 | **K4** | evaluation, and the 56 `eo::` builtins | `evaluate` **295 lines**, literal and list operations **1,009 lines** |
 | **K5** | evaluation of user `program`s, and its termination | `evaluateProgramApp` / `evaluateProgramInternal` — **111 lines**, plus 248 programs |
 | **K6** | what a proof *is*, and what makes one valid | `Kind::PROOF`, `(pf F)`, and the rule registry in `state.cpp` |
-| **K7** | what the signature's rules **mean**, w.r.t. an SMT-LIB semantics | `Cpc/SmtModel.lean` in [Logos](logos.md) — **1,602 lines, and it did not exist a year ago** |
+| **K7** | what the signature's rules **mean**, w.r.t. an SMT-LIB semantics | `Cpc/SmtModel.lean` in [Logos](logos.md) — **1,602 lines at the referenced revision** |
 
 The striking thing is how small K2 and K3 are. The type system and the matcher —
 the two pieces that decide whether a rule application is legitimate — are **466
@@ -163,27 +166,16 @@ lines together**. The weight is in evaluation, and specifically in the 1,009
 lines of builtin operations, which is arithmetic and string manipulation rather
 than logic.
 
-K1–K6 are engineering: a specification of an existing 14,000-line program.
-Large, finite, and carrying no research risk — with the one exception of K5's
-termination question, which is genuinely open and is discussed below.
+K1–K6 describe obligations for a general Eunoia checker, including the behavior
+of program evaluation. K7 concerns the semantics of a particular calculus.
+Neither a small source count nor an existing CPC checker proves these
+obligations for ethos.
 
-**K7 was the research risk, and it is the one that has been retired.** Verifying
-K1–K6 alone buys *relative soundness* — "if the signature's rules are sound, the
-checker only accepts valid proofs" — which is what most checkers in this space
-deliver and is not the whole claim. Discharging K7 needs a mechanized SMT-LIB
-semantics, and the honest position a year ago was that no such thing existed.
-
-[Logos](logos.md) has one. `Cpc/SmtModel.lean` is 1,602 lines of standalone
-model semantics for SMT-LIB — standalone in the strong sense that it never
-mentions the checker — and `Cpc/Spec.lean` supplies the correspondence between
-Eunoia terms and SMT-LIB terms. **591 of CPC's 593 non-expert rules are proved
-sound against it**, with no `sorry`, `admit` or `axiom` anywhere in the
-development. The two that are not are `beta-reduce` and `trust`, and `trust`
-cannot be, which is
-[the point](logos.md#l6--trust-has-no-soundness-proof-and-that-is-the-whole-story).
-
-So the list above is no longer a research agenda. It is a description of
-something that exists, and telos's job is to read it rather than to redo it.
+[Logos](logos.md) supplies a formal model and soundness proofs for its supported
+CPC rules. It is not a verified implementation of arbitrary Eunoia signatures,
+and the correspondence between its compiled evaluation and ethos remains a
+separate question. Its model restrictions also matter when transferring a
+result to SMT-LIB.
 
 ## What "defining the kernel" means, in order
 
@@ -205,11 +197,10 @@ one everybody skips. Skipping it is respectable, but it should be said out loud
 that the rules then *are* the axioms, and 593 hand-written axioms is a large
 thing to trust.
 
-**[Logos](logos.md) has done all four**, for CPC specifically rather than for
-Eunoia in general, and did not stop at three. That is the single most important
-fact in this directory, and it means the list above is context for reading
-somebody else's development rather than a plan. What telos does about that is
-[the last section of `logos.md`](logos.md#what-this-does-to-telos).
+**[Logos](logos.md) supplies a different CPC checking implementation with a
+soundness theorem.** This is enough to motivate consuming it in the producer
+experiment, but not a proof of ethos's type checker or general evaluator.
+Telos's plan is [the producer experiment](../TODO.md), not a new framework checker.
 
 ## Prior art, and what each guarantee actually is
 
@@ -231,7 +222,7 @@ anyway because independence is worth something without proof.
 | **Carcara** | Alethe checker and elaborator, Rust | **nothing. Carcara is not a verified tool.** | all of it. Its value is *independence* from the solver plus speed, and elaboration of coarse steps into fine ones |
 | **ethos** | the Eunoia framework checker, C++ | **nothing. ethos is not a verified tool.** | all 13,862 lines, plus the 12,530-line signature it is handed |
 
-### The five kinds of guarantee on that list
+### The kinds of guarantee on that list
 
 Worth separating, because telos has to choose one and the choice is the design.
 
@@ -242,7 +233,7 @@ Worth separating, because telos has to choose one and the choice is the design.
 | **C** | **verified solver** | IsaSAT, versat | the search is proved; no certificate is produced or needed | years of work, a large trusted base by comparison, and no artifact a third party can re-check |
 | **D** | **proof reconstruction** | lean-smt | the smallest possible trusted base — the host kernel and nothing else | **incompleteness.** 29% of cvc5's proofs do not reconstruct |
 | **E** | **unverified but independent** | Carcara, ethos | a second opinion from code that shares nothing with the solver | no proof. Independence is not verification, and the two get conflated constantly |
-| **F** | **verified program, unverified compiler** | **Logos** | an ordinary, unconditional theorem about the checking function — proved once, no axiom admitted at check time, no proof term produced per input | the compiler that turned it into the binary you ran. Strictly weaker than B, strictly stronger than A, and it is where you land when your language has no verified compiler |
+| **F** | **verified program, unverified compiler** | **Logos** | a theorem with explicit hypotheses about the checking function — proved once, no axiom admitted at check time, no proof term produced per input | the compiler that turned it into the binary you ran. Its assumptions differ from reflection and verified compilation; these are not a single ranking |
 
 Two observations that bear directly on telos.
 
@@ -254,11 +245,11 @@ the production path, "13,862 lines of C++ and 12,530 lines of Eunoia, on their
 authors' word."
 
 [Logos](logos.md) answers the same question with **2,680 lines of Lean
-specification** and a machine-checked proof of everything else. Same calculus,
+specification** and a machine-checked soundness development, subject to the parser,
+input correspondence, semantic and compilation obligations above. Same calculus,
 same signature — generated from it, in fact — and roughly a tenth of the reading.
-That is the kernel argument getting shorter in the sense
-[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) means, and it happened while this
-repository was measuring the C++ side of it.
+That comparison concerns source sizes, not a measured reduction of the whole
+trusted base.
 
 **Kind C is the road telos explicitly does not take.** IsaSAT and versat prove
 the search, and they are the two clearest demonstrations of what that costs:
@@ -282,20 +273,20 @@ The lineage, closest first. Not endorsements — the ones worth reading before
 writing anything, with what to read each one *for*.
 
 **Read first, and completely**
-- **[Logos](https://github.com/ajreynol/logos)** — `~/logos`. Not background:
-  the thing telos is built on. Read `README.md`'s *Correctness* section for the
+- **[Logos](https://github.com/ajreynol/logos)** — the Logos source tree. Not background:
+  the checker telos proposes to use. Read `README.md`'s *Correctness* section for the
   theorem, `docs/modularity.md` for the contract a second checker has to meet,
   `Cpc/SmtModel.lean` for the 1,602 lines that are the actual specification, and
   `scripts/cpc-loc-summary.py` for where the weight sits. Analysis in
   [`logos.md`](logos.md).
 
 **The framework itself**
-- Eunoia / ethos — `~/ethos`, and the `cpc` signature in `~/cvc5/proofs/eo/cpc`.
+- Eunoia / ethos — the ethos source tree, and the `cpc` signature in cvc5's `proofs/eo/cpc/`.
   The primary source; read `type_checker.cpp` before reading anything written
   about it. The Cooperating Proof Calculus has its own paper, which is the
   intended account of what the rules mean.
-- LFSC — ethos's predecessor, from Stump's group, which is also versat's. The
-  design decisions telos would be re-examining were mostly made here.
+- LFSC — a related logical framework from Stump's group, which is also
+  versat's. Its treatment of computational side conditions is relevant here.
 - Dedukti / λΠ-modulo, and Lambdapi. The same shape — a dependently typed core
   plus a user-supplied rewrite system — with a mature literature on exactly the
   [K5](#what-eunoia-actually-is) obligations: confluence, termination, subject
@@ -329,10 +320,10 @@ writing anything, with what to read each one *for*.
 
 **The problem telos claims to dissolve**
 - Nötzli et al., *Reconstructing Fine-Grained Proofs of Rewrites Using a
-  Domain-Specific Language*, FMCAD 2022. Read §IV-A before believing
+  Domain-Specific Language*, FMCAD. Read §IV-A before believing
   [inversion 3](design.md#i3--rewrites-prove-themselves-as-they-fire). The paper
-  chose not to instrument the rewriter, for stated reasons, and telos's answer
-  is that a different host language changes the cost — a hypothesis, not a
+  argues against instrumenting the rewriter because of its complexity. Telos's
+  answer is that a different host language changes the cost — a hypothesis, not a
   refutation.
 - Carcara — read the elaborator, not the checker. Turning coarse steps into fine
   ones is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) in another format, solved by a tool

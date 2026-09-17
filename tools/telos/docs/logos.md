@@ -7,12 +7,13 @@ checker for SMT, written in Lean 4**, whose soundness is proved against a
 self-contained formalization of SMT-LIB's model semantics, and whose calculus is
 compiled from the same `Cpc.eo` signature cvc5 emits proofs against.
 
-It is not prior art telos should study and improve on. It is the thing telos is
-built on, and it is a **moving target** — the calculus is regenerated as CPC
+It is the checker telos proposes to use, and it is a **moving target** — the
+calculus is regenerated as CPC
 changes, and the proof development grows with it.
 
-Measured 2026-08-31 at logos `a5650dad`, against cvc5 `aee8742404`. Every number
-below came from a command in the logos tree.
+The source measurements cover logos `a5650dad` and cvc5 `aee8742404`;
+they are not a committed baseline here. The correctness boundary below refers
+to logos `be4791204be5616df2bf6f42ea304b45b08d33e1`.
 
 ---
 
@@ -25,14 +26,15 @@ below came from a command in the logos tree.
 | **calculus** | generated from `Cpc.eo` by `ethos-eoc`, the Eunoia compiler in the ethos tree. Not hand-transcribed |
 | **verdicts** | `correct` (0) · `incorrect` (1) · `incomplete` (2) |
 | **status** | 591 rules, **all proven**; no `sorry`, `admit` or `axiom` anywhere in 872 Lean files |
-| **age** | 707 commits since 2026-03-03 |
 
 The verdict trichotomy is the first thing that should catch a dokimasia
 reader's eye, and it is discussed [below](#l5--the-incomplete-verdict-is-a-completeness-instrument).
 
 ## What it weighs
 
-`scripts/cpc-loc-summary.py`, non-blank non-comment lines:
+`scripts/cpc-loc-summary.py`, non-blank non-comment lines. This table is the
+local register for the recorded Logos counts; the child README copies it.
+There is no automatic comparison between the table, that copy and Logos:
 
 | | files | lines | |
 | --- | ---: | ---: | --- |
@@ -49,17 +51,16 @@ invariance 8,204; top-level checker correctness 4,599; canonicity 1,091.
 
 | | ethos + the `cpc` signature | Logos |
 | --- | --- | --- |
-| what a human must read and believe | **≈26,400 lines** — 13,862 of C++ plus 12,530 of Eunoia | **2,680 lines** of Lean specification |
-| what a machine checks | nothing | **691,993 lines** of proof |
+| source components compared | **≈26,400 lines** — 13,862 of C++ plus 12,530 of Eunoia | **2,680 lines** of Lean specification |
+| machine-checked soundness development | none established here | **691,993 lines** of proof |
 | the calculus is | hand-written, and separately hand-implemented in C++ | generated from the signature |
-| unverified residue | all of it | the parser — 2,653 lines |
+| outside the checker theorem | checker and signature | parser, original-input match, specification adequacy and compilation |
 | speed | fast, and the design goal | "not (yet) optimized … significantly slower" |
 
 [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) says the measure that matters is
-**"how long the argument is and how much of it a reader can check."** Logos
-answers that with a factor of ten, and moves the rest onto Lean's kernel. That
-is the axis this whole repository is organised around, moved further in six
-months than static analysis of cvc5's C++ will move it ever.
+**"how long the argument is and how much of it a reader can check."** These
+line counts compare source components, not the whole trust argument; they do
+not measure correctness or the value of static analysis.
 
 ## What its guarantee actually is
 
@@ -79,21 +80,30 @@ compiler's correctness theorem so the statement covers the machine code — is
 exactly what is missing.
 
 > **Kind F — a verified program, compiled by an unverified compiler.**
-> The theorem is real, unconditional and machine-checked. Getting from it to
-> the binary you ran costs you Lean's compiler and the C toolchain.
+> The theorem is machine-checked and has explicit parsing and acceptance
+> hypotheses. Getting from it to the binary you ran costs you Lean's compiler
+> and the C toolchain.
 
 Trusted base of a `correct` verdict, in full:
 
 | | |
 | --- | --- |
-| **the specification is the right one** | 2,680 lines. This is the irreducible human obligation and it is what the ten-fold reduction bought |
+| **the specification is the right one** | 2,680 lines at the referenced revision; a human must assess its adequacy for the intended fragment |
 | **Lean's kernel** | which is not itself verified — see [`language.md`](language.md#lean-4--chosen) |
 | **Lean's compiler and the C toolchain** | because you ran a binary, not a proof term |
 | **the parser** | 2,653 unverified lines. The theorem is about whatever the parser read |
 | **that the assumptions are the problem you asked about** | Logos does not compare them to an original input; `include` and `reference` are ignored |
 
-The last two are the interesting ones and both are named openly in the logos
-README, which is the right way to state a guarantee.
+The theorem proves unsatisfiability in Logos's model semantics.
+[That semantics differs from SMT-LIB](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md):
+arrays are almost-constant maps, `Real` uses rationals, and uninterpreted sorts
+have infinite domains. These restrict the model class and can affect quantified
+or nonlinear reasoning without triggering `incomplete`. Sets and sequences are
+extensions; parametric datatypes are refused during parsing.
+
+A producer therefore needs a justified fragment and a check that the parsed
+assumptions are its intended input. A `correct` verdict alone does not establish
+unsatisfiability of an arbitrary SMT-LIB problem.
 
 ---
 
@@ -111,7 +121,7 @@ per-rule proofs**, so:
 - a rule whose *statement* changed keeps its old proof and therefore **fails to
   build**;
 - `install-cpc.sh --cached --check` is the `regeneration` CI group and fails
-  when generated code has drifted from the signature it came from.
+  when generated code has drifted from its source signature.
 
 That is [inversion I2](design.md#i2--one-definition-of-the-calculus) — one
 definition of the calculus — implemented, in production, with each way it can go
@@ -186,9 +196,10 @@ everything no input has reached — which is exactly the limitation
 [`docs/contract.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#the-gap-this-exists-to-close)
 exists to name.
 
-The static counterpart — *which proofs could logos ever return `incomplete` on*
-— is a dokimasia-shaped question about a Lean development rather than about
-C++, and nobody is asking it.
+The static counterpart — which proofs can return `incomplete` — is a coverage
+question about the translation. Logos's conformance page is a starting point.
+Neither this census nor a zero `incomplete` count establishes semantic
+conformance or completeness of the producer's search.
 
 ### L6 — `trust` has no soundness proof, and that is the whole story
 
@@ -206,12 +217,12 @@ theorem.
 
 So the two projects meet exactly here, and the sentence is worth getting right:
 
-> **Every hole dokimasia counts is a proof Logos cannot check.**
+> **An unjustified `trust` step is not a sound CPC derivation Logos can certify.**
 
-dokimasia measures how often cvc5 reaches for `trust`. Logos makes reaching for
-it fatal. Neither observation is available from inside the other project, and
-together they turn "proof completeness" from a quality metric into a
-precondition for the soundness argument existing at all.
+Dokimasia also reports static gaps that need reachability evidence. Its finding
+count is not a count of proofs Logos rejects; that relationship requires a
+corpus run. The generated program name is not itself a soundness proof for
+unjustified uses of the rule.
 
 ### L7 — Performance is the open flank, and it is where telos's questions bite
 
@@ -222,9 +233,8 @@ CI, which compiles only a representative subset.
 That is the reality check on
 [the language decision](language.md) and on
 [I1](design.md#i1--the-answer-carries-its-certificate)'s cost question. It is
-also not obviously telos's problem: a checker that is 100× slower than ethos is
-still fast relative to solving, and the trade it buys is a ten-fold smaller
-trusted base.
+a cost telos must measure: relative checking speed alone says nothing about
+whether checking dominates solving on the chosen corpus.
 
 ### L8 — What Logos deliberately is not
 
@@ -247,12 +257,9 @@ duplicate:
 
 ## What this does to telos
 
-Most of what [`TODO.md`](../TODO.md) proposed as telos's first year exists, is
-better than the sketch, and is maintained. Specifically: the language question
-is settled by demonstration rather than by argument, the SMT-LIB semantics that
-[`kernel-of-cvc5.md`](kernel-of-cvc5.md#what-eunoia-actually-is) called the
-research risk **exists** as `Cpc/SmtModel.lean`, and the "one definition of the
-calculus" inversion is shipping with CI behind it.
+Logos supplies an executable checker and a formal semantics against which its
+supported rules are proved. Telos's plan is to consume that work and measure
+the cost of producing certificates in an explicitly supported fragment.
 
 What remains unclaimed is the **producer** side. Logos is a checker and says so.
 Every inversion in [`design.md`](design.md) that is about the thing *emitting*
@@ -262,13 +269,10 @@ they fire, safe mode as a type — is untouched by it.
 Which gives telos a definition of success that is executable rather than
 rhetorical:
 
-> **telos succeeds when Logos says `correct`.**
+> **telos succeeds when Logos says `correct` for the intended input in the agreed fragment.**
 
-Not "produces proofs". Not "has a verified kernel" — that is Logos's, and telos
-should inherit it rather than rebuild it. A solver whose output Logos accepts
-with verdict `correct`, on a fragment, is a complete statement of the goal, and
-the `incomplete` count is the completeness metric this repository has been
-looking for all along — computed by a tool, per input, with no static analysis
-in the loop.
+Record `incorrect`, `incomplete`, parser errors, timeouts and successful checks
+separately. These measure different boundaries; none by itself measures search
+completeness or establishes input correspondence.
 
-The revised plan is in [`TODO.md`](../TODO.md).
+The experiment plan is in [`TODO.md`](../TODO.md).

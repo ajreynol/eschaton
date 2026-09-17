@@ -14,7 +14,8 @@ agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Eunoia listing:** unadvertised
+**Footing:** `unadvertised-child` — speculative research with no implementation;
+the parent does not advertise it.
 
 ---
 
@@ -30,10 +31,9 @@ that make solvers hard: the invariants nobody states, the performance work that
 is all context, and the long tail of theory combination where being nearly right
 is being wrong.
 
-**The small version is already done.** LLM2SMT built an agent-written QF_UF
-solver competitive on SMT-LIB, so the question is not whether but at what scale
-and coverage — and proof emission is where that project needed the most human
-help. Details in [`related-work.md`](../../docs/related-work.md).
+**A small case study exists.** The LLM2SMT study reports competitive
+QF_UF solving with limited proof certification. It does not establish that the
+approach scales to a broader SMT solver. Details in [`related-work.md`](../../docs/related-work.md).
 
 Starting from nothing is what separates it from [`cvc6`](../cvc6/README.md):
 same tooling, opposite premise about whether cvc5's code is an asset or a

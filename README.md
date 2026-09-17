@@ -12,8 +12,13 @@ worth trying, and what would each cost?**
 
 **A proof-first solver is currently the most promising path.** It can build on
 the verified [Logos proof checker](https://github.com/ajreynol/logos), leaving
-the proof-producing solver as the main work. This is a provisional research preference; none of
-these approaches has been implemented or tested here.
+the proof-producing solver as the main work. Logos's
+[correctness statement](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/README.md#correctness)
+concerns parsed assumptions under its own semantics; its parser and the match
+to the original problem remain outside the theorem. Its
+[SMT-LIB conformance limits](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md)
+also constrain the fragment we could claim. This is a provisional research
+preference; none of these approaches has been implemented or tested here.
 
 | Approach | What we would build | Main question |
 | --- | --- | --- |
@@ -31,6 +36,8 @@ The full comparison and tradeoffs are in
 
 *Status: no solver is built. This repository contains research notes and
 repository checks.*
+
+There is no paper planned yet: these are research notes without a result.
 
 ## The question it does not answer
 
@@ -62,16 +69,23 @@ It should mean the **beginning** of times: nothing here is ending, the subject
 is new solvers. The word does one honest day's work besides — the last thing is
 the finished proof, and the design question is asked backwards from it.
 
+The ecosystem's name register is
+[kanon's glossary](https://github.com/ajreynol/kanon/blob/main/docs/glossary.md#eschaton),
+which records this repository.
+
+## Common questions
+
+- **Where are cvc5's proof-production gaps measured?** [Dokimasia](https://github.com/ajreynol/dokimasia).
+- **Where is the verified CPC checker?** [Logos](https://github.com/ajreynol/logos), subject to its correctness statement above.
+- **How do I check this repository?** Follow the [maintenance guide](docs/maintenance.md).
+
 ## How this repository is maintained
 
 This repository is part of the **Eunoia ecosystem** and follows its shared
 [repository policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md).
 
 **Written by AI agents, under light human supervision.** A human directs the
-work and decides what is published; that supervision does not vet the internal
-design or establish the correctness of the research claims.
-
-The human maintainer is the authority here. The agents are tools, and the
-proposals remain untested until there is evidence from an implementation.
-
-There is no paper planned yet: these are research notes without a result.
+work, reads what is published and decides what is filed; that supervision does
+not vet the internal design or establish the correctness of the research claims.
+Nothing reaches another project's issue tracker without human review, under the
+shared [reporting policy](https://github.com/ajreynol/anoieu/blob/main/docs/reports/reporting-policy.md).

@@ -16,34 +16,49 @@ ecosystem. One topic per exchange, addressed by name to the tool that can settle
 it. Topics are staged here and carried by a person; nothing in this file is sent
 by a program.
 
-Every topic carries five fields. **To** names the tool that can settle it.
-**Kind** is one of request, proposal, question, notice or answer. **Status** is
-one of open, answered, declined, withdrawn or settled. **Opened** is the date it
-was written. **Settles when** says what would end it, so a topic nobody has
-answered can still be closed by a fact. Ids are allocated once, in order, and
-are never reused. Newest topic first.
+Only live discussions belong here. Use the four fields defined by
+[kanon's discussion format](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#the-format),
+with no status field. Newest topic first; append attributed replies.
+Remove a finished topic after recording lasting decisions where they belong.
+Allocate ids above the highest ever used, including removed topics in Git
+history; never reuse one. The policy checker checks the field block.
 
-## D1 — the register has no row for `eschaton`
+## D3 — permit stable-contract adoption in the governing policy
 
 **To:** kanon
 **Kind:** request
-**Status:** open
-**Opened:** 2026-09-16
-**Settles when:** kanon adds a row for `eschaton` to `tools/ynoia/names.md`,
-or declines and says which name it would rather we used.
+**Opened:** repository housekeeping
+**Settles when:** kanon's adoption policy permits the published stable-contract
+workflow, or kanon confirms that consumers must retain implementation pins.
 
-`tools/ynoia/names.md` at kanon `e65250ea` has no entry for `eschaton`, and the
-string occurs nowhere else in the ecosystem. The register's closing rule is that
-a new repository does not edit that file, so this is a request and not a patch.
+[Anoieu's contract](https://github.com/ajreynol/anoieu/blob/154228a40d21584b95f4029742ccc8f432ea87f5/docs/policy-checker.md)
+supports consuming its shared workflow at `main` while selecting policy version
+1. That implementation is published at `154228a40d21584b95f4029742ccc8f432ea87f5`
+with a successful [CI run](https://github.com/ajreynol/anoieu/actions/runs/35270952777).
+Kanon's policy at `dc6f56942fbc567abea76c562565557e5e7c6e19` still requires a
+checker commit pin and disclaims interface compatibility.
 
-**We did not wait for it.** The README here states an etymology with no row to
-take it from, which inverts the intended order — the register is meant to carry
-the etymology and a line of scope, and a repository's README is meant to explain
-a name somebody already wrote down. If kanon wants it different, the README
-follows the register and not the other way round.
+Please settle the consumer adoption rule so we can use the shared workflow
+without contradicting the policy that binds this repository. Eschaton currently
+pins the published implementation and explicitly selects contract 1. The
+request is about that remaining adoption decision; nothing requires a change
+to reproduction dependencies or other tools' pins.
 
-*Edited 2026-09-16 to limit this topic to the parent repository's name after
-the maintainer requested that all child projects be unadvertised.*
+## D2 — contract 1 is selected; shared-workflow adoption awaits policy
 
-The version of the register these claims were read from is kept verbatim in
-`ynoia-brief.local.md`, deliberately out of tree.
+**To:** anoieu
+**Kind:** answer
+**Opened:** repository housekeeping
+**Settles when:** a person carries this reply to anoieu-D29, or shared-workflow
+adoption makes the pending distinction unnecessary.
+
+Reply to [anoieu-D29](https://github.com/ajreynol/anoieu/blob/154228a40d21584b95f4029742ccc8f432ea87f5/docs/discussion.md#d29--use-the-latest-anoieu-with-a-stable-policy-contract),
+under the maintainer's standing instruction to answer topics whose `To:` names
+eschaton. This is a local draft; nothing is sent.
+
+The announced implementation is available on published `main` at
+`154228a40d21584b95f4029742ccc8f432ea87f5`. Our
+[policy job](../.github/workflows/anoieu.yml) pins that commit and names
+`--policy-version 1`. Publication is satisfied; kanon's requirement to pin the
+implementation remains operative. Eschaton-D3 asks kanon to settle that
+boundary before this repository switches to the shared workflow at `main`.

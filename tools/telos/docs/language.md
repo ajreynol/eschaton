@@ -5,18 +5,14 @@ solver. **Rust** named in advance as the escape hatch for a search core that
 needs to be fast, entering through the certificate interface so that nothing
 verified is lost when it is used.
 
-This is a decision record, not an advocacy document. The alternatives are good
-and the reasons they lost are specific.
+This page states the provisional choice and the tradeoffs of the alternatives.
 
-**It is also, as of now, mostly retrospective.**
-[Logos](logos.md) is a verified SMT proof checker in Lean 4 with a
-machine-checked soundness theorem, a 1,602-line Lean formalization of SMT-LIB
-model semantics, and 591 CPC rules proved sound. It settles requirements 1, 2, 3
-and 5 by existing, and it supplies the honest reading of requirement 4: not
-optimized, significantly slower than performant checkers, and a full proof build
-takes over two hours. Read the rest of this document as the argument you would
-have had to make in advance, checked against a case where somebody made it and
-was right.
+[Logos](logos.md) supplies an existing Lean checker, so interoperability is the
+main reason for this provisional choice. Its source measurements here cover
+`a5650dad`; they do not establish producer performance. The
+[correctness boundary](logos.md#what-its-guarantee-actually-is) remains part of
+the choice. The other tools below are discussed in
+[the kernel comparison](kernel-of-cvc5.md); this is not a benchmark ranking.
 
 ## What the language has to do
 
@@ -35,10 +31,10 @@ cannot do 1 is not a candidate.
 
 ### Lean 4 — chosen
 
-Requirement 1 is *free*. `Answer φ` with no proofless constructor is an ordinary
-inductive type, and "the solver cannot answer without evidence" is checked by
-Lean's kernel. No analysis, no convention, no CI job — the property holds
-because the program elaborated.
+Requirement 1 can be expressed by an inductive return type in Lean. That
+constrains successful answers, but does not establish termination or search
+completeness. Runtime CPC data, input correspondence and serialization still
+need validation; a proposition alone may be erased during compilation.
 
 Be precise about what that buys, since this document is about not overstating
 guarantees. **Lean's kernel is not verified.** It is small, and it has
@@ -78,11 +74,11 @@ a measured completeness cost. That is a better starting position than any other
 candidate offers.
 
 And [Logos](logos.md) is a third instance, in the same language, against the
-same calculus telos cares about: an unconditional Lean theorem about the
+same calculus telos cares about: a Lean theorem with explicit hypotheses about the
 checking function, with no axiom admitted at check time and no proof term
 produced per input. It is neither reflection nor reconstruction, which is why
-[the guarantee taxonomy](kernel-of-cvc5.md#the-five-kinds-of-guarantee-on-that-list)
-needed a sixth entry for it.
+[the guarantee taxonomy](kernel-of-cvc5.md#the-kinds-of-guarantee-on-that-list)
+includes it separately.
 
 Requirement 4 is the weakness and it is real. Lean is reference-counted with
 persistent data structures; CDCL wants mutable arrays, cache-friendly watch
@@ -131,8 +127,8 @@ ceremony.
 
 Loses on 5 and, more importantly, on the same SMT-automation point as Verus:
 F\*'s proofs go to Z3, and the parts that do not (`Meta-F*` tactics) are the
-parts you would be living in for the metatheory. Smaller community, and the
-language has been through a significant redesign. If telos's centre of gravity
+parts you would be living in for the metatheory. Its smaller community also
+matters for maintenance. If telos's centre of gravity
 were "verified C that cvc5 can link", this would win; it is not.
 
 ### Isabelle/HOL + Sepref → LLVM — the closest precedent, and still no
@@ -150,7 +146,7 @@ Calibrate that carefully, because it is easy to over-read. IsaSAT solves roughly
 small field, not with CaDiCaL or Kissat, which it is not close to. And it
 **emits no certificate**: you trust the solver, so a third party has nothing to
 re-check. That is kind C in
-[the guarantee table](kernel-of-cvc5.md#the-five-kinds-of-guarantee-on-that-list),
+[the guarantee table](kernel-of-cvc5.md#the-kinds-of-guarantee-on-that-list),
 and it is the opposite of the trade telos is making.
 
 It loses on 1 and 3. HOL is simply typed: `Answer φ` — a type indexed by a term
@@ -164,10 +160,9 @@ the only game in town.
 ### Rocq (Coq) + extraction — no
 
 SMTCoq is the direct prior art and worth reading. But extraction targets OCaml,
-which puts requirement 4 out of reach for a solver, and Rocq's imperative story
-is weaker than Lean's for no compensating advantage. Lean does what Rocq does
-here, with a better compilation target and a community currently pointed at
-exactly this problem.
+which is not the direct Logos integration this experiment needs. No local
+benchmark establishes that an OCaml producer would be too slow; this choice
+is about reusing the checker, not ruling out other implementation languages.
 
 ### Everything else
 
@@ -187,7 +182,7 @@ them beats a candidate above on any requirement.
 
 Lean 4 wins 1, 2, 3 and 5, and loses 4 — which is the requirement
 [I5](design.md#i5--soundness-is-the-kernels-job-completeness-is-the-type-systems)
-was designed to make cheap to fix later.
+is intended to make cheap to address.
 
 ## Reflection or reconstruction
 
@@ -214,10 +209,10 @@ Proof Calculus proof is the second kind.
 an ordinary universally quantified Lean statement about
 `Eo.logos_check_proof : String -> Except String Verdict`, proved once. Checking
 a proof runs a compiled binary; no axiom is admitted, no term is built, and the
-kernel is not in the loop at run time at all. The price is that the binary came
-out of an unverified compiler —
-[kind F](kernel-of-cvc5.md#the-five-kinds-of-guarantee-on-that-list). The price
-of *reconstruction* would have been building a Lean term per proof, which for
+kernel is not in the loop at run time at all. The price is that the binary depends
+on an unverified compiler —
+[kind F](kernel-of-cvc5.md#the-kinds-of-guarantee-on-that-list). The price
+of *reconstruction* is building a Lean term per proof, which for
 `Bitblasting.eo`-shaped certificates is exactly the case reflection exists for.
 
 **Provisional decision: follow Logos.** Failing that, and for the parts of telos
@@ -258,10 +253,9 @@ defended.
 
 ## The first thing to write
 
-Not a solver. **A Eunoia type checker in Lean**, covering
-[K1, K2, K3, K6](kernel-of-cvc5.md) only — no evaluation, no `program`s — and
-differential-tested against `ethos` on the proofs cvc5 already emits. It is
-about 500 lines of original to model, it decides whether the language choice
-survives contact, and it produces something that runs.
+A proof-carrying Boolean rewriter that emits CPC for Logos, as defined by
+[T2](../TODO.md#t2--a-proof-carrying-rewriter-for-one-theory). Measure authoring,
+certificate construction and checking costs, and verify input correspondence.
+Writing a new Eunoia checker is outside the charter.
 
 Ordered next steps are in [`TODO.md`](../TODO.md).

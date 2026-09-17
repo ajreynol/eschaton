@@ -1,11 +1,14 @@
 # Five inversions
 
-Each section takes one thing dokimasia measured about cvc5, states why it is
-the way it is, and states what a solver built the other way round would do
+Each section takes one thing dokimasia measures about cvc5, proposes an
+explanation, and states what a solver built the other way round would do
 instead. Each also carries **what would make it wrong**, because a design note
 whose author cannot say how it fails is an advertisement.
 
-Nothing here has been built. Every claim is a hypothesis.
+There is no implementation here. The cvc5 examples refer to `aee8742404`;
+the Logos source counts refer to `a5650dad`. These are source measurements,
+not benchmark results. The proposed benefits are hypotheses; see
+[Logos](logos.md#what-its-guarantee-actually-is) for the correctness boundary.
 
 ---
 
@@ -21,9 +24,8 @@ d_im.lemma(lem, InferenceId::ARITH_MY_NEW_INFERENCE);
 ```
 
 compiles, runs, and silently produces a trust step. **The ergonomic path is the
-proofless one.** That is not carelessness — it is what happens when proofs are
-added to a solver that already worked, and every one of them would have had to
-be retrofitted at once otherwise.
+proofless one.** The interface permits proof production to be optional; the
+proposed design makes evidence mandatory for successful answers.
 
 Downstream: 79 inferences fall through to a trust step by construction
 ([i-22](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), 8 trust steps are built with `TrustId::NONE`
@@ -31,40 +33,33 @@ and so cannot be attributed at all ([i-9](https://github.com/ajreynol/dokimasia/
 `--check-proofs-complete` exists to discover at runtime, one benchmark at a
 time, which of these a given input reached.
 
-**The inversion.** The result type is indexed by the input:
+**The inversion.** Require a runtime certificate tied to the input. This is
+schematic Lean notation; the certificate format and checking predicate remain
+to be defined:
 
 ```lean
 inductive Answer (phi : Formula) where
-  | unsat   (pi : Proof (.not phi))
-  | sat     (M : Model) (h : M |= phi)
+  | unsat   (certificate : CpcProof) (checked : ChecksAgainst phi certificate)
+  | sat     (M : Model) (h : Satisfies M phi)
   | unknown (r : Limitation)
 ```
 
-`unsat` is uninhabited without a proof term. Not "discouraged", not "checked in
-CI" — uninhabited. There is no `pg = nullptr` because there is no `pg`; the
-proof is the constructor's argument, and the compiler will not let you omit it.
+A successful constructor requires evidence. A certificate is data that must
+survive compilation; Lean erases propositions from compiled code, as its
+[reference explains](https://lean-lang.org/doc/reference/latest/The-Type-System/Propositions/). Exporting CPC,
+checking the parsed assumptions against `phi`, and validating the certificate
+are separate obligations. A type annotation on an untrusted search routine
+does not establish those obligations on its own.
 
-Three consequences, in increasing order of how much they matter:
+A closed `Limitation` type can require a reason for `unknown`. It cannot prove
+that search terminates, succeeds on every input, or reaches every annotated
+path. Proof support is intended to be mandatory for successful answers, while
+resource exhaustion remains a legitimate outcome.
 
-1. **dokimasia's founding question is answered by `grep`.** *Is there a path
-   through the solver that produces no proof at all?* The paths are exactly the
-   `unknown` constructors. Enumerable, at compile time, with no analysis tool.
-2. **A hole must name itself to typecheck.** `Limitation` is a closed inductive
-   type. `TrustId::NONE` — a declared hole with no stated reason — is not
-   expressible. Whether the *reason* is honest is still a human question, but
-   whether one was given stops being one.
-3. **Proofs cannot be off.** Contract §3 —
-   [*the solver that produces the proof is the solver that solved it*](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#why-3-is-not-a-footnote)
-   — is the subtlest of cvc5's three failure modes, and it exists because
-   `--produce-proofs` is a mode. Here it is not a mode. There is one solver.
-
-**What would make it wrong.** Cost. cvc5 turns proofs off by default because
-users want speed, and "there is one solver and it is the slow one" may simply
-be unacceptable. The honest mitigation is that a proof term you never inspect
-can be cheap — a lazily-constructed DAG, or an opaque token in a build that
-compiles the checker out — but "cheap" is a measurement nobody here has taken,
-and if it turns out to be 3x then this inversion has a real price and the
-project should say so rather than argue.
+**What would make it wrong.** Authoring and runtime costs. A lazily constructed
+certificate DAG may reduce the cost, but replacing it with an opaque unchecked
+token would abandon the guarantee. The first experiment must measure both
+certificate construction and independent checking.
 
 ---
 
@@ -80,10 +75,9 @@ they can disagree — it found one
 ([i-21](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md): `SUBS`'s documentation omits an argument its
 checker reads).
 
-[R1](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r1--emit-the-tables-cvc5-already-has) is this
-repository's highest-leverage ask: *emit the tables cvc5 already has*. It is an
-ask because the tables are currently recovered by parsing C++, which produced
-three parser bugs in one afternoon.
+[R1](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r1--emit-the-tables-cvc5-already-has) is dokimasia's request: *emit the tables cvc5 already has*. It is an
+ask because the tables are recovered by parsing C++, leaving their accuracy
+dependent on that parser.
 
 **The inversion.** There is one inductive definition of the calculus. The
 checker is a function over it, the printer is a function over it, the
@@ -91,11 +85,11 @@ documentation is generated from it, and the signature *is* it.
 `dokimasia.signature` has nothing to check because there is nothing for the two
 halves to disagree about — the class of defect it looks for is not expressible.
 
-**This one is no longer a proposal.** [Logos](logos.md) compiles its entire
+**The checker side has an implementation.** [Logos](logos.md) compiles its entire
 calculus — 591 rules, the term language, the parser configuration, the
 translation to SMT-LIB — out of `Cpc.eo` with `ethos-eoc`, keeps the per-rule
 proofs across regeneration, and has a CI group that fails when generated code
-drifts from the signature it came from. A rule added to CPC shows up as a
+drifts from its source signature. A rule added to CPC shows up as a
 `sorry` stub; a rule whose *statement* changed keeps its old proof and fails to
 build. Both failures are loud and distinct by design. telos inherits this rather
 than redesigning it.
@@ -122,14 +116,13 @@ to become a thing that can drift.
 **What cvc5 does, and why.** cvc5's rewriter is a black box, and proofs of
 rewrites are recovered afterwards by searching a database of RARE rules for
 something that explains what the rewriter did. This is deliberate and argued in
-print — Nötzli et al., FMCAD 2022, §I:
+print — Nötzli et al., the FMCAD paper, §I:
 
 > *"we propose an alternative approach that does not rely on instrumenting the
 > original rewriter … instrumenting this code to additionally produce proofs
 > makes it even more complex and makes it harder to add new rewrite rules."*
 
-The consequence is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md), the sharpest finding in this
-repository and the one it explicitly cannot fix: reconstruction is a recursive
+The consequence is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md), a reconstruction limit recorded by dokimasia: reconstruction is a recursive
 search with **no termination guarantee** — applying a rule spawns sub-problems
 (its preconditions, and the gap between its instantiated RHS and the target)
 that are not provably simpler than the goal. The paper says so outright, which
@@ -137,34 +130,39 @@ is why `--proof-rewrite-rcons-rec-limit` exists at all. Measured: 92–95% of
 rewrite *steps* reconstruct, but only **20–22% of proofs are fully
 fine-grained**, because one coarse step spoils a proof.
 
-So: **whether a cvc5 proof is complete depends on how long a search was allowed
+So: **whether a cvc5 proof is complete depends on how long a search is allowed
 to run.** That is a strange property for a contract to have, and
 [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) is right that a kernel has to
 confront it rather than inherit it.
 
-**The inversion.** The rewriter's type is
+**The inversion.** A schematic result type carries the rewritten term and a
+runtime certificate of semantic equality:
 
 ```lean
-def rewrite (t : Term) : (t' : Term) × Proof (t = t')
+structure RewriteResult (t : Term) where
+  result : Term
+  certificate : CpcProof
+  checked : ChecksEquality t result certificate
 ```
 
-There is no reconstruction, so there is no search, so there is no budget, so
-`i-4` does not exist. The 38 rewrites whose reconstruction depends on a search
-budget do not get a bigger budget — they have none.
+The format and `ChecksEquality` predicate remain to be defined, as in I1.
 
-**Why this is not just re-proposing what FMCAD 2022 rejected.** It is exactly
-re-proposing that, and the paper's objection is real: instrumenting a rewriter
-by hand makes it complex and makes rules harder to add. The claim is that the
+For rules supported by this interface, justification is constructed with the
+rewrite rather than recovered by a later search. This does not remove budgets
+from solver search, conditional-rule discharge, or unsupported rewrites.
+
+**The FMCAD paper's objection applies here.** Its concern is that instrumenting
+a rewriter by hand makes it complex and makes rules harder to add. The claim is that the
 objection is *about the language*, not about the architecture. A declarative
 rule in a dependently typed host elaborates to **both** the rewrite and its
 justification from one source, so there is no second thing to maintain and no
 second place to get it wrong. Writing a rule stays as cheap as writing a RARE
 rule; the proof is a derived artifact, not a parallel obligation.
 
-That also kills [F1 and F3](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md) outright — a
-rule that *misstates* the rewrite, and a rule that is dead — which today are
-**invisible failure modes**: F1 never matches and so silently contributes
-nothing, forever.
+Generating the rewrite and justification together may prevent some
+[correspondence defects](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md).
+It does not ensure that a rule is ever selected, that its preconditions are
+reachable, or that the generator implements the intended rule.
 
 **What would make it wrong.** This is the inversion most likely to be wrong,
 and it should be tested before anything else is built on it. Three ways it
@@ -209,10 +207,11 @@ features, and a feature with no proof support does not typecheck in the safe
 instantiation. Not pruned at link time — *rejected at type-check time*, with the
 error naming the feature.
 
-Concretely: an inference that can only produce `Answer.unknown` has that in its
-type, and the safe configuration instantiates `Limitation` at the empty type. A
-proofless inference in a safe build is then not a runtime exception, not a link
-error, but a type error at the definition site, before anything is built.
+Concretely, proof-producing features would require a certificate interface
+when registered in the safe configuration. Operational limits such as timeouts
+must still permit `unknown`; making every `Limitation` uninhabited would
+incorrectly equate proof support with total search. The type-level interface is
+an experiment, not a demonstrated replacement for runtime checks.
 
 This is the second wishue in [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)
 — *a safe build that cannot be unsafe* — reached by construction rather than by
@@ -241,26 +240,25 @@ soundness.** Not *is this proof step valid* but *is there a path that produces
 no proof at all*. It can take that stance because something else handles
 soundness — `ethos` checks the proof, so dokimasia does not have to.
 
-telos splits the same way, and the split is what keeps it from being a decade of
-work:
+Telos proposes the following split:
 
-| | who guarantees it | how | what it costs |
-| --- | --- | --- | --- |
-| **soundness** | **[Logos](logos.md)** | a machine-checked Lean theorem against a 2,680-line specification of SMT-LIB semantics | **already paid** — 691,993 lines of proof, by somebody else |
-| **completeness** | the type system | `Answer φ` has no proofless constructor ([I1](#i1--the-answer-carries-its-certificate)) | free |
-| **the search** | **nobody** | untrusted, deliberately | nothing |
+| obligation | proposed mechanism | limit |
+| --- | --- | --- |
+| validity of a supported CPC refutation | Logos's soundness theorem | parsed assumptions under Logos's semantics, with the trust obligations in [Logos](logos.md#what-its-guarantee-actually-is) |
+| evidence accompanying a successful answer | a certificate-bearing return type and validation at the boundary | not termination or mathematical completeness |
+| finding an answer | untrusted search | may fail, time out or return `unknown` |
 
-That first row used to read "a verified kernel — the hard part, but small and
-bounded." It is not a plan any more. Logos is the kernel, telos does not write
-one, and the correct posture toward it is a consumer's: emit CPC, run `logos`,
-and treat any verdict other than `correct` as telos's bug.
+The heading's “completeness” means proof coverage for successful answers only.
+An algebraic data type does not prove that every valid input can be solved.
+Any verdict other than `correct` must be investigated and classified as a
+producer defect, unsupported fragment, resource limit or possible checker
+issue; it is not automatically a defect in one particular tool.
 
-**The search is not verified and should not be.** This is the LCF / de Bruijn
-architecture: the search may be wrong in any way that does not produce a proof
-the kernel accepts, the kernel is small enough to verify, and the type system
-rules out the one remaining failure — answering without a certificate at all.
+**The search is unverified under this design.** Independent certificate checking
+is what prevents a search error from becoming an accepted refutation, provided
+the input correspondence and semantic boundary hold.
 
-The alternative has been tried and the price is on the record. IsaSAT and versat
+IsaSAT and versat provide examples of the alternative. They
 verify the *search* itself, and both show what that costs: IsaSAT is the fastest
 verified SAT solver by a wide margin and still nowhere near CaDiCaL, and
 versat's guarantee turns out to be soundness of UNSAT only — not completeness,
@@ -272,14 +270,8 @@ per-tool guarantees are tabulated in
 [`kernel-of-cvc5.md`](kernel-of-cvc5.md#prior-art-and-what-each-guarantee-actually-is);
 they differ more than the shared word "verified" suggests.
 
-So "a statically verified SMT solver" means, precisely:
-
-> a solver whose **kernel** is verified, whose **completeness** is a type, and
-> whose **search** is untrusted and free to be as clever and as ugly as it needs
-> to be.
-
-Any other reading of the phrase is a much larger project and probably not a
-finishable one.
+The intended claim is a solver with a verified checking function and mandatory
+certificates for successful answers. No solver here establishes that claim yet.
 
 **What would make it wrong.** Two things. First, the kernel is only small if K4
 and K5 stay out of it — and 1,009 lines of builtin operations plus 248 signature

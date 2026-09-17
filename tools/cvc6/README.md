@@ -14,7 +14,8 @@ auto-refactored development of the solver, driven by autonomous agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Eunoia listing:** unadvertised
+**Footing:** `unadvertised-child` — speculative research with no implementation;
+the parent does not advertise it.
 
 ---
 
@@ -23,15 +24,14 @@ for cvc5 or a request of its developers; the name is used because it states the
 bet in four characters.
 
 **The bet: the accumulated design is the asset, and its upkeep is the problem.**
-Twenty years of theory engineering is the expensive part, and this position says
-you do not throw it away to fix the order it was built in — you mechanize the
-maintenance until the order stops mattering, the structure reworked and then
-*kept* reworked rather than repaired at the pace hands work.
+The existing theory engineering is the expensive part. This position proposes
+automating its maintenance so that proof coverage and structure improve without
+replacing the solver.
 
 That makes it a rate question rather than a design question, and the direct
-competitor to [`telos`](../telos/README.md): telos argues cvc5's proof gaps
-follow from proofs having been added to a solver that already worked, and if
-agents close gaps faster than the code grows them, the argument stops mattering.
+competitor to [`telos`](../telos/README.md): telos proposes designing proof
+production alongside search. This approach instead asks whether agents can
+close gaps in the existing solver faster than they accumulate.
 
 ## What it does not answer
 

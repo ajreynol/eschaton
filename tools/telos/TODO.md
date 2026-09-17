@@ -1,9 +1,9 @@
 # Next steps
 
-**Rewritten after reading [Logos](docs/logos.md).** The previous version planned
-a year of work — describe Eunoia's semantics, mechanize the type system, build a
-checker in Lean — most of which exists, is finished, and is maintained. What
-follows is what is left.
+The plan consumes [Logos](docs/logos.md) as the checker and tests the producer
+side. All tasks below are proposals; none is implemented here. Source counts
+refer to the source revisions in the linked notes. Read the correctness
+boundary before choosing an experimental fragment.
 
 Ordered by **how fast each one could kill the project**, the same selection rule
 [`docs/goals.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md) applies to finding holes: optimise for
@@ -13,7 +13,7 @@ the latency of the answer, not for how much work it represents.
 | --- | --- | --- | --- | --- |
 | **T1** | read Logos properly | nothing — it is the prerequisite for every other row | days | knowing what is already done |
 | **T2** | a proof-carrying rewriter for one theory | **[I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire)**, the riskiest inversion, and the only one Logos does not settle | a week | the answer to whether telos's central claim holds |
-| **T3** | a CPC corpus, run through **both** ethos and logos | nothing — it is the oracle, and a measurement nobody has | days | agreement data, and the first `incomplete` census |
+| **T3** | a CPC corpus, run through **both** ethos and logos | nothing — it is the oracle, and a measurement this repository does not have | days | agreement data, and the first `incomplete` census |
 | **T4** | the static `incomplete` question | nothing | weeks | a dokimasia-shaped analysis of a Lean development |
 | **T5** | differential-test ethos's evaluator against logos's compiled semantics | nothing here — but it may find a real defect | days | possibly a soundness finding, for somebody else's register |
 | **T6** | measure ethos's real TCB | nothing — it corrects a number | hours | an exact figure to replace a file-level estimate |
@@ -26,11 +26,11 @@ it is a week, and nothing else depends on its outcome being favourable.
 ## T1 — Read Logos properly
 
 Not a formality. [`docs/logos.md`](docs/logos.md) is an outside reading of the
-repository, made in an afternoon from its README, its scripts and its line
-counts. It is not a substitute for the four things that actually matter:
+repository based on its README, scripts and source counts. It is not a substitute for the four things that actually matter:
 
-- **`Cpc/SmtModel.lean`** — 1,602 lines, and the only part of the whole
-  development a human is obliged to read. If the specification is wrong, nothing
+- **`Cpc/SmtModel.lean`** — 1,602 lines at the referenced revision; it is part of
+  the specification a reviewer must understand, alongside `Cpc/Spec.lean` and
+  the executable boundary. If the specification is wrong, nothing
   downstream of it means anything, and it is the one place where "the proof
   checks" is not an answer;
 - **`docs/modularity.md`** — written for exactly telos's situation and specific
@@ -41,7 +41,7 @@ counts. It is not a substitute for the four things that actually matter:
   is `and` in Cpc and `imp` in CpcMini) make a proof reusable by accident only,
   with a one-line discipline to adopt **before the first proof**;
 - **`Cpc/Api.lean`, `ApiChecks.lean`, `ApiCorrect.lean`** — how the theorem
-  connects to the string the executable was handed. This is the part most
+  connects to the string the executable receives. This is the part most
   verified-checker projects leave informal and this one does not;
 - **`docs/smt-model-definitions.pdf`** — the intended write-up of the semantics,
   the specification and the checker.
@@ -52,15 +52,16 @@ rejects `sorry`/`admit`/`axiom` textually with no build at all.
 
 ## T2 — A proof-carrying rewriter for one theory
 
-**The experiment that matters, and the only inversion Logos leaves open.**
+**The experiment that matters, and the producer question Logos does not answer.**
 
-Logos settles the kernel. It says nothing about the *producer*, and
+Logos supplies the checking function within its documented semantic boundary.
+It says nothing about the *producer*, and
 [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) is the load-
 bearing claim on that side: that a rewriter can return `(t', proof that t = t')`
 at no meaningful cost to the author of a rewrite rule, dissolving
 [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) — the search budget that cvc5's proof completeness
-currently depends on. FMCAD 2022 explicitly declined to do this, for stated
-reasons. The claim is that a dependently typed host changes the arithmetic, and
+currently depends on. The FMCAD paper argues against instrumenting the rewriter because of
+the complexity and authoring cost. The claim is that a dependently typed host changes the arithmetic, and
 **it has never been tested.**
 
 Test it small. Pick one theory where cvc5's RARE coverage is already good — the
@@ -68,7 +69,9 @@ Boolean rules, `theory/booleans/rewrites` — and:
 
 1. write its rules once, declaratively;
 2. elaborate each into a rewrite *and* its justification;
-3. measure **how much per-rule manual work the justification needed** (the FMCAD
+3. check that the proof's parsed assumptions are the intended rewrite problem
+   in the agreed fragment;
+4. measure **how much per-rule manual work the justification needed** (the FMCAD
    objection) and **what building a proof term on every step costs at runtime**
    (the objection FMCAD did not have to make).
 
@@ -88,17 +91,17 @@ Run cvc5 with `--dump-proofs --proof-format=cpc` over a benchmark set, then run
 `--safe-mode=safe` against unrestricted, so it divides along the line
 [the contract](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md) cares about.
 
-Three things fall out, and the second and third are measurements nobody has:
+Three measurements are useful to this repository:
 
 - **the oracle** for T2 and T5;
 - **the `incomplete` census.** Logos returns three verdicts, and `incomplete`
   means it accepted the proof but the proof mentions something the SMT-LIB
   specification does not model. How often, and on what? That is a coverage
-  number for the specification, and the specification is the only part of the
-  trusted base a human reads;
+  number for translation coverage, not semantic conformance. Record parser
+  errors and timeouts separately;
 - **ethos/logos disagreement.** Any proof one accepts and the other rejects is
-  interesting by construction, and the direction matters: a proof `ethos`
-  accepts and `logos` calls `incorrect` is the more alarming one.
+  worth investigating after confirming the signature, supported syntax and
+  assumptions. Neither direction alone establishes a soundness defect.
 
 ## T4 — The static `incomplete` question
 
@@ -114,32 +117,27 @@ of at C++. The side conditions are `TranslatableAssumptionList` and
 `Decidable`, which means the question is about the *reach* of `__eo_to_smt`
 rather than about a heuristic.
 
-Worth doing because it is the one place telos's parent repository has a genuine
-methodological advantage, and because a specification's coverage gap is exactly
-as invisible as a solver's until somebody enumerates it.
+Start with Logos's conformance documentation and distinguish an unsupported
+translation from a restriction on the model class. Only the first need produce
+`incomplete`; the census must not be presented as a complete semantic audit.
 
 ## T5 — ethos's evaluator against logos's compiled semantics
 
-The previous version of this list proposed differential-testing the signature's
-4,186 lines of Eunoia `program`s against the C++ they mirror, on the grounds
-that they were trusted completely and checked by nothing.
-
-**That is no longer the right framing.** The programs are compiled into Logos —
-592 `__eo_prog_*` definitions — and **520 of the 591 rule proofs depend on one**.
-A program that was wrong in a way that made its rule unsound would make that
-rule's soundness proof fail. The signature's computational content is inside the
-soundness argument now.
+Logos proves supported rules sound under its compiled semantics. That gives a
+useful comparison point for the Eunoia programs those rules use, within the
+model and trust boundary described in [Logos](docs/logos.md).
 
 What is *not* established is that the two implementations of Eunoia evaluation
 agree: `ethos`'s C++ evaluator (`TypeChecker::evaluate`, the 56 `eo::` builtins,
 `evaluateProgramApp`) against what `ethos-eoc` compiles the same signature into.
-If they diverge, one of them accepts a proof the other does not, and the Lean
-theorem is about the Lean one. T3's corpus makes this cheap to look for.
+A divergence may change acceptance; the Lean theorem concerns only the Lean
+implementation. A disagreement needs reduction and semantic analysis before
+it is called a defect. T3's corpus makes this cheap to look for.
 
 **Where it belongs.** This is a *soundness* question about `ethos`, and
 dokimasia is [completeness, not soundness](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md#the-stance).
-Recording it because the gap is real and nobody appears to be looking at it —
-not because this repository should claim it.
+Any concrete finding belongs in the parent's reporting process, with evidence
+and human review; this task does not authorize reporting it externally.
 
 ## T6 — Measure ethos's real TCB
 
@@ -166,13 +164,13 @@ typecheck.
 
 The target is precise and someone else maintains the goalposts:
 
-> **telos succeeds when Logos says `correct`.**
+> **telos succeeds when Logos says `correct` for the intended input in the agreed fragment.**
 
-Not `incomplete`, which means the proof left the specified fragment. Not
-"produces proofs", which is unfalsifiable. A fragment on which a telos solver's
-output is accepted by an independently maintained verified checker, with the
-`incomplete` count as the completeness metric — measured per input, by a tool,
-with no static analysis in the loop.
+The input correspondence and chosen fragment are part of the acceptance
+criterion. Record `correct`, `incorrect`, `incomplete`, parser errors and
+resource limits separately. An `incomplete` census describes translation
+coverage; it does not establish completeness of search or full SMT-LIB
+conformance.
 
 ## Not doing
 
@@ -195,13 +193,8 @@ with no static analysis in the loop.
 T1 and T6 are days. T3 is days. T2 is a week or two and could fail. T4 is weeks.
 Nothing here produces a solver.
 
-But the scale has changed, and in the right direction. The previous version of
-this file estimated a year before anything could be called a solver, on the
-assumption that telos had to build a verified kernel first. It does not. Logos
-took roughly six months and 707 commits to do that — the repository carries its
-own estimate of what the proofs would have cost by hand, and the number in it is
-25 expert person-years, which is worth reading as a statement about how the
-work was done as much as about how large it is.
+These are planning estimates, not measurements. Consuming an existing checker
+reduces the proposed scope, but does not settle certificate construction costs.
 
 The progressive stance from [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) applies
 unchanged: **every degree is worth having, and there is no finish line.** T3

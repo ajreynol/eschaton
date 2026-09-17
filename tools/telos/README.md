@@ -17,7 +17,8 @@ authority on — not the search.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Eunoia listing:** unadvertised
+**Footing:** `unadvertised-child` — speculative research with no implementation;
+the parent does not advertise it.
 
 **Internal.** A research note, not a project announcement, and unadvertised
 until there is something to show — not pointed at rather than not visible, since
@@ -32,8 +33,7 @@ would leave the repository exactly as functional as it is now.
 ## The charter
 
 **The question.** *If the proof came first, what would the solver look like?*
-The premise below says why that is the complementary question to the parent's
-and not a competing one.
+The parent compares this proposal with alternative ways to develop a solver.
 
 **The goals, in order** — they are [`TODO.md`](TODO.md)'s `T1` to `T6`, ordered
 by how fast each could kill the project rather than by how much work each
@@ -42,9 +42,10 @@ is the only one whose outcome could invalidate the design.
 
 **The wishue** — the outcome if this went unusually well, and not a commitment.
 It is already stated, and stated as a target somebody else maintains the
-goalposts for: **telos succeeds when Logos says `correct`** — a fragment on
+goalposts for: **telos succeeds when Logos says `correct` for the intended
+input in the agreed fragment** — a fragment on
 which a telos solver's output is accepted by an independently maintained
-verified checker, with the `incomplete` count as the completeness metric.
+verified checker, with verdicts and unsupported inputs recorded separately.
 
 **Out of scope**, in full in [`TODO.md`](TODO.md)'s *Not doing*, and in
 summary: writing a kernel (Logos is the kernel); writing a solver until `T2`
@@ -60,14 +61,14 @@ easier to *argue* which part of cvc5 has to be right, along five axes —
 nameable, closed, small, local, mechanized — with mechanized named explicitly as
 **the last axis, not the first**.
 
-That ordering is correct for cvc5, and it is correct because cvc5 exists. The
-axes are hard there because proofs were added to a solver that already worked,
-and every finding in this repository is a consequence of that order:
+The design hypothesis is that constructing proofs alongside search could
+reduce some reconstruction costs. Dokimasia's measurements motivate that
+hypothesis; they do not prove that development order causes the gaps:
 `ProofGenerator* pg = nullptr` is a default argument
 ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h6--no-proof-must-be-said-out-loud)), the safe-mode
 disable list is maintained by hand ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
 completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)) because the
-rewriter was deliberately left uninstrumented.
+rewriter does not construct these proofs as it rewrites.
 
 telos asks the complementary question, and only the complementary question:
 
@@ -79,16 +80,15 @@ is downstream of a design that is already fixed.
 
 **There is a competing answer, and it is [`cvc6`](../cvc6/README.md).** The
 opposite bet is that cvc5's *development procedure* is the thing to automate —
-the accumulated design kept and its upkeep mechanized, rather than the design
-thrown away to fix the order it was built in. **If that were true, the argument
-from build order that this whole directory rests on would matter much less**,
-because holes would close faster than they accumulate. Neither bet has produced
-anything. [`approaches.md`](../../docs/approaches.md) compares them, with telos
+the existing design kept and its upkeep mechanized. Its question is whether
+automated maintenance closes proof gaps more cheaply than a new design.
+Both proposals are untested. [`approaches.md`](../../docs/approaches.md)
+compares them, with telos
 as the current, provisional preference.
 
 ## The foothold: Logos
 
-**telos is built on [`ajreynol/logos`](https://github.com/ajreynol/logos), and
+**telos proposes to use [`ajreynol/logos`](https://github.com/ajreynol/logos), and
 Logos is a moving target.** Everything below is downstream of that fact, so it
 belongs before the design rather than after it.
 
@@ -99,38 +99,48 @@ against `Cpc/SmtModel.lean`, a standalone Lean formalization of SMT-LIB's model
 semantics. Its calculus is **compiled from the same `Cpc.eo` signature cvc5
 emits proofs against**, by `ethos-eoc`, and regenerated as CPC changes.
 
-Measured at logos `a5650dad`:
+The measurements cover logos `a5650dad`; these are source sizes, not a complete trusted-base measurement. The figures are copied from
+[the measurement note](docs/logos.md#what-it-weighs); no automatic comparison
+keeps the copy current:
 
 | | ethos + the `cpc` signature | **Logos** |
 | --- | --- | --- |
-| what a human must read and believe | ≈**26,400 lines** — 13,862 C++, 12,530 Eunoia | **2,680 lines** of Lean specification |
-| what a machine checks | nothing | **691,993 lines** of proof |
+| source components compared | ≈**26,400 lines** — 13,862 C++, 12,530 Eunoia | **2,680 lines** of Lean specification |
+| machine-checked soundness development | none established here | **691,993 lines** of proof |
 | rules proved sound | — | **591 of 593**, no `sorry`/`admit`/`axiom` in 872 files |
 | the calculus is | hand-written twice, in Eunoia and in C++ | generated from the signature, with drift caught in CI |
-| unverified residue | all of it | the parser — 2,653 lines |
+| outside the checker theorem | C++ checker and Eunoia signature | parser, input correspondence, specification adequacy and compilation |
 
 The two CPC rules with no soundness proof are `beta-reduce` and **`trust`** —
 cvc5's declared hole, the one
 [`dokimasia.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/trust/) censuses 75 ids of. It cannot have
 one. Which states the relationship between these two projects in a sentence:
 
-> **Every hole dokimasia counts is a proof Logos cannot check.**
+> **An unjustified `trust` step is not a sound CPC derivation Logos can certify.**
+
+Dokimasia also reports static candidates and coverage risks; those are not a
+one-to-one prediction of Logos verdicts.
+
+At logos `be4791204be5616df2bf6f42ea304b45b08d33e1`, the theorem is about the assumptions the parser reads under Logos's semantics.
+Arrays, reals and uninterpreted sorts have documented model restrictions; these
+do not necessarily cause `incomplete`. The parser, original-input match and
+compiled execution remain trust obligations. Read the
+[conformance limits](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md)
+before choosing a fragment. A Boolean rewriter is the proposed first test.
 
 Full description, measurements and eight things telos should learn from it are
 in [`docs/logos.md`](docs/logos.md). **Read that first.**
 
-The consequence for telos is large and worth stating plainly: the kernel half of
-this project already exists and is better than the sketch that preceded it. What
+Logos supplies an existing checker for the proposed producer. What
 is unclaimed is the **producer** side — and that gives telos a definition of
 success that is executable rather than rhetorical:
 
-> **telos succeeds when Logos says `correct`.**
+> **telos succeeds when Logos says `correct` for the intended input in the agreed fragment.**
 
 ## Derived from measurements, not from wishes
 
-Every design decision below comes from a measured finding, and the derivation is
-the point: a list of things a hypothetical solver could do better is worthless;
-a list where each entry closes a hole somebody measured is a specification.
+The design notes draw on dokimasia's findings at cvc5 `aee8742404`. The proposed answers remain hypotheses; none establishes a
+property of an implementation here.
 
 | dokimasia found | telos's answer | where |
 | --- | --- | --- |
@@ -147,7 +157,7 @@ enough to start.
 
 Before defining a kernel you have to be able to point at the one that exists.
 cvc5 has **two**, they are not the same size, and they do not trust the same
-things. Measured 2026-08-31 against cvc5 `aee8742404` and ethos `b9188b86`:
+things. The measurements cover cvc5 `aee8742404` and ethos `b9188b86`:
 
 | | internal — `--check-proofs` | external — `ethos` |
 | --- | --- | --- |
@@ -186,21 +196,18 @@ theorem about the machine code* down to *nothing at all*.
 
 ## The language
 
-**Lean 4** — which Logos settles by demonstration rather than by argument, so
-the decision record below is now a rationalisation of a choice that has already
-been made and validated at scale. Rust stays named as the escape hatch for a
-search core that needs to go fast.
+**Lean 4** is the provisional language for the first experiment, because it
+can use Logos directly. Rust remains an option for an untrusted search core;
+its suitability depends on measurements, not on the checker's implementation
+language alone.
 
-The independent argument, had Logos not existed, is that in a dependently typed
-host language **[inversion 1](docs/design.md#i1--the-answer-carries-its-certificate)
-is free**. `solve` cannot return `unsat` without a proof term, because the
-return type says so, and that is checked by a kernel nobody has to trust our
-account of. dokimasia's founding question — *is there a path through the solver
-that produces no proof at all?* — is answered by the type signature, statically,
-permanently, for no ongoing cost. A language that cannot do that would put
-telos in the business of building dokimasia again.
+A dependent return type can require evidence for each successful answer, but it
+does not prove termination, successful search on every input, or correct proof
+serialization. CPC certificates must survive at runtime; a Lean proposition
+alone can be erased during compilation. The design notes distinguish these
+obligations.
 
-Alternatives considered and why they lost — Rust + Verus, F\* → C, Isabelle/HOL
+Alternatives and their tradeoffs — Rust + Verus, F\* → C, Isabelle/HOL
 + Sepref, Rocq — are in [`docs/language.md`](docs/language.md), along with what
 would change the decision.
 
