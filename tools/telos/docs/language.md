@@ -253,8 +253,10 @@ defended.
 
 ## The first thing to write
 
-A proof-carrying Boolean rewriter that emits CPC for Logos, as defined by
-[T2](TODO.md#t2--a-proof-carrying-rewriter-for-one-theory). Measure authoring,
+A **proof-producing rewriter** for Booleans that emits CPC for Logos,
+compared with **generated** and **proof-reconstructing rewriters** using the
+[shared definitions](../../../README.md#three-approaches-to-rewriter-maintenance)
+and [T2](TODO.md#t2--a-proof-producing-rewriter-for-one-theory). Measure authoring,
 certificate construction and checking costs, and verify input correspondence.
 Writing a new Eunoia checker is outside the charter.
 

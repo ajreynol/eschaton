@@ -1,5 +1,13 @@
 # Competing approaches
 
+The [README](../README.md#three-approaches-to-rewriter-maintenance) defines the
+shared terms **generated rewriter**, **proof-producing rewriter** and
+**proof-reconstructing rewriter**. They name
+competing ways to maintain a rewriter and its proofs, usable across the broader
+solver proposals below.
+
+## Broader solver approaches
+
 Three bets on how to get a better SMT solver than the ones we have. **Proof-first
 design is the current preference; none has been tested here.** Its existing
 verified checker in Logos and concrete next experiment make it the most promising
@@ -9,7 +17,7 @@ what already exists in public for each is
 
 | | keeps from cvc5 | written by | the bet | dies if |
 | --- | --- | --- | --- | --- |
-| Proof-first design | the calculus, and parts of the internal proof checker | people | designing proof production with search may reduce reconstruction gaps | a proof-carrying rewriter costs too much, **or generating the existing rewriter from the rules closes the same gap more cheaply** |
+| Proof-first design | the calculus, and parts of the internal proof checker | people | designing proof production with search may reduce reconstruction gaps | a proof-producing rewriter costs too much, **or a hybrid using generated rules closes the same gap more cheaply** |
 | Automated maintenance | all of it | agents | the design is the asset; mechanize the upkeep and the build order stops mattering | upkeep does not outrun accumulation |
 | Agent-built solver | nothing | agents | solvers are scarce because people are, so make architecture cheap to vary | the hard parts are exactly the parts that do not automate |
 
@@ -20,20 +28,59 @@ existing implementation is cheaper still. The measurements do not establish
 that development order causes the gaps, and the approaches could complement
 each other.
 
-**And there is now evidence in that disagreement, on the side of improving the
-existing implementation.** The proof-first bet rests on the claim that a rewrite
-can only carry its proof if the rewriter is written to do so from the start.
+**Building a new solver with agents is arguing about something else.** It shares
+automated maintenance's method and proof-first design's willingness to start
+over, and it is the only one whose bet is about *production cost* rather than
+correctness — which is also its weakness: nothing in it
+produces a reason to believe the output. The LLM2SMT study reports
+competitive QF_UF solving with much more limited certification; see the
+[source summary](related-work.md#agent-built-solvers).
+
+## Three approaches to rewriter maintenance
+
+A **proof-producing rewriter** returns the rewritten term and its equality
+certificate together. The proposal here uses a dependently typed host
+to derive both from one rewrite definition. Its maintenance claim is that adding
+or changing a rule needs little separate proof work. That claim remains untested.
+
+A **generated rewriter** makes declarative proof rules the source of executable
+rewrite code. A maintainer edits the rule and regenerates the matcher; a step
+records the rule that fired so the proof producer can apply it directly.
+
+A **proof-reconstructing rewriter** is cvc5's current approach: the handwritten
+rewriter produces a result, then a separate reconstructor searches proof rules
+for an explanation. This lets the rewriter evolve without constructing a proof
+at each step, at the cost of maintaining the correspondence and the search.
+
+**This third approach is very hard to verify statically.** Proving the rules
+sound is only part of the task. To guarantee a proof for every supported
+rewrite, one must also show that the rules cover the handwritten code's
+behaviour and that reconstruction finds the proof within its budget, including
+conditional-rule obligations. Those obligations are not necessarily simpler
+than the original goal. A checked proof establishes the soundness of the step
+it justifies; it does not establish this global reconstruction guarantee.
+Generated and proof-producing rewriters expose more of that correspondence
+directly, but neither is automatically verified by its architecture.
+
+**The `rdbExec` branch advocates a hybrid:** generated rules alongside
+handwritten theory rewriters and proof reconstruction. At the revision read
+here, generated rules run when the theory rewriter leaves a term unchanged;
+the branch does not aim to
+replace all rewriting with generated code. Its prototype is in
 [`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
-read at `4585967004` from cvc5 `5cc03f4b95`, is a third answer: **generate the
-rewriter's matching code from the RARE rules**, so the rewrite *is* a rule
-application and the proof step names the rule that fired instead of searching
-for one. Exploratory work in a personal fork — six rules, no release, and no
-position of cvc5's — but it closes part of the same gap **with no new solver,
-no new language and no new kernel**, which is the cheapest bid on the table.
+read at `4585967004` from cvc5 `5cc03f4b95`. This is exploratory work in a
+personal fork: six rules, no release, and no position of cvc5's.
+
+These compete on the cost of maintaining rewrites with proofs, and can overlap
+in an implementation. A proof-producing rewriter specifies what a rewrite must
+return; a generated rewriter specifies where its executable code comes from;
+a proof-reconstructing rewriter relies on later search. These terms do not
+commit to a new solver, a programming language, or who writes the code.
+The broader proof-first proposal must therefore justify its cost against
+the hybrid use of generated rules inside the existing solver.
+
 [`related-work.md`](related-work.md#where-a-rewrites-proof-comes-from--the-argument-all-three-bets-inherit)
-describes it and the published stance it departs from; the mechanism and what
-it does to the proof-first bet are in
-[`design.md` I3](../tools/telos/docs/design.md#i3--rewrites-prove-themselves-as-they-fire).
+records the prototype and the published proof-reconstruction baseline.
 
 **This narrows the question rather than settling it.** An `:exec` rewrite
 removes one of the two things reconstruction recurses on — the gap between a
@@ -45,14 +92,6 @@ narrowed, not removed. What nobody has measured is how far it goes: how many of
 cvc5's RARE rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and
 what the ones that cannot have in common. **That measurement, not a new
 argument, is what would move this comparison.**
-
-**Building a new solver with agents is arguing about something else.** It shares
-automated maintenance's method and proof-first design's willingness to start
-over, and it is the only one whose bet is about *production cost* rather than
-correctness — which is also its weakness: nothing in it
-produces a reason to believe the output. The LLM2SMT study reports
-competitive QF_UF solving with much more limited certification; see the
-[source summary](related-work.md#agent-built-solvers).
 
 ## What proof-first design would keep
 
@@ -86,17 +125,19 @@ rejected.
 ## How any of this gets decided
 
 Each bet has a cheap experiment that could kill it, and none has been run: a
-proof-carrying rewriter for one theory; one agent-driven refactor of one cvc5
+proof-producing rewriter for one theory; one agent-driven refactor of one cvc5
 subsystem measured against the gaps it is meant to close; or a new theory
 solver that passes somebody else's benchmark set. The preference for proof-first
 design remains provisional until those experiments provide evidence to judge
 the approaches.
 
-**The first of those experiments now has a comparison to make, and it is not
-the one it was designed against.** A proof-carrying rewriter for one theory was
-meant to test the 2022 objection that instrumenting a rewriter costs too much
-per rule. It must now also be measured against marking a RARE rule `:exec` and
-regenerating the matcher, which is one token per rule. **An experiment that
-beats the paper and loses to the branch has not settled anything in
-proof-first design's favour**, and the design note says so where the claim
-lives.
+**Compare a proof-producing rewriter with a generated rewriter on one theory.**
+Measure manual work per rule, supported rewrites, certificate construction and
+checking costs against the proof-reconstructing baseline. The 2022 paper argues
+for that baseline on maintenance grounds; the hybrid `:exec` prototype tests
+generation inside it. Measure both its generated rules and the work left to
+handwritten rewriting and reconstruction. Marking an existing RARE rule `:exec`
+adds one token, but that does not measure the cost of expressing a new
+rule, handling its conditions, or maintaining the generator. **An experiment
+that beats the paper and loses to the branch has not settled anything in
+proof-first design's favour.**

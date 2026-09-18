@@ -113,7 +113,12 @@ to become a thing that can drift.
 
 ## I3 — Rewrites prove themselves as they fire
 
-**What cvc5 does, and why.** cvc5's rewriter is a black box, and proofs of
+This proposes a **proof-producing rewriter**, compared below with a **generated
+rewriter** and cvc5's **proof-reconstructing rewriter**. The names follow the
+[parent README](../../../README.md#three-approaches-to-rewriter-maintenance).
+
+**What cvc5 does, and why.** Its current approach is a proof-reconstructing
+rewriter: the rewriter is a black box, and proofs of
 rewrites are recovered afterwards by searching a database of RARE rules for
 something that explains what the rewriter did. This is deliberate and argued in
 print — Nötzli et al., the FMCAD paper, §I:
@@ -129,6 +134,12 @@ that are not provably simpler than the goal. The paper says so outright, which
 is why `--proof-rewrite-rcons-rec-limit` exists at all. Measured: 92–95% of
 rewrite *steps* reconstruct, but only **20–22% of proofs are fully
 fine-grained**, because one coarse step spoils a proof.
+
+**A proof-reconstructing rewriter is very hard to verify statically.** A
+guarantee that every rewrite has a reconstructed proof must relate the
+handwritten implementation to the separate rule database and show that the
+bounded search succeeds, including on conditions. Checking the proofs it finds
+establishes something narrower: those particular steps are justified.
 
 So: **whether a cvc5 proof is complete depends on how long a search is allowed
 to run.** That is a strange property for a contract to have, and
@@ -164,18 +175,22 @@ Generating the rewrite and justification together may prevent some
 It does not ensure that a rule is ever selected, that its preconditions are
 reachable, or that the generator implements the intended rule.
 
-### There is a second answer, and it does not need a new solver
+### Generated rewriters and the hybrid in `rdbExec`
 
-**Same problem, opposite move.** Telos proposes writing a rewriter in a host
-whose type system can carry the justification. The other answer keeps the
-rewriter and **generates its code from the rules**: RARE stops being a
-description of what the rewriter did and becomes a source the rewriter is built
-from, so the rewrite *is* a rule application and there is nothing left to
-reconstruct.
+A **proof-producing rewriter** returns its result with its justification;
+telos proposes expressing that interface in a dependently typed host.
+A **generated rewriter** takes its executable code from declarative proof rules.
+The rewrite is a rule application, so its proof can name the rule directly.
+These approaches compete on maintenance cost and can overlap in an
+implementation. A **proof-reconstructing rewriter** searches for the proof
+afterwards; rule conditions and fallback cases can still need that search in
+a hybrid.
 
-**It exists as code.** `ajreynol/cvc5` branch `rdbExec`, at `4585967004`,
+**The branch advocates a hybrid.** `ajreynol/cvc5` branch `rdbExec`, at `4585967004`,
 branched from cvc5 `5cc03f4b95` — an exploratory branch, not a shipped feature,
-not a cvc5 position, and read here at that commit. The shape:
+not a cvc5 position, and read here at that commit. It combines generated rules
+with the handwritten theory rewriters and retains proof reconstruction. Its
+generated portion runs when the theory rewriter leaves a term unchanged. The shape:
 
 | piece | what it does |
 | --- | --- |
@@ -251,16 +266,18 @@ fails:
 - performance. Building a proof term for every rewrite step, when a solver
   performs millions of them, may dominate. cvc5's design avoids this cost by
   construction and telos would be paying it on every step;
-- **the generated-rewriter route gets there first, and more cheaply.** If
+- **A hybrid using generated rules gets there first, and more cheaply.** If
   marking rules `:exec` closes the same gap inside a solver that already works,
   the dependently typed host is buying a guarantee nobody needed at a price
   nobody wanted to pay. This is the failure mode with a working prototype
   behind it, and it is the one to test against.
 
-**The cheapest test:** implement one theory's rewriter this way, for a fragment
+**The cheapest test:** implement a proof-producing rewriter for one theory, in a fragment
 where cvc5's RARE coverage is already good, and measure both the rule-authoring
-cost and the runtime — **against the `:exec` route, not against the 2022 paper
-alone.** Small, decisive, and does not require a solver.
+cost and the runtime against generated rewriting in the hybrid `:exec`
+prototype and the proof-reconstructing baseline. Include the hybrid's remaining
+handwritten work and reconstruction costs. The experiment does not require a
+solver.
 
 ---
 

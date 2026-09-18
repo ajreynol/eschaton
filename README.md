@@ -8,7 +8,48 @@ it says. This is about the solvers that would deserve that.
 It asks one question: **which approaches to a better-founded SMT solver are
 worth trying, and what would each cost?**
 
-## Approaches under consideration
+## Three approaches to rewriter maintenance
+
+A rewriter simplifies terms, and a proof-producing solver must justify those
+changes. We compare three ways to maintain rewrites and their proofs:
+**generated**, **proof-producing**, and **proof-reconstructing rewriters**.
+These are shared terms for the approaches.
+
+| Approach | What a maintainer edits | How the proof follows | Main question |
+| --- | --- | --- | --- |
+| **Generated rewriter** | Declarative proof rules from which executable rewrite code is generated. | The generated code applies a rule and records its identity so the proof producer can apply it directly. | How much rewriting can be expressed this way, and at what maintenance and runtime cost? |
+| **Proof-producing rewriter** | Rewrite code that returns a proof with the rewritten term. | The rewrite constructs its equality certificate as it runs. The proposal here uses types to require that certificate. | Can this keep manual work per rule and runtime cost low enough? |
+| **Proof-reconstructing rewriter** | Handwritten rewrite code and a separate collection of proof rules. | After rewriting, a reconstructor searches for a proof of the result. This is cvc5's current approach. | Can reconstruction keep up with changes and find a proof within its budget? Very hard to verify statically. |
+
+The maintenance tradeoff is where the connection between a rewrite and its
+proof lives: in generated code, in the rewrite's return value, or in a later
+search. These approaches can be combined within one solver.
+
+**A proof-reconstructing rewriter is very hard to verify statically.** A
+guarantee that every rewrite gets a proof must connect separately maintained
+rewrite code, proof rules and bounded search. Checking a proof once found does
+not establish that reconstruction will always find one. Generated and
+proof-producing rewriters make that connection more explicit, but their rules,
+generators and proof interfaces still need justification.
+
+**The `rdbExec` branch advocates a hybrid.** In
+[`ajreynol/cvc5`](https://github.com/ajreynol/cvc5/tree/rdbExec), read at
+`4585967004`, six RARE rules marked `:exec` generate rewrite code alongside the
+handwritten theory rewriters and their proof reconstruction. The generated
+rules run when the theory rewriter leaves a term unchanged. Proof production
+applies the recorded rule directly where possible, while retaining
+reconstruction for conditions and fallback
+cases. This is exploratory work in a personal fork, not a release or a position
+of cvc5's. Our proof-producing rewriter remains a proposal.
+
+**Next experiment:** compare generated and proof-producing rewriters with the
+proof-reconstructing baseline on one theory, measuring manual work per rule,
+coverage, certificate construction and checking costs. Use the hybrid
+`rdbExec` design as the practical baseline for generation inside an existing
+solver. The [comparison](docs/approaches.md#three-approaches-to-rewriter-maintenance) develops
+the tradeoffs; [related work](docs/related-work.md) records the evidence.
+
+## Broader solver approaches
 
 **A proof-first solver is currently the most promising path.** It can build on
 the verified [Logos proof checker](https://github.com/cvc5/logos), leaving
@@ -26,21 +67,10 @@ preference; none of these approaches has been implemented or tested here.
 | **Automated maintenance** | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
 | **Agent-built solver** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
 
-**Preferred next step:** prototype a proof-carrying rewriter for one theory and
-measure the manual work per rule and runtime overhead. Its outcome determines
-whether to proceed with the solver design.
-
-**There is a competing answer to the same question, and it needs no new
-solver:** generate the existing rewriter's matching code from the rewrite rules,
-so that a rewrite is a rule application and its proof names the rule rather than
-searching for one. Exploratory work in a personal fork
-([`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
-read at `4585967004`) does this for six rules; it is not a release and not a
-position of cvc5's. It narrows the gap the proof-first bet is aimed at without
-replacing anything, so the experiment above has to be measured against it and
-not only against the published objection it was designed to answer.
-[`docs/related-work.md`](docs/related-work.md) has the literature and the branch;
-[`docs/approaches.md`](docs/approaches.md) has what it does to the comparison.
+The rewriter comparison above is the first test of the proof-first proposal.
+Choosing how to maintain rewrites is separate from choosing whether to build a
+new solver or who writes it; any of these broader approaches could use these
+rewriter techniques or a hybrid.
 
 The full comparison and tradeoffs are in
 [`docs/approaches.md`](docs/approaches.md), and existing public work is in

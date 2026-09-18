@@ -1,7 +1,11 @@
 # Related work
 
-Public work bearing on the three bets in [`approaches.md`](approaches.md),
-arranged by which one it helps or hurts. This is a reading list, not a
+Public work bearing on the rewriter approaches and the three broader solver
+proposals in [`approaches.md`](approaches.md), arranged by which one it helps or
+hurts. **Generated rewriter**, **proof-producing rewriter** and
+**proof-reconstructing rewriter** use the
+[README's definitions](../README.md#three-approaches-to-rewriter-maintenance).
+This is a reading list, not a
 systematic survey. Results below are the authors' reports,
 not runs here.
 
@@ -60,9 +64,9 @@ experiment the maintenance proposal still needs.
 
 ## Where a rewrite's proof comes from — the argument all three bets inherit
 
-**This is the one piece of related work that is not merely adjacent: it is the
-published stance the proof-first bet is arguing against**, and it constrains
-the other two as much as it constrains that one.
+This section records the **proof-reconstructing rewriter**, cvc5's current
+approach and the baseline for generated and proof-producing rewriters. Its
+maintenance argument applies across the broader solver proposals.
 
 **[Nötzli, Barbosa, Niemetz, Preiner, Reynolds, Barrett and Tinelli,
 *Reconstructing Fine-Grained Proofs of Rewrites Using a Domain-Specific
@@ -90,6 +94,13 @@ because one unreconstructed step makes a whole proof coarse. Reported cost: a
 equality to be proved, and so there is no guarantee of termination in
 general."*
 
+This is why a proof-reconstructing rewriter is **very hard to verify
+statically**: a guarantee of reconstruction must cover the correspondence
+between rewrite code and proof rules, and the success of bounded search for all
+supported rewrites. The reported reconstruction rates measure particular runs;
+they do not establish that guarantee. A proof found in a run can still be checked
+independently.
+
 **Four further limits the authors state**, each of which bounds any proposal
 here: commutativity is not built into matching and must be expressed as extra
 rules; some rewriting is not rules at all (arithmetic *"boils down to
@@ -107,29 +118,33 @@ as a single rewrite rule in RARE."*
 > cvc5's proof coverage is**; nothing here restates its analysis or competes
 > with it.
 
-### The third answer, and it is a branch rather than a paper
+### Generated rewriting — the hybrid in `rdbExec`
 
 **[`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
 read at `4585967004`, branched from cvc5 `5cc03f4b95`.** Exploratory work in a
 personal fork: not a release, not a cvc5 position, and not a claim this
 repository is making about cvc5's plans.
 
-It takes neither the paper's route nor the proof-first one. **RARE rules marked
-`:exec` are compiled into the rewriter**: `rewrite_db_exec_printer.cpp`
-generates straight-line matching C++ from the rules, the rewriter applies them
-as a last resort, and the proof step records which rule fired so the
-post-processor applies it directly *"rather than searching"*. Six rules carry
+The branch advocates a **hybrid of generated rewriting and the existing
+proof-reconstructing approach**.
+**RARE rules marked `:exec` are compiled into the rewriter**:
+`rewrite_db_exec_printer.cpp` generates straight-line matching C++ from the
+rules. The handwritten theory rewriters remain; generated rules run as a last
+resort when a theory rewriter leaves a term unchanged. The proof step records
+which rule fired so the post-processor applies it directly *"rather than
+searching"*. Six rules carry
 `:exec` at that commit, and one of them replaces a hand-written case deleted
 from `SequencesRewriter`.
 
-**Why it belongs on a reading list about new solvers.** The FMCAD stance and
-the proof-first stance share a premise — that you either instrument a rewriter
-by hand or reconstruct afterwards. **Generating the rewriter from the rules is
-a third option, and it is the cheapest of the three to try**, because it needs
-no new language, no new kernel and no new solver. Its evidence is a prototype,
-not a measurement: nothing here establishes that it scales past six rules,
-and the branch itself keeps the search as a fallback and still reconstructs
-rule conditions through it.
+**Why it competes with a new proof-producing rewriter.** It reduces the work of
+keeping rewrite code and proof rules aligned by generating the former from the latter.
+The prototype does this inside an existing solver, providing a comparison for
+the proposal to construct rewrites and certificates together in a dependently
+typed host. Nothing here establishes that either is cheaper at scale: the
+generated portion covers six rules, keeps search as a fallback and still
+reconstructs rule conditions through it. Its hybrid design is part of the
+comparison: measure the handwritten work that remains as well as the generated
+portion.
 
 ## Proof-first design — the crowded half
 
@@ -148,8 +163,8 @@ that a new SMT producer will be easy to build.
 authoring cost or runtime cost of designing a solver around proof production.
 That is an experiment to run, not a claim that no such work exists.
 
-**Whether a new solver is needed to make rewrites carry their proofs.** The
-`rdbExec` branch above is a working counter-example at prototype scale, inside
+**How a proof-producing rewriter compares with a generated rewriter.** The
+`rdbExec` branch above uses generation in a hybrid at prototype scale, inside
 a solver nobody rewrote. Nothing on this list says how far that route goes —
 what fraction of the 321 RARE rules at cvc5 `aee8742404` could carry `:exec`,
 what the rules that cannot have in common, or what the generated matcher costs at

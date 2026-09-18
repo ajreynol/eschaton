@@ -10,7 +10,8 @@ kernel that is already verified.
 checker, which [dokimasia](https://github.com/ajreynol/dokimasia) is the
 authority on — not the search.
 **Written by:** people.
-**Dies if:** a proof-carrying rewriter costs too much.
+**Dies if:** a proof-producing rewriter costs too much, or a hybrid using
+generated rules closes the same gap more cheaply.
 
 **Status:** research notes. Nothing is built.
 
@@ -35,9 +36,16 @@ would leave the repository exactly as functional as it is now.
 **The question.** *If the proof came first, what would the solver look like?*
 The parent compares this proposal with alternative ways to develop a solver.
 
+The experiment explores a **proof-producing rewriter** and compares it with a
+**generated rewriter** and cvc5's **proof-reconstructing rewriter**, using the
+[parent README's shared terminology](../../README.md#three-approaches-to-rewriter-maintenance).
+The `rdbExec` branch is a hybrid baseline: generated rules alongside handwritten
+rewriting and proof reconstruction. These terms describe techniques usable by
+any solver.
+
 **The goals, in order** — they are [`TODO.md`](docs/TODO.md)'s `T1` to `T6`, ordered
 by how fast each could kill the project rather than by how much work each
-represents. `T2`, a proof-carrying rewriter for one theory, is first because it
+represents. `T2`, a proof-producing rewriter for one theory, is first because it
 is the only one whose outcome could invalidate the design.
 
 **The wishue** — the outcome if this went unusually well, and not a commitment.

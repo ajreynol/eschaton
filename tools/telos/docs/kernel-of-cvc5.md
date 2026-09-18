@@ -322,9 +322,14 @@ writing anything, with what to read each one *for*.
 - Nötzli et al., *Reconstructing Fine-Grained Proofs of Rewrites Using a
   Domain-Specific Language*, FMCAD. Read §IV-A before believing
   [inversion 3](design.md#i3--rewrites-prove-themselves-as-they-fire). The paper
-  argues against instrumenting the rewriter because of its complexity. Telos's
-  answer is that a different host language changes the cost — a hypothesis, not a
-  refutation.
+  argues against instrumenting the rewriter because of its complexity.
+  A **proof-producing rewriter** is telos's proposed answer: a different host
+  language may change the cost. Compare it with **generated** and
+  **proof-reconstructing rewriters** under the
+  [shared definitions](../../../README.md#three-approaches-to-rewriter-maintenance);
+  the language claim remains a hypothesis. The proof-reconstructing approach is
+  very hard to verify statically: checking a found proof does not establish that
+  bounded reconstruction succeeds for every rewrite.
 - Carcara — read the elaborator, not the checker. Turning coarse steps into fine
   ones is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) in another format, solved by a tool
   that does not claim verification and does not need to.
