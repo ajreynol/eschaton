@@ -9,7 +9,7 @@ This page states the provisional choice and the tradeoffs of the alternatives.
 
 [Logos](logos.md) supplies an existing Lean checker, so interoperability is the
 main reason for this provisional choice. Its source measurements here cover
-`a5650dad`; they do not establish producer performance. The
+`56c7b409`; they do not establish producer performance. The
 [correctness boundary](logos.md#what-its-guarantee-actually-is) remains part of
 the choice. The other tools below are discussed in
 [the kernel comparison](kernel-of-cvc5.md); this is not a benchmark ranking.
@@ -254,8 +254,8 @@ defended.
 ## The first thing to write
 
 A proof-carrying Boolean rewriter that emits CPC for Logos, as defined by
-[T2](../TODO.md#t2--a-proof-carrying-rewriter-for-one-theory). Measure authoring,
+[T2](TODO.md#t2--a-proof-carrying-rewriter-for-one-theory). Measure authoring,
 certificate construction and checking costs, and verify input correspondence.
 Writing a new Eunoia checker is outside the charter.
 
-Ordered next steps are in [`TODO.md`](../TODO.md).
+Ordered next steps are in [`TODO.md`](TODO.md).

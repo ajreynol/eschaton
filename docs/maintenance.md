@@ -53,7 +53,30 @@ against its YAML. These are the whole CI suite here: there is no solver test
 suite. A pass establishes repository conventions, not research results.
 
 The governing policy reference is kanon
-`dc6f56942fbc567abea76c562565557e5e7c6e19`; it is separate from the checker pin.
+`ad18fb2108f9560ca8327de9b86e064b15287e4b`; it is separate from the checker pin.
+
+## Which form of the check this repository runs
+
+Anoieu offers two forms and
+[the governing policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#2-run-the-check)
+accepts either: a pinned checker commit, or a call to anoieu's
+[shared workflow](https://github.com/ajreynol/anoieu/blob/main/docs/policy-checker.md)
+at `main` naming a policy contract. **This repository pins the implementation
+and names contract 1**, which is a decision rather than a default.
+
+The pin keeps the checker implementation fixed until a commit here changes it.
+Its policy verdict can be reproduced offline with the same input tree, checker
+revision and a compatible Python interpreter. This matters in a repository
+whose entire CI is this one job and whose content is prose. The hosted job still
+depends on GitHub, the network, runner images and action versions; pinning the
+checker does not make those dependencies reproducible or prevent their failures.
+
+The shared-workflow form fixes the obligations through a contract and lets the
+implementation move. A rerun can therefore report a different policy verdict
+after an implementation update, including a fix for a missed violation. Contract
+1 permits fixes, not new requirements; it does not guarantee that the checker
+has no bugs. Either form's checker can be run locally, but a called GitHub
+workflow itself requires a hosted run.
 
 ## Updating the checker
 
@@ -64,10 +87,3 @@ jobs; a green branch tip at another commit is not evidence. This remote check
 belongs in the update process, outside CI. If the result is absent, unfinished
 or failing, keep the existing pin. The pinned commit has a successful
 [CI run](https://github.com/ajreynol/anoieu/actions/runs/35270952777).
-
-Anoieu provides a
-[stable checker contract and shared workflow](https://github.com/ajreynol/anoieu/blob/154228a40d21584b95f4029742ccc8f432ea87f5/docs/policy-checker.md).
-This job explicitly selects contract 1 and keeps its implementation pinned
-while kanon's adoption policy requires it. Following the shared workflow at
-`main` also requires the governing adoption instructions to permit that choice;
-the pending request and reply are in [discussion](discussion.md).

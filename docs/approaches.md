@@ -42,9 +42,9 @@ since rule conditions are still reconstructed through the same bounded search.
 So the budget that
 [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) records is
 narrowed, not removed. What nobody has measured is how far it goes: how many of
-cvc5's 321 RARE rules could carry `:exec`, and what the ones that cannot have in
-common. **That measurement, not a new argument, is what would move this
-comparison.**
+cvc5's RARE rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and
+what the ones that cannot have in common. **That measurement, not a new
+argument, is what would move this comparison.**
 
 **Building a new solver with agents is arguing about something else.** It shares
 automated maintenance's method and proof-first design's willingness to start
@@ -60,7 +60,7 @@ Proof-first design is **not** "rip the spine out of cvc5 and build around it",
 though it is closer to that than the other two. It keeps the **proof calculus** — the
 `Cpc.eo` signature cvc5 already emits against — **parts of the internal proof
 checker**, and dokimasia's measurements of where cvc5's proof coverage has
-holes. Its kernel is [Logos](https://github.com/ajreynol/logos), a verified
+holes. Its kernel is [Logos](https://github.com/cvc5/logos), a verified
 checker in Lean that already exists; what this approach would build is the
 producer. The search does not come across.
 
@@ -70,10 +70,10 @@ registered theory rule checkers under `--check-proofs`: a compile closure of
 179 files and 41,446 lines, about 8% of `src/`. This is a source dependency
 measurement, not a minimal trusted-base proof. Which parts to keep is undecided.
 
-Logos's [correctness statement](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/README.md#correctness)
+Logos's [correctness statement](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/README.md#correctness)
 concerns the assumptions its parser reads under its model
 semantics. The parser, original-input correspondence and compiled execution
-remain trust obligations. Its [conformance limits](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md)
+remain trust obligations. Its [conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
 mean that a `correct` verdict alone is not a general SMT-LIB guarantee.
 The first Boolean rewriter experiment must check the input correspondence as
 well as the verdict. `incomplete` measures unsupported translations; it does

@@ -17,8 +17,8 @@ authority on — not the search.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Footing:** `unadvertised-child` — speculative research with no implementation;
-the parent does not advertise it.
+**Footing:** `unadvertised-child` — a child project of eschaton: speculative
+research with no implementation, not advertised on the parent's front page.
 
 **Internal.** A research note, not a project announcement, and unadvertised
 until there is something to show — not pointed at rather than not visible, since
@@ -35,7 +35,7 @@ would leave the repository exactly as functional as it is now.
 **The question.** *If the proof came first, what would the solver look like?*
 The parent compares this proposal with alternative ways to develop a solver.
 
-**The goals, in order** — they are [`TODO.md`](TODO.md)'s `T1` to `T6`, ordered
+**The goals, in order** — they are [`TODO.md`](docs/TODO.md)'s `T1` to `T6`, ordered
 by how fast each could kill the project rather than by how much work each
 represents. `T2`, a proof-carrying rewriter for one theory, is first because it
 is the only one whose outcome could invalidate the design.
@@ -47,7 +47,7 @@ input in the agreed fragment** — a fragment on
 which a telos solver's output is accepted by an independently maintained
 verified checker, with verdicts and unsupported inputs recorded separately.
 
-**Out of scope**, in full in [`TODO.md`](TODO.md)'s *Not doing*, and in
+**Out of scope**, in full in [`TODO.md`](docs/TODO.md)'s *Not doing*, and in
 summary: writing a kernel (Logos is the kernel); writing a solver until `T2`
 returns; verifying the search, ever, under the current design; claiming anything
 about cvc5, ethos or logos, since a fact about any of them goes into that
@@ -88,7 +88,7 @@ as the current, provisional preference.
 
 ## The foothold: Logos
 
-**telos proposes to use [`ajreynol/logos`](https://github.com/ajreynol/logos), and
+**telos proposes to use [`cvc5/logos`](https://github.com/cvc5/logos), and
 Logos is a moving target.** Everything below is downstream of that fact, so it
 belongs before the design rather than after it.
 
@@ -99,15 +99,16 @@ against `Cpc/SmtModel.lean`, a standalone Lean formalization of SMT-LIB's model
 semantics. Its calculus is **compiled from the same `Cpc.eo` signature cvc5
 emits proofs against**, by `ethos-eoc`, and regenerated as CPC changes.
 
-The measurements cover logos `a5650dad`; these are source sizes, not a complete trusted-base measurement. The figures are copied from
+The measurements cover logos `56c7b409`; these are source sizes, not a complete
+trusted-base measurement. The figures are copied from
 [the measurement note](docs/logos.md#what-it-weighs); no automatic comparison
 keeps the copy current:
 
 | | ethos + the `cpc` signature | **Logos** |
 | --- | --- | --- |
 | source components compared | ≈**26,400 lines** — 13,862 C++, 12,530 Eunoia | **2,680 lines** of Lean specification |
-| machine-checked soundness development | none established here | **691,993 lines** of proof |
-| rules proved sound | — | **591 of 593**, no `sorry`/`admit`/`axiom` in 872 files |
+| machine-checked soundness development | none established here | **691,928 lines** of proof |
+| rules proved sound | — | **591 of 593**, no `sorry`/`admit`/`axiom` in 890 files |
 | the calculus is | hand-written twice, in Eunoia and in C++ | generated from the signature, with drift caught in CI |
 | outside the checker theorem | C++ checker and Eunoia signature | parser, input correspondence, specification adequacy and compilation |
 
@@ -121,11 +122,12 @@ one. Which states the relationship between these two projects in a sentence:
 Dokimasia also reports static candidates and coverage risks; those are not a
 one-to-one prediction of Logos verdicts.
 
-At logos `be4791204be5616df2bf6f42ea304b45b08d33e1`, the theorem is about the assumptions the parser reads under Logos's semantics.
+At logos `56c7b409`, the theorem is about the assumptions the parser reads
+under Logos's semantics.
 Arrays, reals and uninterpreted sorts have documented model restrictions; these
 do not necessarily cause `incomplete`. The parser, original-input match and
 compiled execution remain trust obligations. Read the
-[conformance limits](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md)
+[conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
 before choosing a fragment. A Boolean rewriter is the proposed first test.
 
 Full description, measurements and eight things telos should learn from it are
@@ -163,7 +165,7 @@ things. The measurements cover cvc5 `aee8742404` and ethos `b9188b86`:
 | --- | --- | --- |
 | trusted C++ | **41,446 lines**, 179 files — 8.0% of `src/` | **13,862 lines**, standalone |
 | trusted declarative | — | **12,530 lines** of Eunoia (the `cpc` signature) |
-| the calculus is written as | `switch` bodies and LaTeX doc comments | 620 `declare-rule`, 340 `declare-const`, 151 `define`, 248 `program` |
+| the calculus is written as | `switch` bodies and LaTeX doc comments | 620 `declare-rule`, 340 constant declarations, 151 `define`, 248 `program` |
 | shares code with the solver it checks | **yes** — 10 theory subsystems, the rewriter, `Env` | **no** |
 | how it checks a rewrite | replays it — `MACRO_REWRITE`, registered trusted at pedantic level 4 | re-derives it from rules in the signature |
 
@@ -227,7 +229,7 @@ has been tested against an implementation.
 - [`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md) — what the kernel is today, what "defining" it means, and what each comparable tool's guarantee actually is
 - [`docs/design.md`](docs/design.md) — the five inversions, and the risks in each
 - [`docs/language.md`](docs/language.md) — the decision record
-- [`TODO.md`](TODO.md) — next steps, ordered, with what each produces
+- [`docs/TODO.md`](docs/TODO.md) — next steps, ordered, with what each produces
 
 The same standard as the rest of the repository applies: **a number here comes
 from something that ran**, and everything else is labelled as a design note.

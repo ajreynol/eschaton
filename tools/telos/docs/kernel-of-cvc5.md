@@ -6,7 +6,7 @@ design that follows from it is [`design.md`](design.md).
 
 The source measurements cover cvc5 `aee8742404` and ethos `b9188b86`;
 they are not committed baselines here. Estimates are marked. The Logos counts
-refer to `a5650dad`; its correctness boundary is described in
+refer to logos `56c7b409`; its correctness boundary is described in
 [Logos](logos.md#what-its-guarantee-actually-is).
 
 ## There are two kernels
@@ -62,7 +62,7 @@ Its weight, by file:
 
 Roughly **4,000 lines of typing and evaluation, 2,300 of state, 3,600 of
 parsing.** That split is by file, not by a dependency closure — a proper
-measurement is a `tcb`-shaped job and is [T6 in `TODO.md`](../TODO.md#t6--measure-ethoss-real-tcb).
+measurement is a `tcb`-shaped job and is [T6 in `TODO.md`](TODO.md#t6--measure-ethoss-real-tcb).
 
 Note that the parser is soundness-critical here in a way it usually is not: a
 checker that mis-parses a proof accepts the wrong thing. The source count is
@@ -96,7 +96,7 @@ The `program`s are the thing to look at. 4,186 lines of them:
 | `programs/DistinctValues.eo` | 186 |
 | `programs/Datatypes.eo` | 162 |
 | `programs/Utils.eo` | 156 |
-| six more | 321 |
+| four more | 321 |
 
 **That is another implementation of solver logic**, evaluated by ethos.
 `PolyNorm.eo` implements arithmetic normalization and `Bitblasting.eo` implements
@@ -200,7 +200,7 @@ thing to trust.
 **[Logos](logos.md) supplies a different CPC checking implementation with a
 soundness theorem.** This is enough to motivate consuming it in the producer
 experiment, but not a proof of ethos's type checker or general evaluator.
-Telos's plan is [the producer experiment](../TODO.md), not a new framework checker.
+Telos's plan is [the producer experiment](TODO.md), not a new framework checker.
 
 ## Prior art, and what each guarantee actually is
 
@@ -212,7 +212,7 @@ anyway because independence is worth something without proof.
 
 | tool | what it is | what is actually proved | what is still trusted |
 | --- | --- | --- | --- |
-| **Logos** | verified SMT proof checker in Lean 4, for **CPC** — the calculus cvc5 emits ([`logos.md`](logos.md)) | `correct___logos_check_proof`: if `logos` prints `correct` for a proof file, the assumptions the parser read out of it are unsatisfiable — against a standalone Lean formalization of SMT-LIB model semantics. **591 rules, all proven, no `sorry`/`admit`/`axiom` in 872 files** | the 2,680-line specification being the right one; Lean's kernel; **Lean's compiler and the C toolchain**, since you run a binary; the **unverified 2,653-line parser**; and that the assumptions are the problem you asked about — `include` and `reference` are ignored |
+| **Logos** | verified SMT proof checker in Lean 4, for **CPC** — the calculus cvc5 emits ([`logos.md`](logos.md)) | `correct___logos_check_proof`: if `logos` prints `correct` for a proof file, the assumptions the parser read out of it are unsatisfiable — against a standalone Lean formalization of SMT-LIB model semantics. **591 rules, all proven, no `sorry`/`admit`/`axiom` in 890 files** | the 2,680-line specification being the right one; Lean's kernel; **Lean's compiler and the C toolchain**, since you run a binary; the **unverified 2,657-line parser**; and that the assumptions are the problem you asked about — `include` and `reference` are ignored |
 | **cake_lpr** | LPR/LRAT checker; HOL4, compiled by CakeML | if the **binary** prints `s VERIFIED UNSAT`, the CNF in the parsed DIMACS file is unsatisfiable. Composed with CakeML's compiler-correctness theorem, so the statement is about the machine code — **parsing and I/O included** | HOL4, CakeML's compiler theorem, the machine model. Notably **not** an extraction step or an unverified C compiler |
 | **SMTCoq** | Rocq/Coq plugin; certified checker for zChaff, veriT and CVC4 certificates | the checker is proved correct in Coq; by computational reflection a successful check yields a Coq proof of the goal | Coq itself. Solvers untrusted. Scope is the quantifier-free fragment of bit-vectors, arrays, LIA and UF — not "SMT" |
 | **lean-smt** | Lean 4 tactic; runs cvc5, reconstructs CPC proofs | **nothing is proved.** It builds a native Lean proof *term* for each CPC step, so the result is checked by Lean's kernel like any other proof | Lean's kernel, and nothing else. Reconstruction is not proved correct — it either yields a term the kernel accepts or it fails. Measured: **15,271 of 21,595 cvc5 proofs (71%)**, so the cost of the small trusted base is incompleteness |
@@ -273,7 +273,7 @@ The lineage, closest first. Not endorsements — the ones worth reading before
 writing anything, with what to read each one *for*.
 
 **Read first, and completely**
-- **[Logos](https://github.com/ajreynol/logos)** — the Logos source tree. Not background:
+- **[Logos](https://github.com/cvc5/logos)** — the Logos source tree. Not background:
   the checker telos proposes to use. Read `README.md`'s *Correctness* section for the
   theorem, `docs/modularity.md` for the contract a second checker has to meet,
   `Cpc/SmtModel.lean` for the 1,602 lines that are the actual specification, and

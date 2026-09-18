@@ -11,12 +11,12 @@ worth trying, and what would each cost?**
 ## Approaches under consideration
 
 **A proof-first solver is currently the most promising path.** It can build on
-the verified [Logos proof checker](https://github.com/ajreynol/logos), leaving
+the verified [Logos proof checker](https://github.com/cvc5/logos), leaving
 the proof-producing solver as the main work. Logos's
-[correctness statement](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/README.md#correctness)
+[correctness statement](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/README.md#correctness)
 concerns parsed assumptions under its own semantics; its parser and the match
 to the original problem remain outside the theorem. Its
-[SMT-LIB conformance limits](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md)
+[SMT-LIB conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
 also constrain the fragment we could claim. This is a provisional research
 preference; none of these approaches has been implemented or tested here.
 
@@ -88,7 +88,7 @@ which records this repository.
 ## Common questions
 
 - **Where are cvc5's proof-production gaps measured?** [Dokimasia](https://github.com/ajreynol/dokimasia).
-- **Where is the verified CPC checker?** [Logos](https://github.com/ajreynol/logos), subject to its correctness statement above.
+- **Where is the verified CPC checker?** [Logos](https://github.com/cvc5/logos), subject to its correctness statement above.
 - **How do I check this repository?** Follow the [maintenance guide](docs/maintenance.md).
 
 ## How this repository is maintained

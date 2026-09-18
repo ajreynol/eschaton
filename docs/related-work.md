@@ -151,10 +151,10 @@ That is an experiment to run, not a claim that no such work exists.
 **Whether a new solver is needed to make rewrites carry their proofs.** The
 `rdbExec` branch above is a working counter-example at prototype scale, inside
 a solver nobody rewrote. Nothing on this list says how far that route goes —
-what fraction of 321 RARE rules could carry `:exec`, what the rules that cannot
-have in common, or what the generated matcher costs at runtime. **Until that is
-known, the proof-first bet is arguing for a solver against an alternative that
-needs none**, and no source here settles it.
+what fraction of the 321 RARE rules at cvc5 `aee8742404` could carry `:exec`,
+what the rules that cannot have in common, or what the generated matcher costs at
+runtime. **Until that is known, the proof-first bet is arguing for a solver
+against an alternative that needs none**, and no source here settles it.
 
 **The spine transplant.** Keeping cvc5's core engine as a working artifact and
 rebuilding the architecture around it. No source on this list establishes the

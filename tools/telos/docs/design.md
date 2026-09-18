@@ -6,7 +6,7 @@ instead. Each also carries **what would make it wrong**, because a design note
 whose author cannot say how it fails is an advertisement.
 
 There is no implementation here. The cvc5 examples refer to `aee8742404`;
-the Logos source counts refer to `a5650dad`. These are source measurements,
+the Logos source counts refer to `56c7b409`. These are source measurements,
 not benchmark results. The proposed benefits are hypotheses; see
 [Logos](logos.md#what-its-guarantee-actually-is) for the correctness boundary.
 

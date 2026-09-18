@@ -2,7 +2,7 @@
 
 *The foothold. Read this before anything else in this directory.*
 
-[`ajreynol/logos`](https://github.com/ajreynol/logos) is **a verified proof
+[`cvc5/logos`](https://github.com/cvc5/logos) is **a verified proof
 checker for SMT, written in Lean 4**, whose soundness is proved against a
 self-contained formalization of SMT-LIB's model semantics, and whose calculus is
 compiled from the same `Cpc.eo` signature cvc5 emits proofs against.
@@ -11,9 +11,11 @@ It is the checker telos proposes to use, and it is a **moving target** — the
 calculus is regenerated as CPC
 changes, and the proof development grows with it.
 
-The source measurements cover logos `a5650dad` and cvc5 `aee8742404`;
-they are not a committed baseline here. The correctness boundary below refers
-to logos `be4791204be5616df2bf6f42ea304b45b08d33e1`.
+The source measurements cover Logos
+[`56c7b4098a8c5e7b170ab506fc88d18a913d3cb6`](https://github.com/cvc5/logos/tree/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6)
+and cvc5 `aee8742404`; they are not a committed baseline here. The correctness
+boundary below refers to that Logos revision, and its figures are re-derived
+from the source rather than quoted.
 
 ---
 
@@ -25,7 +27,7 @@ to logos `be4791204be5616df2bf6f42ea304b45b08d33e1`.
 | **grounded in** | `Cpc/SmtModel.lean`, a model semantics for SMT-LIB that is **standalone** — it does not mention the checker and can be read on its own |
 | **calculus** | generated from `Cpc.eo` by `ethos-eoc`, the Eunoia compiler in the ethos tree. Not hand-transcribed |
 | **verdicts** | `correct` (0) · `incorrect` (1) · `incomplete` (2) |
-| **status** | 591 rules, **all proven**; no `sorry`, `admit` or `axiom` anywhere in 872 Lean files |
+| **status** | **all 591 rules it implements are proven** — 591 of the signature's 593 non-expert rules ([L6](#l6--trust-has-no-soundness-proof-and-that-is-the-whole-story)); no `sorry`, `admit` or `axiom` anywhere in 890 Lean files |
 
 The verdict trichotomy is the first thing that should catch a dokimasia
 reader's eye, and it is discussed [below](#l5--the-incomplete-verdict-is-a-completeness-instrument).
@@ -39,20 +41,29 @@ There is no automatic comparison between the table, that copy and Logos:
 | | files | lines | |
 | --- | ---: | ---: | --- |
 | **specification** — `Cpc.Spec` + dependencies | 6 | **2,680** | `SmtModel` 1,602 · `Spec` 387 · `LogosTerm` 253 · `SmtModelDefs` 230 · `SmtEval` 108 · `SmtValueOrder` 100 |
-| **checker** — `Cpc.Logos` + dependencies | 3 | **8,573** | `Cpc.Logos` is 8,212 of it, and is generated |
-| **parser** | 3 | **2,653** | 654 signature-independent, 1,999 generated. **Unverified** |
-| **correctness proof** | 820 | **691,993** | of which rule correctness is 771 files / 634,388 lines |
+| **checker** — `Cpc.Logos` + dependencies | 3 | **8,572** | `Cpc.Logos` is 8,211 of it, and is generated |
+| **parser** | 3 | **2,657** | 658 signature-independent, 1,999 generated. **Unverified** |
+| **correctness proof** | 820 | **691,928** | of which rule correctness is 771 files / 634,322 lines |
 
-Inside the proof: rule correctness **634,388**; translation type preservation
+Inside the proof: rule correctness **634,322**; translation type preservation
 23,796; smt-model-eval type preservation 19,832; closedness and evaluation
-invariance 8,204; top-level checker correctness 4,599; canonicity 1,091.
+invariance 8,203; top-level checker correctness 4,601; canonicity 1,091;
+non-vacuity 83, which the top-level theorem does not import. The seven buckets
+are disjoint and sum to the total.
+
+To reproduce the line counts, run `python3 scripts/cpc-loc-summary.py` in a
+Logos checkout at the full revision above. The 890-file hygiene figure is a
+separate textual scan of all tracked `*.lean` files, including tests and entry
+points. Logos's own `bash scripts/check-proof-hygiene.sh` scans the 872 Lean files
+under `Cpc/` and `CpcMini/`; it also passes at this revision. These are source
+checks; no full Lean proof build was run for these measurements.
 
 **Read those two columns together, because their ratio is the entire product.**
 
 | | ethos + the `cpc` signature | Logos |
 | --- | --- | --- |
 | source components compared | **≈26,400 lines** — 13,862 of C++ plus 12,530 of Eunoia | **2,680 lines** of Lean specification |
-| machine-checked soundness development | none established here | **691,993 lines** of proof |
+| machine-checked soundness development | none established here | **691,928 lines** of proof |
 | the calculus is | hand-written, and separately hand-implemented in C++ | generated from the signature |
 | outside the checker theorem | checker and signature | parser, original-input match, specification adequacy and compilation |
 | speed | fast, and the design goal | "not (yet) optimized … significantly slower" |
@@ -91,11 +102,11 @@ Trusted base of a `correct` verdict, in full:
 | **the specification is the right one** | 2,680 lines at the referenced revision; a human must assess its adequacy for the intended fragment |
 | **Lean's kernel** | which is not itself verified — see [`language.md`](language.md#lean-4--chosen) |
 | **Lean's compiler and the C toolchain** | because you ran a binary, not a proof term |
-| **the parser** | 2,653 unverified lines. The theorem is about whatever the parser read |
+| **the parser** | 2,657 unverified lines. The theorem is about whatever the parser read |
 | **that the assumptions are the problem you asked about** | Logos does not compare them to an original input; `include` and `reference` are ignored |
 
 The theorem proves unsatisfiability in Logos's model semantics.
-[That semantics differs from SMT-LIB](https://github.com/ajreynol/logos/blob/be4791204be5616df2bf6f42ea304b45b08d33e1/docs/smt-lib-conformance.md):
+[That semantics differs from SMT-LIB](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md):
 arrays are almost-constant maps, `Real` uses rationals, and uninterpreted sorts
 have infinite domains. These restrict the model class and can affect quantified
 or nonlinear reasoning without triggering `incomplete`. Sets and sequences are
@@ -171,7 +182,7 @@ not after its second package**.
 
 [`kernel-of-cvc5.md`](kernel-of-cvc5.md#the-external-checker) makes the point
 about ethos and it applies unchanged here: **a checker that mis-parses a proof
-accepts the wrong thing.** Logos's parser is 2,653 lines and is outside the
+accepts the wrong thing.** Logos's parser is 2,657 lines and is outside the
 theorem, which the README says plainly.
 
 This is the one place where cake_lpr is strictly ahead — its correctness
@@ -203,8 +214,9 @@ conformance or completeness of the producer's search.
 
 ### L6 — `trust` has no soundness proof, and that is the whole story
 
-`Cpc.eo` declares **593** non-expert rules. Logos's `CRule` has **591**
-constructors. The two rules in the signature with no constructor are:
+`Cpc.eo` declares **593** non-expert rules at cvc5 `aee8742404` — 620 counting
+the 27 under `expert/`. Logos's `CRule` has **591** constructors. The two rules
+in the signature with no constructor are:
 
 > **`beta-reduce`** and **`trust`**.
 
@@ -275,4 +287,4 @@ Record `incorrect`, `incomplete`, parser errors, timeouts and successful checks
 separately. These measure different boundaries; none by itself measures search
 completeness or establishes input correspondence.
 
-The experiment plan is in [`TODO.md`](../TODO.md).
+The experiment plan is in [`TODO.md`](TODO.md).

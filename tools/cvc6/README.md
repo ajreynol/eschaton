@@ -14,14 +14,14 @@ auto-refactored development of the solver, driven by autonomous agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Footing:** `unadvertised-child` — speculative research with no implementation;
-the parent does not advertise it.
+**Footing:** `unadvertised-child` — a child project of eschaton: speculative
+research with no implementation, not advertised on the parent's front page.
 
 ---
 
 **A working title, and not a pitch to the cvc5 project.** Nothing here is a plan
-for cvc5 or a request of its developers; the name is used because it states the
-bet in four characters.
+for cvc5 or a request of its developers; what the name is doing is at the bottom
+of this page.
 
 **The bet: the accumulated design is the asset, and its upkeep is the problem.**
 The existing theory engineering is the expensive part. This position proposes
@@ -47,3 +47,12 @@ automate is a claim about scale, not about quality.
 
 Nothing. No code, no agent, no refactor, no experiment. The bet is written down
 and untested.
+
+## The name
+
+`cvc6` is cvc5's version number advanced by one, and that is the whole of it: the
+same solver, kept and carried forward, stated in four characters. It is neither
+Greek nor a description of the work, which is **a departure from the shared
+policy's naming rule for a child project**, taken because no Greek word says
+*this one, one release later*. Changing it is the maintainer's decision, not this
+directory's.

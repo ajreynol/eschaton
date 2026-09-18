@@ -14,8 +14,8 @@ agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Footing:** `unadvertised-child` — speculative research with no implementation;
-the parent does not advertise it.
+**Footing:** `unadvertised-child` — a child project of eschaton: speculative
+research with no implementation, not advertised on the parent's front page.
 
 ---
 
@@ -64,3 +64,7 @@ solver comes from and not one thing about what it does.
 A sibling name is sitting right there should a competing approach ever want one:
 `cyclone`, Iowa State's mascot. Nothing here holds it, and the rest of the joke
 writes itself.
+
+**This is a departure, and it is named rather than argued for.** The shared
+policy asks a child project for a Greek name that describes the work; this one is
+neither. Changing it is the maintainer's decision, not this directory's.
