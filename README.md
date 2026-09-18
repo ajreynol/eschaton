@@ -22,9 +22,9 @@ preference; none of these approaches has been implemented or tested here.
 
 | Approach | What we would build | Main question |
 | --- | --- | --- |
-| **Proof-first design** ([telos](tools/telos/README.md)) | A new solver designed around proofs from the start, reusing cvc5's proof calculus and parts of its checker, with Logos as the verified kernel and new, untrusted search. | Can every rewrite carry its proof at an acceptable authoring and runtime cost? |
-| **Automated maintenance** ([cvc6](tools/cvc6/README.md)) | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
-| **Agent-built solver** ([hawkeye](tools/hawkeye/README.md)) | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
+| **Proof-first design** | A new solver designed around proofs from the start, reusing cvc5's proof calculus and parts of its checker, with Logos as the verified kernel and new, untrusted search. | Can every rewrite carry its proof at an acceptable authoring and runtime cost? |
+| **Automated maintenance** | An agent-driven evolution of cvc5: keep the existing solver and automate its refactoring and upkeep. | Can automated maintenance close gaps faster than they accumulate? |
+| **Agent-built solver** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness, and performance at useful scale? |
 
 The [rewriter comparison](#three-approaches-to-rewriter-maintenance) below is
 the first test of the proof-first proposal.

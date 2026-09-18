@@ -14,9 +14,10 @@ agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Visibility:** This child project is named on eschaton's front page at the
-maintainer's request. It is not an island in documentation; it remains isolated
-from the parent's code and CI.
+**Footing:** `unadvertised-child` — unadvertised at the maintainer's request:
+these are speculative research notes, omitted from default ecosystem status
+audits. Eschaton's front page does not name or link this child project; it
+remains isolated from the parent's code and CI.
 
 ---
 

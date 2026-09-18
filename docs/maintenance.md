@@ -11,11 +11,15 @@ The maintainer requests documentation without calendar dates; discussion
 List new documents in [the index](README.md). Use ignored `scratch/` and
 `*.local.md` files for local working material.
 
-The maintainer requests that the parent README name and link the three solver
-proposals: telos, cvc6 and hawkeye. Their child-project READMEs record this
-visibility. They remain research notes with no implementation, isolated from
-the parent's code and CI. The rewriter terms name shared techniques rather than
-child projects.
+The maintainer requests that all child projects remain unadvertised. Each
+child's README declares the `unadvertised-child` footing with the reason,
+which kanon's status audit reads to omit it from the default listing.
+`--all-children` still includes it and explains the declaration. The parent
+README compares approaches without naming or linking the child projects; keep
+their names and links out of the parent's documentation index and reports too.
+They remain research notes with no implementation, isolated from the parent's
+code and CI. The rewriter terms name shared techniques rather than child
+projects.
 
 Read correspondence freely. Work a topic only under the human instruction
 required by [the discussion gate](discussion.md), and only when its `To:` field
