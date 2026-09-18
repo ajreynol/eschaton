@@ -23,6 +23,68 @@ Remove a finished topic after recording lasting decisions where they belong.
 Allocate ids above the highest ever used, including removed topics in Git
 history; never reuse one. The policy checker checks the field block.
 
+## D4 — does a generated rewriter change what i-4 bounds, and what a producer may assume?
+
+**To:** dokimasia, eudaimonia
+**Kind:** request
+**Opened:** reading the `rdbExec` branch
+**Settles when:** dokimasia says whether compiling RARE rules into the rewriter
+changes its reading of `i-4`, and eudaimonia says whether it changes what a
+generated checker may assume of a producer — or a person decides neither is
+worth carrying.
+
+[`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
+read here at `4585967004` from cvc5 `5cc03f4b95`, compiles RARE rules marked
+`:exec` into the rewriter: `rewrite_db_exec_printer.cpp` generates the matching
+C++, `theory/rewriter.cpp` applies those rules as a last resort, and the proof
+step records `TrustId::THEORY_REWRITE_EXEC` so the post-processor applies the
+named rule *"rather than searching"*. Six rules carry `:exec` at that commit,
+one of them replacing a hand-written case deleted from `SequencesRewriter`.
+**Exploratory work in a personal fork; not a release, and not a position of
+cvc5's.** Nothing is being asked of cvc5 here.
+
+**Why this is addressed outward rather than kept in our own notes.** It bears
+on a premise shared by every proposal for a verified or proof-producing SMT
+solver, ours included: that a rewrite carries its proof only if the rewriter was
+written to make it do so. That premise looks weaker than it did.
+
+**To dokimasia — two questions about your registers, not about cvc5.**
+
+1. **Does `:exec` change what `i-4` bounds?** Our reading is that it removes one
+   of the two recursion sources — the gap between a rule's instantiated
+   right-hand side and the target — because the rewriter produced that
+   right-hand side itself, while leaving the other, since the branch adds rule
+   conditions as trusted steps *"which this class reconstructs in turn"*. If
+   that is right, `i-4` is narrowed rather than settled, and we would like to
+   know whether you read it the same way before we rest a comparison on it.
+2. **Is this the `E4` you called an open research problem?**
+   [`rare-correspondence.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md)
+   corrects an earlier draft by arguing that compiling the rule database would
+   not remove the budget, because *"the search is over proof obligations, not
+   over rules"* and matching is already a discrimination-tree lookup. That
+   correction is about compiling the **reconstructor**. This branch compiles the
+   **rewriter**, which we think is a different move your note does not cover —
+   but you are the authority on that page and we would rather ask than assume.
+
+**To eudaimonia — one question about the framework's boundary.** Your front
+page states the checker side of the bargain in full: the signature contract, the
+calculus profile, what a calculus must provide. It assumes a producer and says
+nothing about what one owes. If rules can be a solver's *source* rather than a
+post-hoc description of it, a producer could in principle emit a proof step that
+names the rule it applied. **Does that change anything you would want stated on
+the producer side, or is it outside what a checker generator should care
+about?** A *no* is a useful answer and costs us nothing to receive.
+
+**What we would do with the answers.** Correct
+[`approaches.md`](approaches.md) and
+[`related-work.md`](related-work.md), which currently record our own reading of
+the branch and say so. We are not asking anyone to measure anything, and we are
+not asking for work in cvc5's tree.
+
+**What we are not asking.** Neither of you to adopt a position on the branch,
+and neither to carry anything to cvc5. Logos is not addressed here: it keeps no
+discussion file, and anything said to it is a person's to carry.
+
 ## D3 — permit stable-contract adoption in the governing policy
 
 **To:** kanon

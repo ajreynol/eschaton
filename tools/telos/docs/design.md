@@ -164,8 +164,82 @@ Generating the rewrite and justification together may prevent some
 It does not ensure that a rule is ever selected, that its preconditions are
 reachable, or that the generator implements the intended rule.
 
+### There is a second answer, and it does not need a new solver
+
+**Same problem, opposite move.** Telos proposes writing a rewriter in a host
+whose type system can carry the justification. The other answer keeps the
+rewriter and **generates its code from the rules**: RARE stops being a
+description of what the rewriter did and becomes a source the rewriter is built
+from, so the rewrite *is* a rule application and there is nothing left to
+reconstruct.
+
+**It exists as code.** `ajreynol/cvc5` branch `rdbExec`, at `4585967004`,
+branched from cvc5 `5cc03f4b95` — an exploratory branch, not a shipped feature,
+not a cvc5 position, and read here at that commit. The shape:
+
+| piece | what it does |
+| --- | --- |
+| an `:exec` attribute on a RARE rule | marks it for compilation; parsed in `rw_parser.py`, carried on `Rule.is_exec` |
+| `rewrite_db_exec_printer.cpp` | **generates the matcher**: 1,088 lines that print straight-line C++ testing the shape of a term, emitted by `-o rare-db-exec` and installed by `contrib/install-rare-rewrites` |
+| `rewrite_db_exec.h/.cpp` | the generated database. Its own header: *"The bodies of the methods of this class are generated, not written by hand… Do not edit that file; edit the RARE rules and regenerate it"* |
+| `theory/rewriter.cpp` | applies `:exec` rules **as a last resort, when the theory rewriter leaves a term unchanged** |
+| `TrustId::THEORY_REWRITE_EXEC` | the step the rewriter records, carrying the id of the rule that fired |
+| `ProofPostprocessDsl::proveWithRule` | *"Since we know which rule proves eq, we apply it directly rather than searching"* |
+
+**Why this bears on I3 and not merely on cvc5's engineering.** Dokimasia's
+[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) is that
+proof completeness depends on a search budget. That search recurses on two
+things: the **precondition** of a conditional rule, and the **gap** between the
+instantiated right-hand side and the target. For an `:exec` rewrite the second
+one is gone — not because the search got faster, but because the rewriter
+produced σ(v) itself, so there is no gap to close. **The conditions remain**:
+the branch adds them as trusted steps *"which this class reconstructs in
+turn"*, and those go back through the same bounded search.
+
+So the honest statement is that this route **narrows i-4 rather than dissolving
+it**, and does so without a new language, a new kernel or a new solver.
+
+**Read the branch's own caution, which is the part telos should take most
+seriously.** Three things it says about itself:
+
+- **`proveWithRule` can fail and fall back.** *"This fails if the rule does not
+  apply to eq as it stands, e.g. because eq uses an encoding of terms that
+  differs from the one the RARE rules are stated over. The caller falls back on
+  `d_rdbPc` in that case."* The encoding seam does not disappear; it is handled
+  where it was.
+- **Termination moved into the rule set.** A condition is rewritten like any
+  other term, so it may re-trigger the rule whose condition it is. The branch
+  breaks the cycle by abandoning a match whose condition is already being
+  checked, and says why the bookkeeping is unconditional rather than assertions-
+  only: *"a cyclic condition originates from the RARE rule set"*. **A generated
+  rewriter makes the rule set responsible for termination**, which is an
+  obligation telos would inherit in full and has not costed.
+- **The generated code is checked, not trusted.** `checkMatch` re-instantiates
+  the left-hand side and compares: *"It is what makes the generated code
+  checkable rather than trusted."* That is the same discipline I2 praises Logos
+  for, arrived at independently and inside C++.
+
+**At what scale it has been tried.** Six rules carry `:exec` at `4585967004` —
+five in `theory/strings/rewrites`, one in `theory/bv/rewrites` — out of 321 RARE
+rules in cvc5 `aee8742404`. That is a prototype, and the six are not the easy
+ones: they were chosen to cover an indexed operator, a conditional rule with a
+`:list` variable sandwich, and three rules sharing a prefix tested in one
+traversal. One of them, `re-star-star`, **replaces a hand-written case deleted
+from `SequencesRewriter`**, which its regression calls *"the intended migration
+path: a rewrite implemented by hand is deleted in favour of the RARE rule"*.
+**That single deletion is the existence proof**, and it is worth more to this
+argument than the other five together.
+
+**What it does to telos.** I3's claim was never that proofs-with-rewrites is
+the only route to dissolving i-4; it was that a dependently typed host makes it
+cheap. This branch is a competing bid on cost, from inside a working solver,
+with no rewrite of anything. Telos's claim survives only if elaboration in a
+dependently typed host is cheaper *per rule* than marking a rule `:exec` and
+regenerating — and `:exec` is one token. **That is now the number T2 has to
+beat**, and it is a much harder target than the FMCAD paper alone set.
+
 **What would make it wrong.** This is the inversion most likely to be wrong,
-and it should be tested before anything else is built on it. Three ways it
+and it should be tested before anything else is built on it. Four ways it
 fails:
 
 - the elaboration is not as free as claimed, and generating the justification
@@ -176,11 +250,17 @@ fails:
   not confluent — and those are exactly the parts that resist carrying a proof;
 - performance. Building a proof term for every rewrite step, when a solver
   performs millions of them, may dominate. cvc5's design avoids this cost by
-  construction and telos would be paying it on every step.
+  construction and telos would be paying it on every step;
+- **the generated-rewriter route gets there first, and more cheaply.** If
+  marking rules `:exec` closes the same gap inside a solver that already works,
+  the dependently typed host is buying a guarantee nobody needed at a price
+  nobody wanted to pay. This is the failure mode with a working prototype
+  behind it, and it is the one to test against.
 
 **The cheapest test:** implement one theory's rewriter this way, for a fragment
 where cvc5's RARE coverage is already good, and measure both the rule-authoring
-cost and the runtime. Small, decisive, and does not require a solver.
+cost and the runtime — **against the `:exec` route, not against the 2022 paper
+alone.** Small, decisive, and does not require a solver.
 
 ---
 

@@ -9,7 +9,7 @@ what already exists in public for each is
 
 | | keeps from cvc5 | written by | the bet | dies if |
 | --- | --- | --- | --- | --- |
-| Proof-first design | the calculus, and parts of the internal proof checker | people | designing proof production with search may reduce reconstruction gaps | a proof-carrying rewriter costs too much |
+| Proof-first design | the calculus, and parts of the internal proof checker | people | designing proof production with search may reduce reconstruction gaps | a proof-carrying rewriter costs too much, **or generating the existing rewriter from the rules closes the same gap more cheaply** |
 | Automated maintenance | all of it | agents | the design is the asset; mechanize the upkeep and the build order stops mattering | upkeep does not outrun accumulation |
 | Agent-built solver | nothing | agents | solvers are scarce because people are, so make architecture cheap to vary | the hard parts are exactly the parts that do not automate |
 
@@ -19,6 +19,32 @@ than reconstructing proofs afterwards; the latter asks whether improving the
 existing implementation is cheaper still. The measurements do not establish
 that development order causes the gaps, and the approaches could complement
 each other.
+
+**And there is now evidence in that disagreement, on the side of improving the
+existing implementation.** The proof-first bet rests on the claim that a rewrite
+can only carry its proof if the rewriter is written to do so from the start.
+[`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
+read at `4585967004` from cvc5 `5cc03f4b95`, is a third answer: **generate the
+rewriter's matching code from the RARE rules**, so the rewrite *is* a rule
+application and the proof step names the rule that fired instead of searching
+for one. Exploratory work in a personal fork — six rules, no release, and no
+position of cvc5's — but it closes part of the same gap **with no new solver,
+no new language and no new kernel**, which is the cheapest bid on the table.
+[`related-work.md`](related-work.md#where-a-rewrites-proof-comes-from--the-argument-all-three-bets-inherit)
+describes it and the published stance it departs from; the mechanism and what
+it does to the proof-first bet are in
+[`design.md` I3](../tools/telos/docs/design.md#i3--rewrites-prove-themselves-as-they-fire).
+
+**This narrows the question rather than settling it.** An `:exec` rewrite
+removes one of the two things reconstruction recurses on — the gap between a
+rule's instantiated right-hand side and the target — and leaves the other,
+since rule conditions are still reconstructed through the same bounded search.
+So the budget that
+[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) records is
+narrowed, not removed. What nobody has measured is how far it goes: how many of
+cvc5's 321 RARE rules could carry `:exec`, and what the ones that cannot have in
+common. **That measurement, not a new argument, is what would move this
+comparison.**
 
 **Building a new solver with agents is arguing about something else.** It shares
 automated maintenance's method and proof-first design's willingness to start
@@ -65,3 +91,12 @@ subsystem measured against the gaps it is meant to close; or a new theory
 solver that passes somebody else's benchmark set. The preference for proof-first
 design remains provisional until those experiments provide evidence to judge
 the approaches.
+
+**The first of those experiments now has a comparison to make, and it is not
+the one it was designed against.** A proof-carrying rewriter for one theory was
+meant to test the 2022 objection that instrumenting a rewriter costs too much
+per rule. It must now also be measured against marking a RARE rule `:exec` and
+regenerating the matcher, which is one token per rule. **An experiment that
+beats the paper and loses to the branch has not settled anything in
+proof-first design's favour**, and the design note says so where the claim
+lives.

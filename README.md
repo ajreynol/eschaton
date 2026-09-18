@@ -30,6 +30,18 @@ preference; none of these approaches has been implemented or tested here.
 measure the manual work per rule and runtime overhead. Its outcome determines
 whether to proceed with the solver design.
 
+**There is a competing answer to the same question, and it needs no new
+solver:** generate the existing rewriter's matching code from the rewrite rules,
+so that a rewrite is a rule application and its proof names the rule rather than
+searching for one. Exploratory work in a personal fork
+([`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
+read at `4585967004`) does this for six rules; it is not a release and not a
+position of cvc5's. It narrows the gap the proof-first bet is aimed at without
+replacing anything, so the experiment above has to be measured against it and
+not only against the published objection it was designed to answer.
+[`docs/related-work.md`](docs/related-work.md) has the literature and the branch;
+[`docs/approaches.md`](docs/approaches.md) has what it does to the comparison.
+
 The full comparison and tradeoffs are in
 [`docs/approaches.md`](docs/approaches.md), and existing public work is in
 [`docs/related-work.md`](docs/related-work.md).
