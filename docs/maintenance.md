@@ -11,15 +11,11 @@ The maintainer requests documentation without calendar dates; discussion
 List new documents in [the index](README.md). Use ignored `scratch/` and
 `*.local.md` files for local working material.
 
-All child projects are unadvertised. Keep this declaration, with a reason,
-in each child's README introduction:
-
-```markdown
-**Footing:** `unadvertised-child` — speculative research with no implementation.
-```
-
-Keep their names and inward links out of the parent README, documentation
-index, reports and other reader-facing documentation.
+The maintainer requests that the parent README name and link the three solver
+proposals: telos, cvc6 and hawkeye. Their child-project READMEs record this
+visibility. They remain research notes with no implementation, isolated from
+the parent's code and CI. The rewriter terms name shared techniques rather than
+child projects.
 
 Read correspondence freely. Work a topic only under the human instruction
 required by [the discussion gate](discussion.md), and only when its `To:` field

@@ -209,7 +209,7 @@ conformance.
   If it produces a fact about any of them — as T3 and T5 might — that fact goes
   into the appropriate register under the appropriate project's name, with the
   same evidence standard everything else here is held to.
-- **Announcing it.** See the [notice](../README.md).
+- **Presenting the proposal as an implemented solver.** See the [notice](../README.md).
 
 ## The honest cost
 

@@ -18,13 +18,13 @@ generated rules closes the same gap more cheaply.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Footing:** `unadvertised-child` — a child project of eschaton: speculative
-research with no implementation, not advertised on the parent's front page.
+**Visibility:** This child project is named on eschaton's front page at the
+maintainer's request. It is not an island in documentation; it remains isolated
+from the parent's code and CI.
 
-**Internal.** A research note, not a project announcement, and unadvertised
-until there is something to show — not pointed at rather than not visible, since
-this repository is public. Nothing here makes a claim about cvc5, asks anything
-of cvc5, or should be quoted as though it did.
+**Research notes.** The name identifies a proposal with no implementation.
+Nothing here makes a claim about cvc5, asks anything of cvc5, or should be quoted
+as though it did.
 
 **It ships no code.** Everything in this directory is prose, and deleting it
 would leave the repository exactly as functional as it is now.
@@ -59,7 +59,8 @@ verified checker, with verdicts and unsupported inputs recorded separately.
 summary: writing a kernel (Logos is the kernel); writing a solver until `T2`
 returns; verifying the search, ever, under the current design; claiming anything
 about cvc5, ethos or logos, since a fact about any of them goes into that
-project's register under its own name; and announcing this directory.
+project's register under its own name; and presenting this proposal as an
+implemented solver.
 
 ## The premise
 

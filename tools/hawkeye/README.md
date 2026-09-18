@@ -14,8 +14,9 @@ agents.
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
 
-**Footing:** `unadvertised-child` — a child project of eschaton: speculative
-research with no implementation, not advertised on the parent's front page.
+**Visibility:** This child project is named on eschaton's front page at the
+maintainer's request. It is not an island in documentation; it remains isolated
+from the parent's code and CI.
 
 ---
 
