@@ -68,7 +68,7 @@ checks; no full Lean proof build was run for these measurements.
 | outside the checker theorem | checker and signature | parser, original-input match, specification adequacy and compilation |
 | speed | fast, and the design goal | "not (yet) optimized … significantly slower" |
 
-[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) says the measure that matters is
+[dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about) says the measure that matters is
 **"how long the argument is and how much of it a reader can check."** These
 line counts compare source components, not the whole trust argument; they do
 not measure correctness or the value of static analysis.
@@ -204,7 +204,7 @@ That is this repository's subject appearing inside a soundness tool. cvc5's
 `incomplete` asks whether the *specification* covers what the proof mentions.
 Two different completeness questions, both answered per-input, both silent about
 everything no input has reached — which is exactly the limitation
-[`docs/contract.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#the-gap-this-exists-to-close)
+[dokimasia's stance](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-stance)
 exists to name.
 
 The static counterpart — which proofs can return `incomplete` — is a coverage
@@ -260,7 +260,7 @@ duplicate:
 - **not linked to the input problem.** `include` and `reference` are ignored, so
   a `correct` verdict is about the assumptions the file states, not about the
   benchmark somebody solved. That is one level down from
-  [contract §3](https://github.com/ajreynol/dokimasia/blob/main/docs/contract.md#why-3-is-not-a-footnote) — *the solver
+  [contract §3](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-three-ways-it-breaks) — *the solver
   that produced the proof is the solver that solved it* — and it is the same
   shape of gap;
 - **not fast.**

@@ -17,7 +17,7 @@ not benchmark results. The proposed benefits are hypotheses; see
 **What cvc5 does, and why.** `TheoryInferenceManager` declares
 `ProofGenerator* pg = nullptr` as a default argument, and `conflict(TNode,
 InferenceId)` and `lemma(TNode, InferenceId, LemmaProperty)` take no generator
-at all ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h6--no-proof-must-be-said-out-loud)). So
+at all ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)). So
 
 ```cpp
 d_im.lemma(lem, InferenceId::ARITH_MY_NEW_INFERENCE);
@@ -28,8 +28,8 @@ proofless one.** The interface permits proof production to be optional; the
 proposed design makes evidence mandatory for successful answers.
 
 Downstream: 79 inferences fall through to a trust step by construction
-([i-22](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), 8 trust steps are built with `TrustId::NONE`
-and so cannot be attributed at all ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
+([i-22](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)), 8 trust steps are built with `TrustId::NONE`
+and so cannot be attributed at all ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)), and
 `--check-proofs-complete` exists to discover at runtime, one benchmark at a
 time, which of these a given input reached.
 
@@ -67,15 +67,15 @@ certificate construction and independent checking.
 
 **What cvc5 does, and why.** The calculus is stated three times: as LaTeX
 `\inferrule` blocks in `cvc5_proof_rule.h`
-([H9](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h9--the-rule-documentation-is-a-contract)), as
+([H9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)), as
 C++ checkers registered with `ProofChecker`, and as 620 `declare-rule`s in the
 Eunoia signature. They are written by different people at different times, and
 [`dokimasia.signature`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/signature/) exists precisely because
 they can disagree — it found one
-([i-21](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md): `SUBS`'s documentation omits an argument its
+([i-21](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register): `SUBS`'s documentation omits an argument its
 checker reads).
 
-[R1](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r1--emit-the-tables-cvc5-already-has) is dokimasia's request: *emit the tables cvc5 already has*. It is an
+[R1](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r1--emit-the-tables-cvc5-already-has) is dokimasia's request: *emit the tables cvc5 already has*. It is an
 ask because the tables are recovered by parsing C++, leaving their accuracy
 dependent on that parser.
 
@@ -95,7 +95,7 @@ build. Both failures are loud and distinct by design. telos inherits this rather
 than redesigning it.
 
 This is the least novel idea in the document and the most reliably valuable.
-[H11](https://github.com/ajreynol/dokimasia/blob/main/docs/hygiene.md#h11--the-rare-correspondence-is-stated-not-inferred)
+[H11](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)
 already observes the pattern working inside cvc5: the RARE→`ProofRewriteRule`
 correspondence is *exact in both directions, and holds because it is generated*.
 "Nobody maintains it, so it cannot drift" is the whole design principle,
@@ -127,7 +127,7 @@ print — Nötzli et al., the FMCAD paper, §I:
 > original rewriter … instrumenting this code to additionally produce proofs
 > makes it even more complex and makes it harder to add new rewrite rules."*
 
-The consequence is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md), a reconstruction limit recorded by dokimasia: reconstruction is a recursive
+The consequence is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register), a reconstruction limit recorded by dokimasia: reconstruction is a recursive
 search with **no termination guarantee** — applying a rule spawns sub-problems
 (its preconditions, and the gap between its instantiated RHS and the target)
 that are not provably simpler than the goal. The paper says so outright, which
@@ -143,7 +143,7 @@ establishes something narrower: those particular steps are justified.
 
 So: **whether a cvc5 proof is complete depends on how long a search is allowed
 to run.** That is a strange property for a contract to have, and
-[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md) is right that a kernel has to
+[dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about) is right that a kernel has to
 confront it rather than inherit it.
 
 **The inversion.** A schematic result type carries the rewritten term and a
@@ -171,7 +171,7 @@ second place to get it wrong. Writing a rule stays as cheap as writing a RARE
 rule; the proof is a derived artifact, not a parallel obligation.
 
 Generating the rewrite and justification together may prevent some
-[correspondence defects](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md).
+[correspondence defects](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-rare-correspondence).
 It does not ensure that a rule is ever selected, that its preconditions are
 reachable, or that the generator implements the intended rule.
 
@@ -202,7 +202,7 @@ generated portion runs when the theory rewriter leaves a term unchanged. The sha
 | `ProofPostprocessDsl::proveWithRule` | *"Since we know which rule proves eq, we apply it directly rather than searching"* |
 
 **Why this bears on I3 and not merely on cvc5's engineering.** Dokimasia's
-[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) is that
+[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register) is that
 proof completeness depends on a search budget. That search recurses on two
 things: the **precondition** of a conditional rule, and the **gap** between the
 instantiated right-hand side and the target. For an `:exec` rewrite the second
@@ -213,6 +213,30 @@ turn"*, and those go back through the same bounded search.
 
 So the honest statement is that this route **narrows i-4 rather than dissolving
 it**, and does so without a new language, a new kernel or a new solver.
+
+**Dokimasia confirms that mechanism and bounds it twice**, read at dokimasia
+`1eeae9b`, and the second bound is a correction telos should carry rather than
+soften. `i-4` is a claim about the **procedure**, so removing one recursion
+source for the compiled rules leaves its termination status exactly where it
+was — *"a procedure with no termination argument that now needs the budget less
+often still has no termination argument."* And the budget is spent per
+reconstruction rather than per rule, so six compiled rules are a smaller
+constant and *"a smaller constant is not an argument."* **This cuts both ways
+for telos.** It weakens the branch as a rebuttal of I3, because the branch does
+not retire the obligation telos claims to discharge by construction; and it
+weakens I3's own framing, because *narrowed* and *dissolved* read alike in a
+design note and only one of them is a termination argument. What I3 would have
+to deliver is the argument, not a smaller constant.
+
+**Dokimasia also names a gain that is not I3's.** For a rule compiled into the
+rewriter, the RARE rule and the generated C++ stop being two statements of one
+fact, so
+[i-17](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)'s
+*established only by runtime search* does not describe it — the strongest form
+of the test its pages call `E1`, arriving as a by-product. The cost is that the
+recorded rule is a trust step, trusted when made and reconstructed afterwards,
+which moves the work into its `trust` census. **That by-product is bounded by
+the marker**, which is the six rules counted below and not the technique.
 
 **Read the branch's own caution, which is the part telos should take most
 seriously.** Three things it says about itself:
@@ -287,13 +311,13 @@ solver.
 not have full proof and model support", and delivers it at *runtime*:
 `SetDefaults::setDefaultsPre` turns features off by name, and
 `NoOpTheoryRewriter` throws `SafeLogicException` if a disabled theory is reached
-anyway. The list is hand-maintained ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)), and
+anyway. The list is hand-maintained ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)), and
 `stringLazyPreproc` already escapes it — it declares `no_support = ["proofs"]`,
 defaults to `true`, and neither mechanism disables it
-([i-2](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)). The unsafe code is compiled, linked, and one
+([i-2](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)). The unsafe code is compiled, linked, and one
 missed guard away.
 
-[R8](https://github.com/ajreynol/dokimasia/blob/main/docs/coupling.md#r8--safe-mode-as-a-build-time-property) asks for
+[R8](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r8--safe-mode-as-a-build-time-property) asks for
 the build-time version: make the safe build not *contain* the unsafe code, so a
 missed guard is a link error. `ENABLE_SAFE_MODE` exists and prunes almost
 nothing — five files in `src/` mention `CVC5_SAFE_MODE`, two of them only to
@@ -310,16 +334,16 @@ must still permit `unknown`; making every `Limitation` uninhabited would
 incorrectly equate proof support with total search. The type-level interface is
 an experiment, not a demonstrated replacement for runtime checks.
 
-This is the second wishue in [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)
+This is the second of [dokimasia's two wishues](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-safe-build-that-cannot-be-unsafe)
 — *a safe build that cannot be unsafe* — reached by construction rather than by
-progressive pruning. And it makes the consistency check that document proposes
+progressive pruning. And it makes the consistency check that page proposes
 (the runtime disable list and the build-time exclusion list must agree)
 vacuous: there is one list and it is the type.
 
 **What would make it wrong.** Feature configuration in a real solver is not a
 clean lattice. Options interact, some features are partially proof-producing,
 and "does this have proof support" is often *fragment*-dependent rather than
-feature-dependent — which is exactly [i-15](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md): the
+feature-dependent — which is exactly [i-15](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register): the
 supported fragment is not expressible as a list of kinds, because two of the
 options safe mode disables gate a *logic* and a *type* rather than a kind. A
 type-level encoding that cannot express that is a worse model than cvc5's list,
@@ -332,7 +356,7 @@ not a better one.
 This is the one that makes the other four affordable, and it is a restatement of
 dokimasia's own stance rather than a new idea.
 
-[`docs/goals.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/goals.md) is explicit: **completeness, not
+[dokimasia's stance](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-stance) is explicit: **completeness, not
 soundness.** Not *is this proof step valid* but *is there a path that produces
 no proof at all*. It can take that stance because something else handles
 soundness — `ethos` checks the proof, so dokimasia does not have to.

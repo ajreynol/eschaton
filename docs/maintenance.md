@@ -21,11 +21,15 @@ They remain research notes with no implementation, isolated from the parent's
 code and CI. The rewriter terms name shared techniques rather than child
 projects.
 
-Read correspondence freely. Work a topic only under the human instruction
-required by [the discussion gate](discussion.md), and only when its `To:` field
-names eschaton. Draft replies here for a person to carry; write no other tree.
-When a topic ends, remove it after placing any lasting decision in the document
-it governs. Allocate new ids above every id in this file and its Git history.
+Correspondence follows
+[kanon's discussion-file rules](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#the-discussion-file),
+which this guide does not restate. What is local to this repository: work a
+topic only when its `To:` field names eschaton; draft every reply here for a
+person to carry and write no other tree; and put a lasting decision in the
+document it governs rather than leaving it in a topic — which form of the check
+this repository runs is recorded below for that reason. Ids are allocated above
+every id in [`discussion.md`](discussion.md) and its Git history, which is where
+a removed topic's number survives.
 
 ## Repository checks
 
@@ -53,14 +57,14 @@ against its YAML. These are the whole CI suite here: there is no solver test
 suite. A pass establishes repository conventions, not research results.
 
 The governing policy reference is kanon
-`ad18fb2108f9560ca8327de9b86e064b15287e4b`; it is separate from the checker pin.
+`532ceb17656329d399886421bb39dedd868d6c72`; it is separate from the checker pin.
 
 ## Which form of the check this repository runs
 
 Anoieu offers two forms and
 [the governing policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#2-run-the-check)
 accepts either: a pinned checker commit, or a call to anoieu's
-[shared workflow](https://github.com/ajreynol/anoieu/blob/main/docs/policy-checker.md)
+[shared workflow](https://github.com/ajreynol/anoieu/blob/main/policy_check/README.md)
 at `main` naming a policy contract. **This repository pins the implementation
 and names contract 1**, which is a decision rather than a default.
 

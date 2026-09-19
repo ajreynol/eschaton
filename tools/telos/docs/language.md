@@ -107,7 +107,7 @@ It loses on 1, 2 and 3 together:
 - Verifying an SMT solver's kernel *with an SMT solver* is defensible (the
   argument is relative soundness, and Lean's kernel would not be in the loop
   either way) but it is rhetorically bad for a project whose stated goal is
-  **an argument a reader can check**. [`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)
+  **an argument a reader can check**. [dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)
   measures success as "how long the argument is and how much of it a reader can
   check", and "Z3 said so" is a short argument that a reader cannot check.
 
@@ -217,7 +217,7 @@ of *reconstruction* is building a Lean term per proof, which for
 
 **Provisional decision: follow Logos.** Failing that, and for the parts of telos
 Logos does not cover, reconstruction — because the whole point of
-[`kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)'s measure — *how long the argument is and
+[dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)'s measure — *how long the argument is and
 how much of it a reader can check* — is served by a trusted base of exactly one
 component, and because it produces an object somebody else can check without
 running our code. Revisit it the first time evaluation of a `program`

@@ -2,9 +2,13 @@
 
 The [README](../README.md#three-approaches-to-rewriter-maintenance) defines the
 shared terms **generated rewriter**, **proof-producing rewriter** and
-**proof-reconstructing rewriter**. They name
+**proof-reconstructing rewriter**, and is the ground truth for them. They name
 competing ways to maintain a rewriter and its proofs, usable across the broader
 solver proposals below.
+
+*[Three approaches to rewriter maintenance](#three-approaches-to-rewriter-maintenance)
+below restates those definitions at length. **Nothing compares the two copies**,
+so a reader who finds them disagreeing should take the README's.*
 
 ## Broader solver approaches
 
@@ -82,16 +86,38 @@ the hybrid use of generated rules inside the existing solver.
 [`related-work.md`](related-work.md#where-a-rewrites-proof-comes-from--the-argument-all-three-bets-inherit)
 records the prototype and the published proof-reconstruction baseline.
 
-**This narrows the question rather than settling it.** An `:exec` rewrite
-removes one of the two things reconstruction recurses on — the gap between a
-rule's instantiated right-hand side and the target — and leaves the other,
-since rule conditions are still reconstructed through the same bounded search.
-So the budget that
-[i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) records is
-narrowed, not removed. What nobody has measured is how far it goes: how many of
-cvc5's RARE rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and
-what the ones that cannot have in common. **That measurement, not a new
-argument, is what would move this comparison.**
+**This narrows the question rather than settling it, and the narrowing is
+smaller than it looks.** An `:exec` rewrite removes one of the two things
+reconstruction recurses on — the gap between a rule's instantiated right-hand
+side and the target — and leaves the other, since rule conditions are still
+reconstructed through the same bounded search. Dokimasia, which is the authority
+on [`i-4`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register),
+confirms that mechanism and states two limits on what it buys, read at dokimasia
+`1eeae9b`. `i-4` is a claim about the **procedure**, so narrowing it over the
+compiled rules leaves its termination status exactly where it was: *"a procedure
+with no termination argument that now needs the budget less often still has no
+termination argument."* And the budget is spent per reconstruction rather than
+per rule, so dropping one of its two consumers for six rules is a smaller
+constant — *"a smaller constant is not an argument."*
+
+**What `:exec` does change is a different register.** For a rule compiled into
+the rewriter, the RARE rule and the generated C++ stop being two statements of
+one fact, because the C++ is derived from the rule. Dokimasia reports this as
+the strongest form of the direct test its pages call `E1`, arriving as a
+by-product rather than as a test, and names the cost: recording the applied rule
+as a trust step means the step is trusted when made and reconstructed
+afterwards, which moves work out of its `rewrites` register and into `trust`.
+**The by-product is bounded by the marker**, which six rules carry at
+`4585967004`.
+
+**It is also not dokimasia's `E4`.** That problem is about compiling the rule
+database into the *reconstructor*; this branch compiles the *rewriter* — *"the
+first attacks the search, the second removes the occasion for it."*
+
+What nobody has measured is how far the second goes: how many of cvc5's RARE
+rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and what the ones
+that cannot have in common. **That measurement, not a new argument, is what
+would move this comparison.**
 
 ## What proof-first design would keep
 
@@ -103,7 +129,7 @@ holes. Its kernel is [Logos](https://github.com/cvc5/logos), a verified
 checker in Lean that already exists; what this approach would build is the
 producer. The search does not come across.
 
-[Dokimasia's measurement](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md)
+[Dokimasia's measurement](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)
 of cvc5 `aee8742404` identifies `ProofChecker` plus thirteen
 registered theory rule checkers under `--check-proofs`: a compile closure of
 179 files and 41,446 lines, about 8% of `src/`. This is a source dependency

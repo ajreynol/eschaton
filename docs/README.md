@@ -8,4 +8,5 @@ research preference. These documents are handwritten, not generated.
 | [Approaches](approaches.md) | Compare generated, proof-producing and proof-reconstructing rewriters, the hybrid in `rdbExec`, and the broader solver proposals. |
 | [Related work](related-work.md) | Record public work relevant to the proposals, with source references and limits on the evidence. |
 | [Maintenance](maintenance.md) | Run the repository checks and update their pinned dependency. |
-| [Discussion](discussion.md) | Keep correspondence with other ecosystem repositories for a person to carry. |
+
+[`discussion.md`](discussion.md)

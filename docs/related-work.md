@@ -112,8 +112,8 @@ as a single rewrite rule in RARE."*
 
 > **Provenance.** The PDF was not opened here. Every quotation and figure above
 > is taken from dokimasia's record of the paper in
-> [`docs/rare-correspondence.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/rare-correspondence.md)
-> and [`docs/issues.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md)
+> [the RARE correspondence](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-rare-correspondence)
+> and [the register](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)
 > `i-4`. **Dokimasia is the authority on the RARE correspondence and on what
 > cvc5's proof coverage is**; nothing here restates its analysis or competes
 > with it.
@@ -145,6 +145,21 @@ generated portion covers six rules, keeps search as a fallback and still
 reconstructs rule conditions through it. Its hybrid design is part of the
 comparison: measure the handwritten work that remains as well as the generated
 portion.
+
+**What dokimasia says about it, read at dokimasia `1eeae9b`.** It confirms the
+reading above of what `:exec` removes from reconstruction, and bounds it twice:
+`i-4` is a claim about the procedure, so its termination status is unchanged,
+and the budget is spent per reconstruction rather than per rule, so six compiled
+rules are a smaller constant rather than an argument. It separates this from its
+own `E4`, which is about compiling the rule database into the *reconstructor*
+rather than into the rewriter. And it adds a consequence in another register:
+for a compiled rule the RARE rule and the generated C++ are no longer two
+statements of one fact, so
+[`i-17`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)'s
+*established only by runtime search* does not describe it — at the cost of
+moving the step into dokimasia's `trust` census. **Dokimasia has not read or run
+the branch**; its reading is of the summary above, and moves if the summary is
+wrong.
 
 ## Proof-first design — the crowded half
 

@@ -30,7 +30,7 @@ $ python3 -m dokimasia.tcb measure /path/to/cvc5
 Inside that closure are 97 files of `theory/` (22,217 lines), across 10 theory
 subsystems, plus the rewriter. Six rule checkers `#include` the headers of the
 solvers they check
-([`tcb-001`](https://github.com/ajreynol/dokimasia/blob/main/docs/findings/tcb-001.md)), and `MACRO_REWRITE`'s checker
+([`tcb-001`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#filed)), and `MACRO_REWRITE`'s checker
 replays the rewrite with the same code that produced it — which cvc5 says out
 loud by registering it through `registerTrustedChecker` at pedantic level 4.
 
@@ -181,7 +181,7 @@ result to SMT-LIB.
 
 Four things, in the order they become possible. Each is worth having alone,
 which is the same progressive stance as
-[`docs/kernel.md`](https://github.com/ajreynol/dokimasia/blob/main/docs/kernel.md).
+[dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about).
 
 1. **Describe it.** A precise account of K1–K6, of the kind a paper would carry,
    checkable by a reader against `type_checker.cpp`.
@@ -331,5 +331,5 @@ writing anything, with what to read each one *for*.
   very hard to verify statically: checking a found proof does not establish that
   bounded reconstruction succeeds for every rewrite.
 - Carcara — read the elaborator, not the checker. Turning coarse steps into fine
-  ones is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/issues.md) in another format, solved by a tool
+  ones is [i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register) in another format, solved by a tool
   that does not claim verification and does not need to.

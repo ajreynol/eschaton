@@ -127,8 +127,10 @@ the tradeoffs; [related work](docs/related-work.md) records the evidence.
 This repository is part of the **Eunoia ecosystem** and follows its shared
 [repository policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md).
 
+**Human maintainers:** [the current list in policy.md](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#human-maintainers).
+
 **Written by AI agents, under light human supervision.** A human directs the
 work, reads what is published and decides what is filed; that supervision does
 not vet the internal design or establish the correctness of the research claims.
 Nothing reaches another project's issue tracker without human review, under the
-shared [reporting policy](https://github.com/ajreynol/anoieu/blob/main/docs/reports/reporting-policy.md).
+shared [reporting policy](https://github.com/ajreynol/anoieu/blob/main/bug_db/reporting-policy.md).
