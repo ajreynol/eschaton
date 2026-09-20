@@ -44,51 +44,37 @@ With an Anoieu checkout beside this repository, run from eschaton's root:
 PYTHONDONTWRITEBYTECODE=1 python3 ../anoieu/scripts/policy_check.py --policy-version 1 --root .
 ```
 
-This uses the sibling checkout's version. To
-reproduce CI, use an Anoieu checkout at the full `ANOIEU_REV` commit in
-[the workflow](../.github/workflows/anoieu.yml). The workflow runs the same
-checker on pushes and pull requests with Python 3.12; the checker requires
-Python 3.10 or later and no third-party packages.
+This uses the sibling checkout's version. CI uses anoieu's current `main`, and
+each checker run logs its full implementation commit and selected contract. To
+reproduce a particular CI verdict, use that logged commit with the same input
+tree and contract. The [workflow](../.github/workflows/anoieu.yml) runs on pushes
+and pull requests through anoieu's shared workflow, which uses Python 3.12; the
+checker requires Python 3.10 or later and no third-party packages.
 
 Use a separate checkout under ignored `scratch/` when the sibling is at another
 revision; do not reset a shared checkout. The workflow is the source of truth
-for the pin, contract and invocation. No local comparison checks this prose
+for the contract and invocation. No local comparison checks this prose
 against its YAML. These are the whole CI suite here: there is no solver test
 suite. A pass establishes repository conventions, not research results.
 
-The governing policy reference is kanon
-`2e78d1309520d7f96c635ed29a08ee241371df5e`, which restructured the page without
-changing what it asks of this repository; it is separate from the checker pin.
-
 ## Which form of the check this repository runs
 
-Anoieu offers two forms and
-[the governing policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#2-run-the-check)
-accepts either: a pinned checker commit, or a call to anoieu's
+**This repository follows anoieu's `main` and selects policy contract 1** through
+the
 [shared workflow](https://github.com/ajreynol/anoieu/blob/main/policy_check/README.md)
-at `main` naming a policy contract. **This repository pins the implementation
-and names contract 1**, which is a decision rather than a default.
+recommended by
+[kanon's policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#2-run-the-check).
+This receives implementation fixes automatically and removes manual checker-pin
+updates. For this repository's policy checks, those benefits take priority over
+keeping the implementation fixed between runs.
 
-The pin keeps the checker implementation fixed until a commit here changes it.
-Its policy verdict can be reproduced offline with the same input tree, checker
-revision and a compatible Python interpreter. This matters in a repository
-whose entire CI is this one job and whose content is prose. The hosted job still
-depends on GitHub, the network, runner images and action versions; pinning the
-checker does not make those dependencies reproducible or prevent their failures.
+Contract 1 fixes the automated requirements, applicability and severity. A rerun
+can report a different verdict after an implementation update, including a fix
+for a missed violation or a regression. The logged checker commit identifies
+what ran. The contract does not version kanon's policy document or guarantee
+that the checker has no bugs.
 
-The shared-workflow form fixes the obligations through a contract and lets the
-implementation move. A rerun can therefore report a different policy verdict
-after an implementation update, including a fix for a missed violation. Contract
-1 permits fixes, not new requirements; it does not guarantee that the checker
-has no bugs. Either form's checker can be run locally, but a called GitHub
-workflow itself requires a hosted run.
-
-## Updating the checker
-
-Choose an Anoieu commit whose own CI passed, update `ANOIEU_REV` in the workflow,
-and run that version against this tree before landing the change. Inspect
-Anoieu's `ci` workflow result for that exact full commit, including its required
-jobs; a green branch tip at another commit is not evidence. This remote check
-belongs in the update process, outside CI. If the result is absent, unfinished
-or failing, keep the existing pin. The pinned commit has a successful
-[CI run](https://github.com/ajreynol/anoieu/actions/runs/35270952777).
+Changing the contract is a local decision: review anoieu's contract documentation,
+run the selected contract against this tree, and update the workflow and this
+guide together. The checker can run locally; the called GitHub workflow itself
+requires a hosted run. GitHub may display the check as `anoieu / policy / policy`.

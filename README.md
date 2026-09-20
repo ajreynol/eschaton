@@ -56,9 +56,7 @@ though it did. These approaches are not a pitch to its developers.
 Reading the research notes requires no build or dependencies. There is no solver
 to run yet.
 
-The [Anoieu policy workflow](.github/workflows/anoieu.yml) checks repository
-conventions on every push and pull request, using a pinned checker commit.
-The [maintenance guide](docs/maintenance.md) explains how to run it locally;
+The [maintenance guide](docs/maintenance.md) covers repository checks;
 the [documentation index](docs/README.md) lists the rest of the written work.
 
 ## The name

@@ -7,18 +7,6 @@ permissions:
 
 jobs:
   policy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Fetch the pinned Anoieu checker
-        env:
-          # Adopt only commits where Anoieu's own CI passed.
-          ANOIEU_REV: 154228a40d21584b95f4029742ccc8f432ea87f5
-        run: |
-          git clone --quiet https://github.com/ajreynol/anoieu "$RUNNER_TEMP/anoieu"
-          git -C "$RUNNER_TEMP/anoieu" checkout --quiet --detach "$ANOIEU_REV"
-      - name: Check repository policy
-        run: python3 "$RUNNER_TEMP/anoieu/scripts/policy_check.py" --policy-version 1 --root "$GITHUB_WORKSPACE"
+    uses: ajreynol/anoieu/.github/workflows/policy.yml@main
+    with:
+      policy-version: '1'
