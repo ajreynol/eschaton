@@ -17,7 +17,7 @@ Only the latter uses a separate checker implementation.
 ### The internal checker
 
 `ProofChecker` plus the 13 registered theory rule checkers, run by
-`--check-proofs`. [`dokimasia.tcb`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/tcb/) measures what it
+`--check-proofs`. [`dokimasia_analyzer.tcb`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia_analyzer/tcb/) measures what it
 compiles against:
 
 ```

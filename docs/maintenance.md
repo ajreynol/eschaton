@@ -57,7 +57,8 @@ against its YAML. These are the whole CI suite here: there is no solver test
 suite. A pass establishes repository conventions, not research results.
 
 The governing policy reference is kanon
-`532ceb17656329d399886421bb39dedd868d6c72`; it is separate from the checker pin.
+`2e78d1309520d7f96c635ed29a08ee241371df5e`, which restructured the page without
+changing what it asks of this repository; it is separate from the checker pin.
 
 ## Which form of the check this repository runs
 

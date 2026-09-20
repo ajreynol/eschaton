@@ -110,13 +110,19 @@ the string rewriter is *"over 3,000 lines of C++ code and distinguishes over
 200 different rewrite rules. Moreover, not all of those rules can be expressed
 as a single rewrite rule in RARE."*
 
-> **Provenance.** The PDF was not opened here. Every quotation and figure above
-> is taken from dokimasia's record of the paper in
+> **Provenance.** The PDF was not opened here. The quotations and figures above
+> were taken from dokimasia's record of the paper, read at dokimasia `f9a5bd7`,
+> and its documentation has since been reorganised. At `de0f1b9` what its tree
+> still carries of this is
+> [the register](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)'s
+> `i-4` — the termination quotation, and the 92–95% and 20–22% bands. The rest —
+> the black-box stance, the 3.14× slowdown, 5 of 25 and 5,945 of 26,418, and the
+> polynomial-normalisation and string-rewriter remarks — is on no dokimasia page
+> now, and rests on that earlier reading until somebody opens the paper.
+> **Dokimasia is the authority on
 > [the RARE correspondence](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-rare-correspondence)
-> and [the register](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)
-> `i-4`. **Dokimasia is the authority on the RARE correspondence and on what
-> cvc5's proof coverage is**; nothing here restates its analysis or competes
-> with it.
+> and on what cvc5's proof coverage is**; nothing here restates its analysis or
+> competes with it.
 
 ### Generated rewriting — the hybrid in `rdbExec`
 
@@ -146,20 +152,27 @@ reconstructs rule conditions through it. Its hybrid design is part of the
 comparison: measure the handwritten work that remains as well as the generated
 portion.
 
-**What dokimasia says about it, read at dokimasia `1eeae9b`.** It confirms the
+**What dokimasia says about it, in `dokimasia-D13`, read at dokimasia
+`1eeae9b`.** It confirms the
 reading above of what `:exec` removes from reconstruction, and bounds it twice:
 `i-4` is a claim about the procedure, so its termination status is unchanged,
 and the budget is spent per reconstruction rather than per rule, so six compiled
-rules are a smaller constant rather than an argument. It separates this from its
-own `E4`, which is about compiling the rule database into the *reconstructor*
-rather than into the rewriter. And it adds a consequence in another register:
-for a compiled rule the RARE rule and the generated C++ are no longer two
+rules are a smaller constant rather than an argument. It separates this from
+compiling the rule database into the *reconstructor*, which it calls an open
+problem, rather than into the rewriter. And it adds a consequence in another
+register: for a compiled rule the RARE rule and the generated C++ are no longer two
 statements of one fact, so
 [`i-17`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)'s
 *established only by runtime search* does not describe it — at the cost of
 moving the step into dokimasia's `trust` census. **Dokimasia has not read or run
 the branch**; its reading is of the summary above, and moves if the summary is
 wrong.
+
+**Cite the topic and not the page**, re-read at dokimasia `de0f1b9`:
+`docs/rare-correspondence.md` went in the same reorganisation the provenance
+note above describes, and the trimmed correspondence in `docs/README.md` does
+not carry the `:exec` distinction. `i-4`, `i-17` and `R9` remain current on
+dokimasia's register.
 
 ## Proof-first design — the crowded half
 

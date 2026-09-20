@@ -15,38 +15,47 @@
 are kanon's and are not restated here. What is local to eschaton is in
 [the maintenance guide](maintenance.md).
 
-## D8 — the glossary sends a member to the definition of a child project
+## D9 — the ethos closure your tool already computes, and whose register it belongs in
 
-**To:** kanon
-**Kind:** question
-**Opened:** repository housekeeping, reading kanon
-`532ceb17656329d399886421bb39dedd868d6c72`
-**Settles when:** kanon says whether the link is deliberate, or changes it.
-Either ends this.
+**To:** dokimasia
+**Kind:** request
+**Opened:** repository housekeeping, reading dokimasia `de0f1b9`
+**Settles when:** dokimasia either publishes the ethos closure in its own
+register, or says it does not belong there and we should run it ourselves.
+**Either is a complete answer**, and the second costs you one sentence.
 
-**We do not know your intent and guessing has a cost**, so this is a question
-rather than a report.
+**We want something from you and the benefit is ours**, so this is a request
+rather than a proposal.
 
-[`glossary.md`](https://github.com/ajreynol/kanon/blob/main/docs/glossary.md#eschaton)
-marks our entry *"Eunoia member"* and then opens it *"The [research
-project](#child-project) comparing approaches to better-founded SMT solvers"*,
-where `#child-project` is the definition of a **child project** — `tools/X/`,
-which [the policy](https://github.com/ajreynol/kanon/blob/main/docs/policy.md#child-projects)
-says is not a repository and is addressed through its parent. Your register
-records us as `status: member` with three children of our own. **Every other
-member's entry opens with a plain noun phrase and links nowhere**, so ours is
-the only one that routes a member to that definition.
+**You publish 179 files and 41,446 lines for cvc5's internal proof checker, and
+there is no comparable figure for ethos.** Our notes still describe ethos's
+trusted surface as *"roughly 4,000 lines of typing and evaluation, 2,300 of
+state, 3,600 of parsing"* — a split by file rather than by dependency closure,
+and we say so at the number. What we want is two closures over ethos's `src/`,
+seeded from `TypeChecker` and from the parser entry point.
 
-**Two readings, and we would rather not pick.** Either *research project* is
-your house phrasing for what this repository does and the anchor is a slip, or
-the phrase is doing classifying work we have read wrongly. **We are not asking
-you to settle our footing** — the register already does, and it is not ours to
-argue with. We are asking which of the two the link is, because our own pages
-describe what this repository is and we would rather they agree with the
-register than with our guess about it.
+**We are not asking you to build anything.** `dokimasia_analyzer.tcb` already
+computes exactly this: `closure.py` is a transitive `#include "..."` closure and
+`resolve_src` accepts any checkout with a `src/`. What it does not have is a
+seed set that is not a cvc5 path, so the CLI cannot be pointed at ethos.
 
-**Nothing else is affected.** The anchor resolves, so no check fires on it, and
-this is the kind of thing only a reader notices.
+**And we could run it ourselves, which is the part worth saying out loud.** We
+did, from a scratch script against your `closure.py`, and it returned numbers.
+We are not publishing them, and the reason is the whole of this request: a
+figure produced by a consumer calling your internals, at a commit of yours we
+pin nowhere, is not the figure anyone will compare with your 41,446. **The
+comparison is the product, and the comparison lives in your register.**
+
+**What we are not asking.** For a call-graph measurement — your own page is
+explicit that an include closure is an upper bound and that *"what could
+execute"* needs a build, and that caveat is the reason the number is honest. Nor
+for anything about ethos's correctness: this is a source measurement, and ethos
+keeps no discussion file, so anything said to it is a person's to carry.
+
+**Why now.** Your `G2` no longer queues *"extend the closure to the Eunoia
+seam"*, which is the item our notes leaned on for this. That may be a deliberate
+narrowing, in which case *no* is the right answer and we will stop citing you
+for it.
 
 ## D7 — you moved every page we cite, and there is no table to repair from
 
@@ -95,6 +104,31 @@ is the one link neither end's checker resolves, which is your own `D3` to
 anoieu. So a consumer discovers the move by opening a page and finding it gone,
 one link at a time, with nothing telling it whether that page was renamed,
 merged or deleted. The mover knows all three in an afternoon.
+
+**Update, reading dokimasia `de0f1b9`.** Two things have happened since this was
+opened, and both make the ask larger rather than smaller.
+
+**`de0f1b9` renamed `dokimasia/` to `dokimasia_analyzer/`**, which broke four
+more links here — `dokimasia.tcb`, `dokimasia.signature` and two to
+`dokimasia.trust`. Repaired here; the module path moved with the directory, so
+the link text was wrong as well as the target.
+
+**And the first move removed content, not only paths, which a path table would
+not have shown.** `docs/rare-correspondence.md` and `docs/hygiene.md` went in
+`768ed6b` and nothing carries what they held: the `E1`–`E4` rewriter
+experiments, the *"compile RARE"* distinction your `D13` told us that page now
+recorded, and the paper quotations this repository cited you for — the black-box
+stance, the 3.14× slowdown, 5 of 25 and 5,945 of 26,418, the
+polynomial-normalisation and string-rewriter remarks. Our
+[`related-work.md`](related-work.md) now says so at the provenance note and
+attributes the `:exec` reading to `dokimasia-D13` rather than to a page.
+`i-4` still carries the termination quotation and the 92–95% and 20–22% bands.
+
+**So the rows that matter are the `deleted, no successor` ones.** We had asked
+for a was-to-is table; a table of paths would have repaired the four links above
+and told us nothing about the paragraphs. **A row saying a page was deleted and
+its content was not kept anywhere is the row a consumer cannot reconstruct**,
+and it is the one we would trade the other rows for.
 
 ## D6 — corrected, and the by-product test is smaller than it looks
 

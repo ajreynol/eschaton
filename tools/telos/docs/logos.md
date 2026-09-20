@@ -222,7 +222,7 @@ in the signature with no constructor are:
 
 `trust` is cvc5's declared hole — the rule that proves an arbitrary formula with
 no justification, the one
-[`dokimasia.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/trust/) censuses 75 ids of. It cannot
+[`dokimasia_analyzer.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia_analyzer/trust/) censuses 75 ids of. It cannot
 have a soundness proof, because it is not sound; it appears in the generated
 Lean as a *program*, `__eo_prog_trust`, not as a rule with a correctness
 theorem.

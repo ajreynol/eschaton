@@ -169,9 +169,15 @@ typing and evaluation, 2,300 of state, 3,600 of parsing"* and admits the split i
 by file rather than by dependency closure. Two closures, seeded from
 `TypeChecker` and from the parser entry point.
 
-**A dokimasia task, not a telos one**, and one already implied by
-[`TODO.md` G2](https://github.com/ajreynol/dokimasia/blob/main/TODO.md)'s *"extend the closure to the Eunoia seam."*
-Deprioritised: it sharpens a comparison rather than deciding anything.
+**The mechanism exists; the seeds do not.** Dokimasia's
+`dokimasia_analyzer.tcb` computes exactly this include closure, and the figure
+it publishes for cvc5's internal checker is what an ethos figure would be
+compared against — but its seed sets are cvc5 paths, and its
+[`TODO.md`](https://github.com/ajreynol/dokimasia/blob/main/TODO.md) `G2` no
+longer queues the Eunoia-seam extension this task once leaned on, read at
+dokimasia `de0f1b9`. The parent asks in
+[`D9`](../../../docs/discussion.md) whose measurement it is. Deprioritised
+either way: it sharpens a comparison rather than deciding anything.
 
 ---
 

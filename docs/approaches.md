@@ -103,16 +103,25 @@ constant — *"a smaller constant is not an argument."*
 **What `:exec` does change is a different register.** For a rule compiled into
 the rewriter, the RARE rule and the generated C++ stop being two statements of
 one fact, because the C++ is derived from the rule. Dokimasia reports this as
-the strongest form of the direct test its pages call `E1`, arriving as a
-by-product rather than as a test, and names the cost: recording the applied rule
-as a trust step means the step is trusted when made and reconstructed
-afterwards, which moves work out of its `rewrites` register and into `trust`.
+the strongest form of the direct test its register calls `R9` — instantiate each
+rule's match, run the rewriter, compare to the target — arriving as a by-product
+rather than as a test, and names the cost: recording the applied rule as a trust
+step means the step is trusted when made and reconstructed afterwards, which
+moves work out of its `rewrites` register and into `trust`.
 **The by-product is bounded by the marker**, which six rules carry at
 `4585967004`.
 
-**It is also not dokimasia's `E4`.** That problem is about compiling the rule
-database into the *reconstructor*; this branch compiles the *rewriter* — *"the
-first attacks the search, the second removes the occasion for it."*
+**It is also not the "compile RARE" problem dokimasia called open.** That
+problem is about compiling the rule database into the *reconstructor*; this
+branch compiles the *rewriter* — *"the first attacks the search, the second
+removes the occasion for it."*
+
+**Both paragraphs above are dokimasia's answer rather than its documentation**,
+re-read at dokimasia `de0f1b9`. The page that carried its `E1`–`E4` rewriter
+experiments, `docs/rare-correspondence.md`, went in the reorganisation
+[`D7`](discussion.md) is about, and the trimmed correspondence in `docs/README.md`
+does not carry the `:exec` distinction; `E4` is a label on no dokimasia page now.
+Its `i-4`, `i-17` and `R9` rows are current.
 
 What nobody has measured is how far the second goes: how many of cvc5's RARE
 rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and what the ones

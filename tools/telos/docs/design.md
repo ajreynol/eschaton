@@ -17,7 +17,10 @@ not benchmark results. The proposed benefits are hypotheses; see
 **What cvc5 does, and why.** `TheoryInferenceManager` declares
 `ProofGenerator* pg = nullptr` as a default argument, and `conflict(TNode,
 InferenceId)` and `lemma(TNode, InferenceId, LemmaProperty)` take no generator
-at all ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)). So
+at all — `theory_inference_manager.h:157`, `:214`, `:271` and `:280` at cvc5
+`aee8742404`, read here; dokimasia's
+[H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)
+is the proposed rule that would make a missing proof explicit. So
 
 ```cpp
 d_im.lemma(lem, InferenceId::ARITH_MY_NEW_INFERENCE);
@@ -70,7 +73,7 @@ certificate construction and independent checking.
 ([H9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)), as
 C++ checkers registered with `ProofChecker`, and as 620 `declare-rule`s in the
 Eunoia signature. They are written by different people at different times, and
-[`dokimasia.signature`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/signature/) exists precisely because
+[`dokimasia_analyzer.signature`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia_analyzer/signature/) exists precisely because
 they can disagree — it found one
 ([i-21](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register): `SUBS`'s documentation omits an argument its
 checker reads).

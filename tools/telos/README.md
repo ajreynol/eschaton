@@ -74,8 +74,8 @@ nameable, closed, small, local, mechanized — with mechanized named explicitly 
 The design hypothesis is that constructing proofs alongside search could
 reduce some reconstruction costs. Dokimasia's measurements motivate that
 hypothesis; they do not prove that development order causes the gaps:
-`ProofGenerator* pg = nullptr` is a default argument
-([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)), the safe-mode
+`ProofGenerator* pg = nullptr` is a default argument (cvc5 `aee8742404`, with
+the call sites in [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate)), the safe-mode
 disable list is maintained by hand ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)), and
 completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) because the
 rewriter does not construct these proofs as it rewrites.
@@ -124,7 +124,7 @@ keeps the copy current:
 
 The two CPC rules with no soundness proof are `beta-reduce` and **`trust`** —
 cvc5's declared hole, the one
-[`dokimasia.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia/trust/) censuses 75 ids of. It cannot have
+[`dokimasia_analyzer.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia_analyzer/trust/) censuses 75 ids of. It cannot have
 one. Which states the relationship between these two projects in a sentence:
 
 > **An unjustified `trust` step is not a sound CPC derivation Logos can certify.**
@@ -156,7 +156,7 @@ property of an implementation here.
 
 | dokimasia found | telos's answer | where |
 | --- | --- | --- |
-| the proofless call is the *ergonomic* one ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)) | the answer type carries the certificate; there is no proofless return | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
+| a missing proof is not said out loud ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)) | the answer type carries the certificate; there is no proofless return | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
 | the calculus is stated three times and can disagree (`SIG`, [R1](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r1--emit-the-tables-cvc5-already-has)) | stated once; checker, printer and docs are functions of it | [`design.md`](docs/design.md#i2--one-definition-of-the-calculus) |
 | completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | the rewriter returns its justification; there is no reconstruction to bound | [`design.md`](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) |
 | safe mode is a hand-maintained list ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register), [R8](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r8--safe-mode-as-a-build-time-property)) | the feature set is a type parameter; the unsafe configuration does not compile | [`design.md`](docs/design.md#i4--safe-mode-is-a-type-not-a-list) |
