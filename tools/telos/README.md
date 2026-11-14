@@ -13,7 +13,10 @@ authority on — not the search.
 **Dies if:** a proof-producing rewriter costs too much, or a hybrid using
 generated rules closes the same gap more cheaply.
 
-**Status:** research notes. Nothing is built.
+**Status:** a verified rewriter exists, in its own repository:
+[`ajreynol/telos`](https://github.com/ajreynol/telos), read at `b1c20dc`.
+No solver is built. The notes in this directory are the design record that
+preceded it; [what was built](#what-was-built) says where the two differ.
 
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
@@ -23,12 +26,72 @@ these are speculative research notes, omitted from default ecosystem status
 audits. Eschaton's front page does not name or link this child project; it
 remains isolated from the parent's code and CI.
 
-**Research notes.** The name identifies a proposal with no implementation.
-Nothing here makes a claim about cvc5, asks anything of cvc5, or should be quoted
-as though it did.
+**Research notes.** Nothing here makes a claim about cvc5, asks anything of
+cvc5, or should be quoted as though it did.
 
-**It ships no code.** Everything in this directory is prose, and deleting it
-would leave the repository exactly as functional as it is now.
+**This directory ships no code.** The implementation lives in
+[`ajreynol/telos`](https://github.com/ajreynol/telos), which keeps its own
+documentation, trusted base and CI. Everything here is prose, and deleting it
+would leave this repository exactly as functional as it is now.
+
+## What was built
+
+At `b1c20dc`, telos is a **port of cvc5's rewriter to Lean 4 with a
+machine-checked proof that every rewrite preserves equivalence**, stated as
+`Telos.rewrite_correct (t : Node) (h : t.WellTyped) : t.Equiv (rewrite t)`
+under Logos's semantics. Its [README](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/README.md),
+[design](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/docs/design.md)
+and [trusted base](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/TRUSTED.md)
+are the authority; this section summarizes them and was not re-run here.
+
+- **Every step is a CPC rule checked by Logos.** A matcher generated from the
+  pinned Eunoia signature (88 of the signature's 610 rules at that revision: `bool-*`,
+  `ite-*`, `eq-*` and arithmetic) finds an application, and the step runs Logos's verified
+  checker on a short command list. Theory rewrites such as `aci_norm` and
+  `arith_poly_norm` are computed by unverified code ported from cvc5 and
+  validated by the rule. telos writes no rewrite rule of its own.
+- **Choosing the rule is untrusted.** Hand-written strategies port the control
+  flow of cvc5's theory rewriters. A wrong strategy can lose a rewrite or
+  differ from cvc5, but not return a non-equivalent term. Agreement with cvc5 is
+  tested by differential fuzzing, not proved.
+- **Ported so far:** Booleans, arithmetic (`+`, `-`, `*`, `/`, `div`, `mod`,
+  `abs`, `to_real`, `to_int`, `is_int`, comparisons), and equality, UF and
+  quantifiers as far as they are Boolean. Bit-vectors and the other theories
+  are not started.
+- **Reported results:** on 6,000 fuzzed Boolean terms, about 94% identical to
+  cvc5 and the rest differing by equality orientation; on 3,000 arithmetic
+  terms, 83.5% identical and 92.7% up to orientation; no semantic
+  disagreements; Ethos accepted 2,000 of 2,000 printed proofs.
+- **Three cvc5 arithmetic rewrites have no CPC rule**, so telos cannot certify
+  them: `(is_int (to_real x))` to `true`, removing `to_real` from both sides of
+  `/`, and `(div_total (mod_total x c) c)` to `0`.
+- **Trusted base:** the Logos/CPC definitions, the `Node`-to-Logos translation
+  and the definition of `Node.Equiv`, plus Lean's kernel and compiler. No
+  `sorry` or declared axiom, but 43 `native_decide` axioms enter through
+  Logos's proofs, so the Lean compiler is trusted. The SMT-LIB front end and
+  Logos's parser are outside the theorem.
+- **Logos pin:** [`ajreynol/logos`](https://github.com/ajreynol/logos)
+  `b1b49e7e`, not the `cvc5/logos` `56c7b409` these notes measured.
+
+**Where it departs from these notes.**
+
+- **Scope.** The proposal was a solver. The implementation is a rewriter, which
+  covers [T2](docs/TODO.md#t2--a-proof-producing-rewriter-for-one-theory) and
+  not the producer side. Its own
+  [`solver-plan.md`](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/docs/solver-plan.md)
+  keeps the broader solver plan as the longer-term direction.
+- **Where the certificate comes from.** [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire)
+  proposed rules written once in the host and elaborated into a rewrite and its
+  justification. telos writes no rules. It takes them from CPC, generates only
+  the matcher, and proves once that any composition of checker-accepted steps
+  is an equivalence. The cost per rule is no proof work. Porting a strategy is
+  ordinary programming.
+- **What is not measured.** The comparison T2 asks for against the `rdbExec`
+  hybrid has not been run. Runtime cost is an explicit non-goal at `b1c20dc`:
+  there is no rewrite cache, and fuel replaces termination proofs.
+  [I1](docs/design.md#i1--the-answer-carries-its-certificate) and
+  [I4](docs/design.md#i4--safe-mode-is-a-type-not-a-list) concern a solver's
+  answers and configuration, so they remain untested.
 
 ---
 
@@ -231,9 +294,12 @@ is what the word is for.
 
 ## Status
 
-Design notes only. Nothing is written here. The measurements are of other
-people's trees — cvc5, ethos and logos — and no design claim in this directory
-has been tested against an implementation.
+Design notes, kept as the record that preceded the implementation in
+[`ajreynol/telos`](https://github.com/ajreynol/telos). The measurements are of
+other people's trees, namely cvc5, ethos and logos. The only design claim tested
+against an implementation is the authoring half of I3, by the rewriter
+described [above](#what-was-built). The notes below still describe the
+proposal and have not been rewritten to match it.
 
 - **[`docs/logos.md`](docs/logos.md) — the foothold: what Logos is, what it weighs, what its guarantee is, and eight lessons. Start here**
 - [`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md) — what the kernel is today, what "defining" it means, and what each comparable tool's guarantee actually is

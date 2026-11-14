@@ -1,7 +1,8 @@
 # Next steps
 
 The plan consumes [Logos](logos.md) as the checker and tests the producer
-side. All tasks below are proposals; none is implemented here. Source counts
+side. All tasks below are proposals. Only T2 has since been attempted,
+outside this repository (see its status note). Source counts
 refer to the source revisions in the linked notes. Read the correctness
 boundary before choosing an experimental fragment.
 
@@ -51,6 +52,15 @@ hours** and is deliberately not in CI, and `scripts/check-proof-hygiene.sh`
 rejects `sorry`/`admit`/`axiom` textually with no build at all.
 
 ## T2 — A proof-producing rewriter for one theory
+
+> **Status at [`ajreynol/telos`](https://github.com/ajreynol/telos) `b1c20dc`:
+> partly answered.** A verified rewriter for Booleans and arithmetic exists. It
+> takes its rules from CPC rather than writing them once in the host, and each
+> step is certified by Logos's checker. It needs no proof work per rule, and its
+> printed proofs are accepted by Ethos. The comparison with the `rdbExec` hybrid
+> and the runtime cost of certification are not measured. The
+> [README](../README.md#what-was-built) summarizes what was built and where it
+> departs from the plan below.
 
 Compare a **proof-producing rewriter** with a **generated rewriter** and the
 **proof-reconstructing rewriter** baseline, using the
@@ -205,7 +215,8 @@ conformance.
 
 - **Writing a kernel.** Logos is the kernel. Rebuilding it would be the single
   most expensive way for this project to produce nothing.
-- **Writing a solver**, until T2 returns. A CDCL(T) implementation is the least
+- **Writing a solver**, until T2 returns. T2 has partly returned, as a
+  rewriter; no solver has been started. A CDCL(T) implementation is the least
   interesting and most expensive part of this, and starting there is how
   research projects become abandoned codebases.
 - **Verifying the search.** Ever, under the current design. See

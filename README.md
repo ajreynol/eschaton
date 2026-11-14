@@ -111,7 +111,8 @@ rules run when the theory rewriter leaves a term unchanged. Proof production
 applies the recorded rule directly where possible, while retaining
 reconstruction for conditions and fallback
 cases. This is exploratory work in a personal fork, not a release or a position
-of cvc5's. Our proof-producing rewriter remains a proposal.
+of cvc5's. A proof-producing rewriter for Booleans and arithmetic has since
+been built outside this repository; the comparison below has not been run.
 
 **Next experiment:** compare generated and proof-producing rewriters with the
 proof-reconstructing baseline on one theory, measuring manual work per rule,

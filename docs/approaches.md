@@ -45,7 +45,9 @@ competitive QF_UF solving with much more limited certification; see the
 A **proof-producing rewriter** returns the rewritten term and its equality
 certificate together. The proposal here uses a dependently typed host
 to derive both from one rewrite definition. Its maintenance claim is that adding
-or changing a rule needs little separate proof work. That claim remains untested.
+or changing a rule needs little separate proof work. An implementation outside
+this repository needs none per rule, because it takes its rules from the proof
+calculus. The comparison with the alternatives remains untested.
 
 A **generated rewriter** makes declarative proof rules the source of executable
 rewrite code. A maintainer edits the rule and regenerates the matcher; a step
@@ -159,8 +161,9 @@ rejected.
 
 ## How any of this gets decided
 
-Each bet has a cheap experiment that could kill it, and none has been run: a
-proof-producing rewriter for one theory; one agent-driven refactor of one cvc5
+Each bet has a cheap experiment that could kill it, and none has been run to a
+conclusion: a proof-producing rewriter for one theory, which has been built
+outside this repository but not compared with the alternatives; one agent-driven refactor of one cvc5
 subsystem measured against the gaps it is meant to close; or a new theory
 solver that passes somebody else's benchmark set. The preference for proof-first
 design remains provisional until those experiments provide evidence to judge

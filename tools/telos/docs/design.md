@@ -5,7 +5,10 @@ explanation, and states what a solver built the other way round would do
 instead. Each also carries **what would make it wrong**, because a design note
 whose author cannot say how it fails is an advertisement.
 
-There is no implementation here. The cvc5 examples refer to `aee8742404`;
+There is no implementation here. A verified rewriter now exists in
+[`ajreynol/telos`](https://github.com/ajreynol/telos), and it bears on I3 only;
+[the README](../README.md#what-was-built) records where it departs from these
+notes, which are left as written. The cvc5 examples refer to `aee8742404`;
 the Logos source counts refer to `56c7b409`. These are source measurements,
 not benchmark results. The proposed benefits are hypotheses; see
 [Logos](logos.md#what-its-guarantee-actually-is) for the correctness boundary.
@@ -160,6 +163,13 @@ structure RewriteResult (t : Term) where
 ```
 
 The format and `ChecksEquality` predicate remain to be defined, as in I1.
+
+**What the implementation chose instead.** telos at `b1c20dc` returns a
+`Certified n m` built from a CPC command list that Logos's checker accepted,
+with one theorem covering every composition. It writes no rules: they come from
+the CPC signature and only the matcher is generated. The FMCAD objection about
+authoring cost is therefore met by writing no proofs per rule, not by
+elaborating rules in the host. The runtime cost objection is still unmeasured.
 
 For rules supported by this interface, justification is constructed with the
 rewrite rather than recovered by a later search. This does not remove budgets
