@@ -17,6 +17,11 @@ and cvc5 `aee8742404`; they are not a committed baseline here. The correctness
 boundary below refers to that Logos revision, and its figures are re-derived
 from the source rather than quoted.
 
+**The implementation pins a different Logos.** `ajreynol/telos` at `5661141`
+depends on [`ajreynol/logos`](https://github.com/ajreynol/logos) `f2001ba0`,
+which adds CPC rules the implementation needed. The figures below have not been
+re-measured at that revision.
+
 ---
 
 ## What it is

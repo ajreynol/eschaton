@@ -37,27 +37,25 @@ is being wrong.
 QF_UF solving with limited proof certification. It does not establish that the
 approach scales to a broader SMT solver. Details in [`related-work.md`](../../docs/related-work.md).
 
-Starting from nothing is what separates it from [`cvc6`](../cvc6/README.md):
-same tooling, opposite premise about whether cvc5's code is an asset or a
-constraint.
+Starting from nothing is what separates it from [`telos`](../telos/README.md)
+and [`cvc6`](../cvc6/README.md). Both of those are agent-written ports of cvc5;
+this proposal follows no existing solver.
 
 ## What it does not answer
 
 **Whether the result can be trusted.** A solver written quickly is not a solver
 known to be correct, and an agent's confidence in its own code is worth nothing.
-If the answer is to come with a certificate, that commitment lives in
-[`telos`](../telos/README.md) and would have to be designed in from the start
-rather than added afterwards — which is the exact mistake telos exists to point
-at.
+A certificate would have to be designed in from the start rather than added
+afterwards.
 
-**Starting from a proof-producing solver changes this.** An agent that ports
-cvc5 into Lean against CPC and Logos has a specification, a verified checker and
-a reference to test against. Its output can be trusted within the checker's
-guarantee. That route is [`telos`](../telos/README.md#why-this-is-promising)'s,
-not this one's: it keeps cvc5's calculus, and this proposal keeps nothing.
-[`ajreynol/telos`](https://github.com/ajreynol/telos), a verified Lean port of
-cvc5's rewriter written by agents under human supervision, shows that agent
-authorship and verification need not conflict.
+**The ports show the missing piece.** An agent porting cvc5 into Lean against
+CPC and Logos has a specification, a verified checker and a reference to test
+against. [`ajreynol/telos`](https://github.com/ajreynol/telos), a verified Lean
+rewriter and preprocessor written that way by agents under human supervision,
+shows that agent authorship and verification need not conflict. That route is
+[`telos`](../telos/README.md#why-this-is-promising)'s, not this one's: this
+proposal keeps no calculus, no checker and no reference, so it would have to
+supply all three.
 
 **Nor whether it would be fast.** Competitive SMT performance is the part
 everybody underestimates.

@@ -1,215 +1,140 @@
 # Competing approaches
 
-The [README](../README.md#three-approaches-to-rewriter-maintenance) defines the
-shared terms **generated rewriter**, **proof-producing rewriter** and
-**proof-reconstructing rewriter**, and is the ground truth for them. They name
-competing ways to maintain a rewriter and its proofs, usable across the broader
-solver proposals below.
-
-*[Three approaches to rewriter maintenance](#three-approaches-to-rewriter-maintenance)
-below restates those definitions at length. **Nothing compares the two copies**,
-so a reader who finds them disagreeing should take the README's.*
+The [README](../README.md) names the three solver approaches and defines the
+shared rewriter terms **generated rewriter**, **proof-producing rewriter** and
+**proof-reconstructing rewriter**. It is the authority for both. This page
+develops the tradeoffs without restating the definitions. Public work for each
+approach is in [`related-work.md`](related-work.md).
 
 ## Broader solver approaches
 
-Three bets on how to get a better SMT solver than the ones we have. **Proof-first
-design is the current preference and a promising direction; no solver has been
-tested here.** It has a verified checker in Logos and a concrete next
-experiment. It also has a third advantage, described
-[below](#why-a-proof-producing-solver-is-a-basis-for-agents): an existing
-proof-producing solver gives an AI agent enough structure to write a verified
-one in Lean. They differ on what they keep from cvc5 and on who does the writing;
-what already exists in public for each is
-[`related-work.md`](related-work.md).
-
-| | keeps from cvc5 | written by | the bet | dies if |
+| | keeps from cvc5 | written by | where the guarantee lives | dies if |
 | --- | --- | --- | --- | --- |
-| Proof-first design | the calculus, and parts of the internal proof checker | agents under human supervision, against a fixed calculus and a verified checker | designing proof production with search may reduce reconstruction gaps | a proof-producing rewriter costs too much, **or a hybrid using generated rules closes the same gap more cheaply** |
-| Automated maintenance | all of it | agents | the design is the asset; mechanize the upkeep and the build order stops mattering | upkeep does not outrun accumulation |
-| Agent-built solver | nothing | agents | solvers are scarce because people are, so make architecture cheap to vary | the hard parts are exactly the parts that do not automate |
+| Proof-first port | the proof calculus, and the C++ as the behaviour to match | agents under human supervision, in Lean | certificates in cvc5's calculus, checked or proved sound once against Logos; search untrusted | the approach does not extend past simplification, or runtime cost is prohibitive |
+| Verified Rust port | the design, with the C++ as a general guide | agents under human supervision, in Rust | Verus proofs about the code itself | refactoring for Verus costs the performance, or the verified part stays small |
+| Agent-built solver | nothing | agents | none, unless added | the hard parts are exactly the parts that do not automate |
 
-**Proof-first design and automated maintenance are the real disagreement.**
-The former hypothesizes that designing proof production with search is cheaper
-than reconstructing proofs afterwards; the latter asks whether improving the
-existing implementation is cheaper still. The measurements do not establish
-that development order causes the gaps, and the approaches could complement
-each other.
-
-**Building a new solver with agents is arguing about something else.** It shares
-automated maintenance's method and proof-first design's willingness to start
-over, and it is the only one whose bet is about *production cost* rather than
-correctness — which is also its weakness: nothing in it
-produces a reason to believe the output. The LLM2SMT study reports
-competitive QF_UF solving with much more limited certification; see the
-[source summary](related-work.md#agent-built-solvers).
+**The proof-first port is the current preference.** It is the only approach
+with evidence: a verified Lean port of cvc5's rewriter and preprocessor,
+written by agents under human supervision outside this repository. No solver
+has been built or compared here.
 
 ### Why a proof-producing solver is a basis for agents
 
-**The weakness above is answered when an agent ports a proof-producing solver
-into a verified framework,** within the limits of the checker's correctness
-statement. It is not answered when the agent starts from nothing. cvc5 already provides three things such an agent can use:
+An agent porting a proof-producing solver has three things that an agent
+starting from nothing lacks:
 
 - **A specification for each step.** CPC's rules state what every rewrite and
-  inference may conclude, so the agent ports control flow and does not invent
-  rules.
-- **A verified checker for that specification.** Logos checks CPC steps in
-  Lean, so a port can prove once that any sequence of accepted steps is sound,
-  instead of trusting the agent's code.
+  inference may conclude. The agent ports the choice of rule, not the rule.
+- **A verified checker for that specification.** Logos proves CPC's rules sound
+  in Lean. A port can prove once that any sequence of accepted steps preserves
+  meaning, so the agent's code need not be trusted.
 - **A reference implementation.** cvc5's output allows differential testing of
-  completeness and behaviour, which the checker does not cover.
+  coverage and behaviour, which the theorem does not address.
 
-In a rewriter built this way, an agent's errors can lose rewrites or differ from
-cvc5, but they cannot produce a non-equivalent term. The calculus and checker, which are the trusted parts, are
-maintained independently of the agent. A verified Lean port of cvc5's Boolean
-and arithmetic rewriter, written by agents under human supervision outside
-this repository, follows this pattern: it
-writes no rules of its own and checks each step with Logos. It is evidence about
-a rewriter and says nothing yet about a solver's search, theory combination or
-performance.
+In the rewriter built this way, an agent's error can lose a rewrite or differ
+from cvc5, but cannot return a non-equivalent term. The trusted parts are the
+calculus, the checker's specification and the translation into it, and the
+agent does not maintain them. This answers the agent-built solver's weakness —
+that nothing gives a reason to believe the output — within the limits of
+Logos's correctness statement.
 
-**This changes the "written by" column more than the bet.** Proof-first design
-still bets that designing proof production with search is the cheaper route.
-What changes is that the authoring can be done by agents without giving up the
-reason to believe the output. Agent-built solving from nothing remains a
-separate bet, and a weaker one: it lacks a specification, an oracle and a
-checker for the agent to work against.
+**What the evidence does not show.** Rewriting and preprocessing are
+equivalence-preserving transformations of formulas. A solver also needs search,
+conflict explanation, theory combination and model construction, where porting
+is harder and runtime cost decides usefulness. The implementation has already
+moved some steps from checked certificates to Lean proofs about faster code,
+for speed. That is a small step towards the Rust port's approach.
 
-## Three approaches to rewriter maintenance
+### The real disagreement: certificates or code
 
-A **proof-producing rewriter** returns the rewritten term and its equality
-certificate together. The proposal here uses a dependently typed host
-to derive both from one rewrite definition. Its maintenance claim is that adding
-or changing a rule needs little separate proof work. An implementation outside
-this repository needs none per rule, because it takes its rules from the proof
-calculus. The comparison with the alternatives remains untested.
+**The proof-first port and the Rust port are the real disagreement.** Both
+port cvc5 with agents, and both aim at verification. They disagree about what
+to verify:
 
-A **generated rewriter** makes declarative proof rules the source of executable
-rewrite code. A maintainer edits the rule and regenerates the matcher; a step
-records the rule that fired so the proof producer can apply it directly.
+- The proof-first port verifies a **fixed calculus and its checker**, and leaves
+  search untrusted. Its cost is producing or justifying a certificate for every
+  step. Its benefit is that the trusted part does not grow with the solver.
+- The Rust port verifies **the solver's own code**. Its cost is the proof
+  burden on a large, performance-critical program, and the trusted base
+  includes Verus and the SMT solver Verus uses. Its benefit is that no per-run
+  certificate is needed, and it starts in a language suited to speed.
 
-A **proof-reconstructing rewriter** is cvc5's current approach: the handwritten
-rewriter produces a result, then a separate reconstructor searches proof rules
-for an explanation. This lets the rewriter evolve without constructing a proof
-at each step, at the cost of maintaining the correspondence and the search.
+The verified SAT solvers IsaSAT and versat show the cost of the second route
+for SAT alone; see [related work](related-work.md#verified-checkers-and-verified-solvers). The Rust
+port's claim is that agents change that cost, because the refactoring that
+verification demands is the kind of work agents are good at. That claim is
+untested.
 
-**This third approach is very hard to verify statically.** Proving the rules
+**The two could combine.** A Rust port that keeps cvc5's proof production
+emits certificates that Ethos and Logos can check before any Verus proof
+exists. Verification could then move into the code one component at a time.
+
+### The agent-built solver
+
+**Building from nothing is a bet about production cost, not correctness.** Its
+weakness is that nothing in it produces a reason to believe the output. The
+other two approaches answer that by starting from a solver with a proof
+calculus. The LLM2SMT study reports competitive QF_UF solving with limited
+certification; see the
+[source summary](related-work.md#agent-built-solvers).
+
+## Rewriter maintenance
+
+The rewriter comparison is the first test of any of the approaches above, and
+is independent of which one is chosen.
+
+**What the built rewriter chose.** The verified Lean rewriter writes no rules.
+It generates its matcher from the CPC signature, ports cvc5's theory
+strategies as untrusted code, and proves once that any sequence of
+checker-accepted steps is an equivalence. Its cost per rule is therefore no
+proof work. Rules computed by normalisation (polynomial and ACI normalisation)
+are computed by ported code and then validated or proved. This is a
+generated rewriter whose results also carry proofs. It is not the elaboration
+from rules written in the host language that the original proposal described.
+
+**What a proof-reconstructing rewriter would have to show.** Proving the rules
 sound is only part of the task. To guarantee a proof for every supported
 rewrite, one must also show that the rules cover the handwritten code's
-behaviour and that reconstruction finds the proof within its budget, including
-conditional-rule obligations. Those obligations are not necessarily simpler
-than the original goal. A checked proof establishes the soundness of the step
-it justifies; it does not establish this global reconstruction guarantee.
-Generated and proof-producing rewriters expose more of that correspondence
-directly, but neither is automatically verified by its architecture.
+behaviour and that reconstruction succeeds within its budget, including the
+conditions of conditional rules. A checked proof establishes the step it
+justifies, not this global guarantee.
 
-**The `rdbExec` branch advocates a hybrid:** generated rules alongside
-handwritten theory rewriters and proof reconstruction. At the revision read
-here, generated rules run when the theory rewriter leaves a term unchanged;
-the branch does not aim to
-replace all rewriting with generated code. Its prototype is in
-[`ajreynol/cvc5` branch `rdbExec`](https://github.com/ajreynol/cvc5/tree/rdbExec),
-read at `4585967004` from cvc5 `5cc03f4b95`. This is exploratory work in a
-personal fork: six rules, no release, and no position of cvc5's.
+**What the `rdbExec` hybrid changes.** In the
+[`rdbExec` branch](https://github.com/ajreynol/cvc5/tree/rdbExec), read at
+`4585967004` from cvc5 `5cc03f4b95`, generated rules run when the theory
+rewriter leaves a term unchanged, and the proof producer applies the recorded
+rule directly. This removes one of the two things reconstruction recurses on —
+the gap between a rule's instantiated right-hand side and the target. Rule
+conditions are still reconstructed through the same bounded search. Dokimasia's
+answer [`dokimasia-D13`](https://github.com/ajreynol/dokimasia/blob/main/docs/discussion.md#d13--exec-narrows-i-4-and-it-is-not-the-e4-we-called-an-open-problem),
+read at dokimasia `1eeae9b`, confirms this and bounds it.
+[`i-4`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)
+is a claim about the procedure, so its termination status is unchanged. The
+budget is spent per reconstruction, so six compiled rules are *"a smaller
+constant"*, which *"is not an argument"*. For a compiled rule, the RARE rule
+and the generated C++ are no longer two statements of one fact, at the cost of
+recording the step as trusted and reconstructing it later.
 
-These compete on the cost of maintaining rewrites with proofs, and can overlap
-in an implementation. A proof-producing rewriter specifies what a rewrite must
-return; a generated rewriter specifies where its executable code comes from;
-a proof-reconstructing rewriter relies on later search. These terms do not
-commit to a new solver, a programming language, or who writes the code.
-The broader proof-first proposal must therefore justify its cost against
-the hybrid use of generated rules inside the existing solver.
-
-[`related-work.md`](related-work.md#where-a-rewrites-proof-comes-from--the-argument-all-three-bets-inherit)
-records the prototype and the published proof-reconstruction baseline.
-
-**This narrows the question rather than settling it, and the narrowing is
-smaller than it looks.** An `:exec` rewrite removes one of the two things
-reconstruction recurses on — the gap between a rule's instantiated right-hand
-side and the target — and leaves the other, since rule conditions are still
-reconstructed through the same bounded search. Dokimasia, which is the authority
-on [`i-4`](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register),
-confirms that mechanism and states two limits on what it buys, read at dokimasia
-`1eeae9b`. `i-4` is a claim about the **procedure**, so narrowing it over the
-compiled rules leaves its termination status exactly where it was: *"a procedure
-with no termination argument that now needs the budget less often still has no
-termination argument."* And the budget is spent per reconstruction rather than
-per rule, so dropping one of its two consumers for six rules is a smaller
-constant — *"a smaller constant is not an argument."*
-
-**What `:exec` does change is a different register.** For a rule compiled into
-the rewriter, the RARE rule and the generated C++ stop being two statements of
-one fact, because the C++ is derived from the rule. Dokimasia reports this as
-the strongest form of the direct test its register calls `R9` — instantiate each
-rule's match, run the rewriter, compare to the target — arriving as a by-product
-rather than as a test, and names the cost: recording the applied rule as a trust
-step means the step is trusted when made and reconstructed afterwards, which
-moves work out of its `rewrites` register and into `trust`.
-**The by-product is bounded by the marker**, which six rules carry at
-`4585967004`.
-
-**It is also not the "compile RARE" problem dokimasia called open.** That
-problem is about compiling the rule database into the *reconstructor*; this
-branch compiles the *rewriter* — *"the first attacks the search, the second
-removes the occasion for it."*
-
-**Both paragraphs above are dokimasia's answer rather than its documentation**,
-re-read at dokimasia `de0f1b9`. The page that carried its `E1`–`E4` rewriter
-experiments, `docs/rare-correspondence.md`, went in the reorganisation
-[`D7`](discussion.md) is about, and the trimmed correspondence in `docs/README.md`
-does not carry the `:exec` distinction; `E4` is a label on no dokimasia page now.
-Its `i-4`, `i-17` and `R9` rows are current.
-
-What nobody has measured is how far the second goes: how many of cvc5's RARE
-rules could carry `:exec` — 321 of them at cvc5 `aee8742404` — and what the ones
-that cannot have in common. **That measurement, not a new argument, is what
-would move this comparison.**
-
-## What proof-first design would keep
-
-Proof-first design is **not** "rip the spine out of cvc5 and build around it",
-though it is closer to that than the other two. It keeps the **proof calculus** — the
-`Cpc.eo` signature cvc5 already emits against — **parts of the internal proof
-checker**, and dokimasia's measurements of where cvc5's proof coverage has
-holes. Its kernel is [Logos](https://github.com/cvc5/logos), a verified
-checker in Lean that already exists; what this approach would build is the
-producer. The search does not come across.
-
-[Dokimasia's measurement](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)
-of cvc5 `aee8742404` identifies `ProofChecker` plus thirteen
-registered theory rule checkers under `--check-proofs`: a compile closure of
-179 files and 41,446 lines, about 8% of `src/`. This is a source dependency
-measurement, not a minimal trusted-base proof. Which parts to keep is undecided.
-
-Logos's [correctness statement](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/README.md#correctness)
-concerns the assumptions its parser reads under its model
-semantics. The parser, original-input correspondence and compiled execution
-remain trust obligations. Its [conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
-mean that a `correct` verdict alone is not a general SMT-LIB guarantee.
-The first Boolean rewriter experiment must check the input correspondence as
-well as the verdict. `incomplete` measures unsupported translations; it does
-not detect every semantic mismatch or prove completeness of search.
-
-The spine transplant proper — keep cvc5's core engine as a working artifact and
-rebuild the architecture around it — is a fourth bet, unclaimed here rather than
-rejected.
+**What would move the comparison.** It needs a measurement, not another
+argument. How many of cvc5's RARE rules could carry `:exec` — there were 321 at
+cvc5 `aee8742404` — and what do the ones that cannot have in common? On the
+other side, what does the Lean rewriter cost at runtime against cvc5 on the same
+terms? **An experiment that beats the 2022 reconstruction paper but loses to
+the hybrid has not settled anything in the proof-first port's favour.**
 
 ## How any of this gets decided
 
-Each bet has a cheap experiment that could kill it, and none has been run to a
-conclusion: a proof-producing rewriter for one theory, which has been built
-outside this repository but not compared with the alternatives; one agent-driven refactor of one cvc5
-subsystem measured against the gaps it is meant to close; or a new theory
-solver that passes somebody else's benchmark set. The preference for proof-first
-design remains provisional until those experiments provide evidence to judge
-the approaches.
+Each approach has an experiment that could kill it:
 
-**Compare a proof-producing rewriter with a generated rewriter on one theory.**
-Measure manual work per rule, supported rewrites, certificate construction and
-checking costs against the proof-reconstructing baseline. The 2022 paper argues
-for that baseline on maintenance grounds; the hybrid `:exec` prototype tests
-generation inside it. Measure both its generated rules and the work left to
-handwritten rewriting and reconstruction. Marking an existing RARE rule `:exec`
-adds one token, but that does not measure the cost of expressing a new
-rule, handling its conditions, or maintaining the generator. **An experiment
-that beats the paper and loses to the branch has not settled anything in
-proof-first design's favour.**
+- **Proof-first port:** extend the Lean port to one piece of search — for
+  example, a CDCL(T) core for one theory — and measure whether certificates or
+  Lean proofs keep pace with the port.
+- **Verified Rust port:** port one cvc5 subsystem to Rust, refactor it until
+  Verus verifies a meaningful property, and measure the cost and the
+  performance relative to the C++.
+- **Agent-built solver:** a new theory solver that passes somebody else's
+  benchmark set with checkable output.
+
+Only the first has started, and only for simplification. The preference
+remains provisional until these experiments produce evidence.

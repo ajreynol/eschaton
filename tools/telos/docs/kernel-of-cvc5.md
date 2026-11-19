@@ -259,7 +259,8 @@ UNSAT, not complete, not terminating — is much narrower than the word
 "verified" suggests on first reading. Both emit no certificate, so a third party
 has nothing to check.
 [I5](design.md#i5--soundness-is-the-kernels-job-completeness-is-the-type-systems)
-is the decision to go the other way.
+is the decision to go the other way. [`cvc6`](../../cvc6/README.md) is the
+proposal that takes this road, betting that agents change its cost.
 
 **And note what lean-smt's 71% is.** It is a *completeness* number, produced by
 the same trade dokimasia measures in cvc5: the smaller the trusted base, the

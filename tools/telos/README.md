@@ -2,24 +2,23 @@
 
 *What would you build if you started from the answer?*
 
-**Proposal.** Keep cvc5's proof calculus and parts of its internal checker,
-throw away the search, and design a solver in which the proof comes first — on a
-kernel that is already verified.
+**Proposal.** Port cvc5 to Lean with agents, justify every step in cvc5's
+proof calculus, and verify that justification once, on a kernel that is already
+verified. Search stays untrusted.
 
-**Keeps from cvc5:** the proof calculus and parts of the internal proof
-checker, which [dokimasia](https://github.com/ajreynol/dokimasia) is the
-authority on — not the search.
+**Keeps from cvc5:** the proof calculus, and the C++ as the behaviour to match.
+[Dokimasia](https://github.com/ajreynol/dokimasia) is the authority on cvc5's
+proof coverage.
 **Written by:** agents, under human supervision —
-[`ajreynol/telos`](https://github.com/ajreynol/telos) was written that way. The
-calculus and checker are fixed, so the writer need not be trusted; see
-[why this is promising](#why-this-is-promising).
-**Dies if:** a proof-producing rewriter costs too much, or a hybrid using
-generated rules closes the same gap more cheaply.
+[`ajreynol/telos`](https://github.com/ajreynol/telos) was written that way.
+**Dies if:** the approach does not extend from simplification to search, or its
+runtime cost is prohibitive.
 
-**Status:** a verified rewriter exists, in its own repository:
-[`ajreynol/telos`](https://github.com/ajreynol/telos), read at `b1c20dc`.
-No solver is built. The notes in this directory are the design record that
-preceded it; [what was built](#what-was-built) says where the two differ.
+**Status:** a verified rewriter and preprocessor exist, in their own
+repository: [`ajreynol/telos`](https://github.com/ajreynol/telos), read at
+`5661141`. No solver is built. The notes in this directory are the design
+record that preceded it; [where the two differ](#where-the-implementation-departs-from-these-notes)
+is below.
 
 **Against the alternatives:** [`approaches.md`](../../docs/approaches.md).
 **Already done in public:** [`related-work.md`](../../docs/related-work.md).
@@ -30,285 +29,168 @@ audits. Eschaton's front page does not name or link this child project; it
 remains isolated from the parent's code and CI.
 
 **Research notes.** Nothing here makes a claim about cvc5, asks anything of
-cvc5, or should be quoted as though it did.
+cvc5, or should be quoted as though it did. This directory ships no code: the
+implementation keeps its own documentation, trusted base and CI.
 
-**This directory ships no code.** The implementation lives in
-[`ajreynol/telos`](https://github.com/ajreynol/telos), which keeps its own
-documentation, trusted base and CI. Everything here is prose, and deleting it
-would leave this repository exactly as functional as it is now.
+---
 
 ## Why this is promising
 
 **A proof-producing solver is a strong basis for an AI agent to write a
-verified one in Lean.** cvc5 gives such an agent a specification for each step
+verified one in Lean.** cvc5 gives the agent a specification for each step
 (CPC's rules), a verified checker for that specification (Logos), and a
-reference implementation to test against (cvc5 itself). The agent ports control
-flow, which is untrusted. The trusted parts, the rules and the checker, are
-maintained elsewhere and do not change while it works. The rewriter below,
-[`ajreynol/telos`](https://github.com/ajreynol/telos), was written by agents
-under human supervision and follows this pattern. It writes no rule of its own, a wrong strategy cannot
-return a non-equivalent term, and differential fuzzing against cvc5 measures
-what the theorem does not.
+reference implementation to test against (cvc5 itself). The agent ports
+control flow, which is untrusted, and the trusted parts are maintained
+elsewhere. A wrong strategy can lose a rewrite or differ from cvc5, but cannot
+return a non-equivalent term. Differential fuzzing against cvc5 measures what
+the theorem does not.
 
-That makes telos the meeting point of two bets the parent keeps separate.
-[`hawkeye`](../hawkeye/README.md) asks whether agents can write a solver, and
-lacks a reason to believe the result. telos supplies that reason. What is still
-open is whether the pattern extends from rewriting to search, theory
-combination and conflict explanation, where the porting is harder and runtime
-cost matters. This is the current preference: promising, and untested beyond
-the rewriter.
+This combines two bets the parent keeps separate.
+[`hawkeye`](../hawkeye/README.md) asks whether agents can write a solver, but
+has no reason to believe the result. telos supplies that reason.
+[`cvc6`](../cvc6/README.md) also ports cvc5 with agents, but verifies the code
+instead of the steps. The open question is whether the approach extends from
+rewriting and preprocessing to search, theory combination and conflict
+explanation, where porting is harder and runtime cost matters.
 
 ## What was built
 
-At `b1c20dc`, telos is a **port of cvc5's rewriter to Lean 4 with a
-machine-checked proof that every rewrite preserves equivalence**, stated as
-`Telos.rewrite_correct (t : Node) (h : t.WellTyped) : t.Equiv (rewrite t)`
-under Logos's semantics. Its [README](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/README.md),
-[design](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/docs/design.md)
-and [trusted base](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/TRUSTED.md)
-are the authority; this section summarizes them and was not re-run here.
+At `5661141`, according to its
+[README](https://github.com/ajreynol/telos/blob/566114153c36bff8145224bf8831250c079a51f3/README.md),
+[design](https://github.com/ajreynol/telos/blob/566114153c36bff8145224bf8831250c079a51f3/docs/design.md)
+and [trusted base](https://github.com/ajreynol/telos/blob/566114153c36bff8145224bf8831250c079a51f3/TRUSTED.md),
+which are the authority; nothing was re-run here:
 
-- **Every step is a CPC rule checked by Logos.** A matcher generated from the
-  pinned Eunoia signature (88 of the signature's 610 rules at that revision: `bool-*`,
-  `ite-*`, `eq-*` and arithmetic) finds an application, and the step runs Logos's verified
-  checker on a short command list. Theory rewrites such as `aci_norm` and
-  `arith_poly_norm` are computed by unverified code ported from cvc5 and
-  validated by the rule. telos writes no rewrite rule of its own.
-- **Choosing the rule is untrusted.** Hand-written strategies port the control
-  flow of cvc5's theory rewriters. A wrong strategy can lose a rewrite or
-  differ from cvc5, but not return a non-equivalent term. Agreement with cvc5 is
-  tested by differential fuzzing, not proved.
-- **Ported so far:** Booleans, arithmetic (`+`, `-`, `*`, `/`, `div`, `mod`,
-  `abs`, `to_real`, `to_int`, `is_int`, comparisons), and equality, UF and
-  quantifiers as far as they are Boolean. Bit-vectors and the other theories
-  are not started.
-- **Reported results:** on 6,000 fuzzed Boolean terms, about 94% identical to
-  cvc5 and the rest differing by equality orientation; on 3,000 arithmetic
-  terms, 83.5% identical and 92.7% up to orientation; no semantic
-  disagreements; Ethos accepted 2,000 of 2,000 printed proofs.
-- **Three cvc5 arithmetic rewrites have no CPC rule**, so telos cannot certify
-  them: `(is_int (to_real x))` to `true`, removing `to_real` from both sides of
-  `/`, and `(div_total (mod_total x c) c)` to `0`.
-- **Trusted base:** the Logos/CPC definitions, the `Node`-to-Logos translation
-  and the definition of `Node.Equiv`, plus Lean's kernel and compiler. No
-  `sorry` or declared axiom, but 43 `native_decide` axioms enter through
-  Logos's proofs, so the Lean compiler is trusted. The SMT-LIB front end and
-  Logos's parser are outside the theorem.
+- **Two theorems.** `Telos.rewrite_correct`: every rewrite of a well-typed
+  term is equivalent to it. `Telos.preprocess_correct`: the preprocessed
+  assertions are equivalent to the input. "Equivalent" means equal in every
+  model under Logos's semantics.
+- **Rewriter.** A port of cvc5's `Rewriter` and theory rewriters for Booleans,
+  arithmetic, UF and `distinct`, bit-vectors, arrays, strings in part, finite
+  sets, datatypes and tuples, and quantifiers as far as they are Boolean.
+  Scope is cvc5's safe-mode fragment.
+- **Preprocessor.** A port of passes from cvc5's `ProcessAssertions`,
+  including rewriting, non-clausal simplification, static learning and theory
+  preprocessing with purification skolems.
+- **How steps are justified.** The baseline is a CPC step checked by Logos's
+  verified checker, with one theorem covering every composition. For speed,
+  some steps are instead *static* (a cheap side condition, proved once to
+  imply that the checker would accept) or *semantic* (a condition proved once
+  to imply equivalence). The rule table is generated from the CPC signature;
+  telos writes no rules of its own.
+- **Proofs for auditing.** The rewriter prints CPC proofs that Logos's checker
+  has accepted, for Ethos to re-check. Proof output for preprocessing steps is a
+  stated goal.
+- **Agreement with cvc5** is tested by differential fuzzing per theory, not
+  proved. The design document records the rates and the cvc5 revisions they
+  were measured against.
+- **Trusted base:** Logos's specification, the translation of telos's terms into
+  Logos terms, and the definition of equivalence, plus Lean's kernel and
+  compiler. No `sorry` or declared axiom, but 43 `native_decide` axioms enter
+  through Logos's proofs, so the Lean compiler is trusted. The SMT-LIB front end
+  and Logos's parser are outside the theorem.
 - **Logos pin:** [`ajreynol/logos`](https://github.com/ajreynol/logos)
-  `b1b49e7e`, not the `cvc5/logos` `56c7b409` these notes measured.
+  `f2001ba0`, not the `cvc5/logos` `56c7b409` these notes measured.
 
-**Where it departs from these notes.**
+**A by-product: porting finds proof holes.** telos's `test/cvc5-holes/`
+records cvc5 rewrites whose proofs at `dsl-rewrite` granularity contain a
+`trust` step, found while porting. It reports that new Logos rules cover all
+but one, and links a cvc5 pull request that fills them. That is telos's report
+about cvc5. Dokimasia, not this directory, is the register for such findings.
 
-- **Scope.** The proposal was a solver. The implementation is a rewriter, which
-  covers [T2](docs/TODO.md#t2--a-proof-producing-rewriter-for-one-theory) and
-  not the producer side. Its own
-  [`solver-plan.md`](https://github.com/ajreynol/telos/blob/b1c20dc87c79b7e378055b670f31684c14d19705/docs/solver-plan.md)
-  keeps the broader solver plan as the longer-term direction.
-- **Where the certificate comes from.** [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire)
-  proposed rules written once in the host and elaborated into a rewrite and its
-  justification. telos writes no rules. It takes them from CPC, generates only
-  the matcher, and proves once that any composition of checker-accepted steps
-  is an equivalence. The cost per rule is no proof work. Porting a strategy is
-  ordinary programming.
-- **What is not measured.** The comparison T2 asks for against the `rdbExec`
-  hybrid has not been run. Runtime cost is an explicit non-goal at `b1c20dc`:
-  there is no rewrite cache, and fuel replaces termination proofs.
-  [I1](docs/design.md#i1--the-answer-carries-its-certificate) and
-  [I4](docs/design.md#i4--safe-mode-is-a-type-not-a-list) concern a solver's
-  answers and configuration, so they remain untested.
+### Where the implementation departs from these notes
 
----
+- **Scope.** The proposal was a solver. The implementation is a rewriter and
+  preprocessor, which covers
+  [T2](docs/TODO.md#t2--a-proof-producing-rewriter-for-one-theory) and part of
+  the producer side. Its own
+  [`solver-plan.md`](https://github.com/ajreynol/telos/blob/566114153c36bff8145224bf8831250c079a51f3/docs/solver-plan.md)
+  keeps the broader solver plan.
+- **Where the justification comes from.**
+  [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) proposed
+  rules written once in the host and elaborated into a rewrite and its proof.
+  telos takes its rules from CPC instead, and generates only the matcher. Its
+  cost per rule is no proof work.
+- **Certificates are not the only mechanism.** The notes assume every
+  successful answer carries a runtime certificate
+  ([I1](docs/design.md#i1--the-answer-carries-its-certificate)). telos uses
+  checked certificates where they are cheap, and Lean proofs about faster code
+  where they are not. Proof production became an auditing goal rather than the
+  means of verification.
+- **What is not measured.** The comparison with the `rdbExec` hybrid has not
+  been run, and runtime cost is a stated non-goal, although performance work
+  has begun. [I4](docs/design.md#i4--safe-mode-is-a-type-not-a-list) concerns a
+  solver's configuration and remains untested, but the port adopts cvc5's safe
+  mode as its scope.
 
 ## The charter
 
 **The question.** *If the proof came first, what would the solver look like?*
-The parent compares this proposal with alternative ways to develop a solver.
 
-The experiment explores a **proof-producing rewriter** and compares it with a
-**generated rewriter** and cvc5's **proof-reconstructing rewriter**, using the
-[parent README's shared terminology](../../README.md#three-approaches-to-rewriter-maintenance).
-The `rdbExec` branch is a hybrid baseline: generated rules alongside handwritten
-rewriting and proof reconstruction. These terms describe techniques usable by
-any solver.
+**The goals** are [`TODO.md`](docs/TODO.md)'s, ordered by how fast each could
+kill the project rather than by how much work each represents.
 
-**The goals, in order** — they are [`TODO.md`](docs/TODO.md)'s `T1` to `T6`, ordered
-by how fast each could kill the project rather than by how much work each
-represents. `T2`, a proof-producing rewriter for one theory, is first because it
-is the only one whose outcome could invalidate the design.
+**The wishue** — the outcome if this went unusually well, and not a commitment:
+**telos succeeds when Logos says `correct` for the intended input in the agreed
+fragment**, a target somebody else maintains the goalposts for. Verdicts and
+unsupported inputs are recorded separately.
 
-**The wishue** — the outcome if this went unusually well, and not a commitment.
-It is already stated, and stated as a target somebody else maintains the
-goalposts for: **telos succeeds when Logos says `correct` for the intended
-input in the agreed fragment** — a fragment on
-which a telos solver's output is accepted by an independently maintained
-verified checker, with verdicts and unsupported inputs recorded separately.
-
-**Out of scope**, in full in [`TODO.md`](docs/TODO.md)'s *Not doing*, and in
-summary: writing a kernel (Logos is the kernel); writing a solver until `T2`
-returns; verifying the search, ever, under the current design; claiming anything
-about cvc5, ethos or logos, since a fact about any of them goes into that
-project's register under its own name; and presenting this proposal as an
+**Out of scope**, in full in [`TODO.md`](docs/TODO.md#not-doing): writing a
+kernel (Logos is the kernel); verifying the search under the current design;
+claiming anything about cvc5, Ethos or Logos, since a fact about any of them
+belongs in that project's register; and presenting this proposal as an
 implemented solver.
 
 ## The premise
 
-dokimasia measures cvc5's proof kernel from the outside, and the arc of that
-measurement is stated in [dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about): make it
-easier to *argue* which part of cvc5 has to be right, along five axes —
-nameable, closed, small, local, mechanized — with mechanized named explicitly as
-**the last axis, not the first**.
+Dokimasia measures cvc5's proof coverage from the outside. Its
+[kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)
+aims to make it easier to *argue* which part of cvc5 has to be right. telos asks
+the complementary question, which dokimasia cannot ask because it studies a
+design that is already fixed: **what would a solver designed around its proofs
+look like?**
 
-The design hypothesis is that constructing proofs alongside search could
-reduce some reconstruction costs. Dokimasia's measurements motivate that
-hypothesis; they do not prove that development order causes the gaps:
-`ProofGenerator* pg = nullptr` is a default argument (cvc5 `aee8742404`, with
-the call sites in [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate)), the safe-mode
-disable list is maintained by hand ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)), and
-completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) because the
-rewriter does not construct these proofs as it rewrites.
-
-telos asks the complementary question, and only the complementary question:
-
-> **If the proof came first, what would the solver look like?**
-
-Not a competitor to cvc5, not a replacement, not a proposal to anyone. A
-research vehicle for the one experiment dokimasia cannot run, because dokimasia
-is downstream of a design that is already fixed.
-
-**There is a competing answer, and it is [`cvc6`](../cvc6/README.md).** The
-opposite bet is that cvc5's *development procedure* is the thing to automate —
-the existing design kept and its upkeep mechanized. Its question is whether
-automated maintenance closes proof gaps more cheaply than a new design.
-Both proposals are untested. [`approaches.md`](../../docs/approaches.md)
-compares them, with telos
-as the current preference and a promising direction.
-
-## The foothold: Logos
-
-**telos proposes to use [`cvc5/logos`](https://github.com/cvc5/logos), and
-Logos is a moving target.** Everything below is downstream of that fact, so it
-belongs before the design rather than after it.
-
-Logos is a **verified proof checker for SMT in Lean 4**. Its soundness theorem
-`correct___logos_check_proof` says: if the checker prints `correct` for a proof
-file, the assumptions the parser read out of it are unsatisfiable — proved
-against `Cpc/SmtModel.lean`, a standalone Lean formalization of SMT-LIB's model
-semantics. Its calculus is **compiled from the same `Cpc.eo` signature cvc5
-emits proofs against**, by `ethos-eoc`, and regenerated as CPC changes.
-
-The measurements cover logos `56c7b409`; these are source sizes, not a complete
-trusted-base measurement. The figures are copied from
-[the measurement note](docs/logos.md#what-it-weighs); no automatic comparison
-keeps the copy current:
-
-| | ethos + the `cpc` signature | **Logos** |
-| --- | --- | --- |
-| source components compared | ≈**26,400 lines** — 13,862 C++, 12,530 Eunoia | **2,680 lines** of Lean specification |
-| machine-checked soundness development | none established here | **691,928 lines** of proof |
-| rules proved sound | — | **591 of 593**, no `sorry`/`admit`/`axiom` in 890 files |
-| the calculus is | hand-written twice, in Eunoia and in C++ | generated from the signature, with drift caught in CI |
-| outside the checker theorem | C++ checker and Eunoia signature | parser, input correspondence, specification adequacy and compilation |
-
-The two CPC rules with no soundness proof are `beta-reduce` and **`trust`** —
-cvc5's declared hole, the one
-[`dokimasia_analyzer.trust`](https://github.com/ajreynol/dokimasia/tree/main/dokimasia_analyzer/trust/) censuses 75 ids of. It cannot have
-one. Which states the relationship between these two projects in a sentence:
-
-> **An unjustified `trust` step is not a sound CPC derivation Logos can certify.**
-
-Dokimasia also reports static candidates and coverage risks; those are not a
-one-to-one prediction of Logos verdicts.
-
-At logos `56c7b409`, the theorem is about the assumptions the parser reads
-under Logos's semantics.
-Arrays, reals and uninterpreted sorts have documented model restrictions; these
-do not necessarily cause `incomplete`. The parser, original-input match and
-compiled execution remain trust obligations. Read the
-[conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
-before choosing a fragment. A Boolean rewriter is the proposed first test.
-
-Full description, measurements and eight things telos should learn from it are
-in [`docs/logos.md`](docs/logos.md). **Read that first.**
-
-Logos supplies an existing checker for the proposed producer. What
-is unclaimed is the **producer** side — and that gives telos a definition of
-success that is executable rather than rhetorical:
-
-> **telos succeeds when Logos says `correct` for the intended input in the agreed fragment.**
-
-## Derived from measurements, not from wishes
-
-The design notes draw on dokimasia's findings at cvc5 `aee8742404`. The proposed answers remain hypotheses; none establishes a
-property of an implementation here.
+The design notes answer five of dokimasia's findings at cvc5 `aee8742404` with
+five inversions. They are hypotheses about a design; none is a claim that cvc5's
+development order caused the gaps.
 
 | dokimasia found | telos's answer | where |
 | --- | --- | --- |
-| a missing proof is not said out loud ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)) | the answer type carries the certificate; there is no proofless return | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
-| the calculus is stated three times and can disagree (`SIG`, [R1](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r1--emit-the-tables-cvc5-already-has)) | stated once; checker, printer and docs are functions of it | [`design.md`](docs/design.md#i2--one-definition-of-the-calculus) |
-| completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | the rewriter returns its justification; there is no reconstruction to bound | [`design.md`](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) |
-| safe mode is a hand-maintained list ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register), [R8](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r8--safe-mode-as-a-build-time-property)) | the feature set is a type parameter; the unsafe configuration does not compile | [`design.md`](docs/design.md#i4--safe-mode-is-a-type-not-a-list) |
-| 8 trust steps have no stated reason ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | a hole must name itself to typecheck | [`design.md`](docs/design.md#i1--the-answer-carries-its-certificate) |
+| a missing proof is not said out loud ([H6](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)) | the answer type carries the certificate | [I1](docs/design.md#i1--the-answer-carries-its-certificate) |
+| the calculus is stated three times and can disagree ([R1](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#r1--emit-the-tables-cvc5-already-has)) | stated once; checker, printer and docs are functions of it | [I2](docs/design.md#i2--one-definition-of-the-calculus) |
+| completeness depends on a search budget ([i-4](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | the rewriter returns its justification | [I3](docs/design.md#i3--rewrites-prove-themselves-as-they-fire) |
+| safe mode is a hand-maintained list ([i-5](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | the feature set is a type parameter | [I4](docs/design.md#i4--safe-mode-is-a-type-not-a-list) |
+| trust steps without a stated reason ([i-9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)) | a hole must name itself to typecheck | [I1](docs/design.md#i1--the-answer-carries-its-certificate) |
 
-Five inversions, five findings. That is the whole design so far, and it is
-enough to start.
+**There is a competing answer, [`cvc6`](../cvc6/README.md):** port cvc5 to
+Rust and verify the code with Verus, rather than verifying a calculus and
+leaving search untrusted. Both are agent-written ports of cvc5.
+[`approaches.md`](../../docs/approaches.md) compares them, with telos as the
+current preference.
 
-## What cvc5's kernel actually is
+## The foothold: Logos
 
-Before defining a kernel you have to be able to point at the one that exists.
-cvc5 has **two**, they are not the same size, and they do not trust the same
-things. The measurements cover cvc5 `aee8742404` and ethos `b9188b86`:
+[Logos](https://github.com/cvc5/logos) is a verified proof checker for CPC in
+Lean 4. Its calculus is compiled from the same `Cpc.eo` signature cvc5 emits
+proofs against, and its theorem says that if it prints `correct`, the
+assumptions its parser read are unsatisfiable under its model semantics. The
+parser, the match to the original input, and compilation are outside the
+theorem, and its
+[conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
+constrain the fragment.
 
-| | internal — `--check-proofs` | external — `ethos` |
-| --- | --- | --- |
-| trusted C++ | **41,446 lines**, 179 files — 8.0% of `src/` | **13,862 lines**, standalone |
-| trusted declarative | — | **12,530 lines** of Eunoia (the `cpc` signature) |
-| the calculus is written as | `switch` bodies and LaTeX doc comments | 620 `declare-rule`, 340 constant declarations, 151 `define`, 248 `program` |
-| shares code with the solver it checks | **yes** — 10 theory subsystems, the rewriter, `Env` | **no** |
-| how it checks a rewrite | replays it — `MACRO_REWRITE`, registered trusted at pedantic level 4 | re-derives it from rules in the signature |
+**An unjustified `trust` step is not a sound CPC derivation Logos can certify.**
+That sentence is where telos and dokimasia meet.
 
-Read the last two rows together and the external checker is the real kernel: it
-is the only one whose correctness is independent of the solver's. It is also
-the smaller one, and its 13,862 lines are a *general-purpose* framework checker
-rather than cvc5-specific code.
-
-But the trusted total is not 13,862. It is 13,862 **plus 12,530 lines of
-Eunoia**, of which **4,186 lines are `program` definitions** — side conditions,
-which is to say a second implementation of polynomial normalisation, ACI
-normalisation, bit-blasting and string reasoning, written in an unverified DSL
-and evaluated by an unverified evaluator. `programs/Strings.eo` alone is 2,277
-lines.
-
-**That is the kernel to learn, and it is the right size to verify.** Not 41,446
-lines of C++ entangled with the solver — the type system and the matcher, the
-two pieces that decide whether a rule application is legitimate, are **466 lines
-together** (`type_checker.cpp:91–556`).
-
-Note what is *not* true of any of it: **neither checker is verified.** ethos is
-an efficient, independent, unverified C++ program, and independence is not
-verification even though the two are constantly conflated. Getting that
-distinction right matters enough that
-[`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md#prior-art-and-what-each-guarantee-actually-is)
-tabulates what every comparable tool actually proves — cake_lpr, SMTCoq,
-lean-smt, bv_decide, IsaSAT, versat, Carcara — because "verified" names at least
-five different guarantees across that list, with trusted bases ranging from *a
-theorem about the machine code* down to *nothing at all*.
+Measurements, the guarantee in detail, and eight lessons are in
+[`docs/logos.md`](docs/logos.md). **Read that first.**
 
 ## The language
 
-**Lean 4** is the provisional language for the first experiment, because it
-can use Logos directly. Rust remains an option for an untrusted search core;
-its suitability depends on measurements, not on the checker's implementation
-language alone.
-
-A dependent return type can require evidence for each successful answer, but it
-does not prove termination, successful search on every input, or correct proof
-serialization. CPC certificates must survive at runtime; a Lean proposition
-alone can be erased during compilation. The design notes distinguish these
-obligations.
-
-Alternatives and their tradeoffs — Rust + Verus, F\* → C, Isabelle/HOL
-+ Sepref, Rocq — are in [`docs/language.md`](docs/language.md), along with what
-would change the decision.
+**Lean 4**, because it can use Logos directly. The implementation has borne
+this out for simplification. Rust remains an option for an untrusted search
+core that emits certificates. The alternatives are in
+[`docs/language.md`](docs/language.md).
 
 ## On the name
 
@@ -316,19 +198,16 @@ would change the decision.
 for the sake of which". The design is asked backwards from the end state, which
 is what the word is for.
 
-## Status
+## The notes
 
-Design notes, kept as the record that preceded the implementation in
-[`ajreynol/telos`](https://github.com/ajreynol/telos). The measurements are of
-other people's trees, namely cvc5, ethos and logos. The only design claim tested
-against an implementation is the authoring half of I3, by the rewriter
-described [above](#what-was-built). The notes below still describe the
-proposal and have not been rewritten to match it.
+Design notes, kept as the record that preceded the implementation. The
+measurements are of other people's trees, namely cvc5, Ethos and Logos, at the
+revisions each page states.
 
 - **[`docs/logos.md`](docs/logos.md) — the foothold: what Logos is, what it weighs, what its guarantee is, and eight lessons. Start here**
-- [`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md) — what the kernel is today, what "defining" it means, and what each comparable tool's guarantee actually is
-- [`docs/design.md`](docs/design.md) — the five inversions, and the risks in each
-- [`docs/language.md`](docs/language.md) — the decision record
+- [`docs/kernel-of-cvc5.md`](docs/kernel-of-cvc5.md) — what cvc5's two proof kernels are, and what each comparable tool's guarantee actually is
+- [`docs/design.md`](docs/design.md) — the five inversions, the risks in each, and what the implementation tested
+- [`docs/language.md`](docs/language.md) — the language decision record
 - [`docs/TODO.md`](docs/TODO.md) — next steps, ordered, with what each produces
 
 The same standard as the rest of the repository applies: **a number here comes

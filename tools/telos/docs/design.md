@@ -5,10 +5,12 @@ explanation, and states what a solver built the other way round would do
 instead. Each also carries **what would make it wrong**, because a design note
 whose author cannot say how it fails is an advertisement.
 
-There is no implementation here. A verified rewriter now exists in
-[`ajreynol/telos`](https://github.com/ajreynol/telos), and it bears on I3 only;
-[the README](../README.md#what-was-built) records where it departs from these
-notes, which are left as written. The cvc5 examples refer to `aee8742404`;
+There is no implementation here. A verified rewriter and preprocessor now
+exist in [`ajreynol/telos`](https://github.com/ajreynol/telos), read at
+`5661141`. Each inversion below opens with a **Tested** line saying what the
+implementation bears on it; the rest is the proposal as written.
+[The README](../README.md#where-the-implementation-departs-from-these-notes)
+summarizes the departures. The cvc5 examples refer to `aee8742404`;
 the Logos source counts refer to `56c7b409`. These are source measurements,
 not benchmark results. The proposed benefits are hypotheses; see
 [Logos](logos.md#what-its-guarantee-actually-is) for the correctness boundary.
@@ -16,6 +18,14 @@ not benchmark results. The proposed benefits are hypotheses; see
 ---
 
 ## I1 — The answer carries its certificate
+
+**Tested:** not as stated, since there is no solver and so no answers. The
+rewriter returns a certified result type, so its proofless return is not
+expressible. But the implementation does not always build a runtime
+certificate: for speed, some steps are justified by a Lean theorem proved once.
+Its proof output is an auditing goal, not the means of verification. That is a
+useful revision of I1: the type must carry *evidence*, which can be a checked
+certificate or a static proof.
 
 **What cvc5 does, and why.** `TheoryInferenceManager` declares
 `ProofGenerator* pg = nullptr` as a default argument, and `conflict(TNode,
@@ -71,6 +81,10 @@ certificate construction and independent checking.
 
 ## I2 — One definition of the calculus
 
+**Tested:** adopted. The implementation generates its rule table from the CPC
+signature in its pinned Logos, and its CI fails when the table is out of date.
+It inherits Logos's mechanism rather than designing a second one, as proposed.
+
 **What cvc5 does, and why.** The calculus is stated three times: as LaTeX
 `\inferrule` blocks in `cvc5_proof_rule.h`
 ([H9](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#proof-hygiene)), as
@@ -119,6 +133,15 @@ to become a thing that can drift.
 
 ## I3 — Rewrites prove themselves as they fire
 
+**Tested:** the authoring half, favourably, by a different route than
+proposed. The implementation writes no rules: it takes them from CPC, so the
+cost per rule is no proof work. Two of the risks listed at the end of this
+section were real. Some rewriting is not a rule application (polynomial and
+ACI normalisation, operations over whole n-ary terms), and checking every step
+was too slow on large shared terms. Both were met by steps proved correct once
+in Lean rather than checked per use. Runtime cost and the comparison with the
+`rdbExec` hybrid remain unmeasured.
+
 This proposes a **proof-producing rewriter**, compared below with a **generated
 rewriter** and cvc5's **proof-reconstructing rewriter**. The names follow the
 [parent README](../../../README.md#three-approaches-to-rewriter-maintenance).
@@ -164,12 +187,12 @@ structure RewriteResult (t : Term) where
 
 The format and `ChecksEquality` predicate remain to be defined, as in I1.
 
-**What the implementation chose instead.** telos at `b1c20dc` returns a
-`Certified n m` built from a CPC command list that Logos's checker accepted,
-with one theorem covering every composition. It writes no rules: they come from
-the CPC signature and only the matcher is generated. The FMCAD objection about
-authoring cost is therefore met by writing no proofs per rule, not by
-elaborating rules in the host. The runtime cost objection is still unmeasured.
+**What the implementation chose instead.** telos returns a certified rewrite
+built from CPC steps that Logos's checker accepted, or from static and
+semantic steps with once-proved theorems, and one theorem covers every
+composition. Its rules come from the CPC signature and only the matcher is
+generated. The FMCAD objection about authoring cost is therefore met by writing
+no proofs per rule, not by elaborating rules in the host.
 
 For rules supported by this interface, justification is constructed with the
 rewrite rather than recovered by a later search. This does not remove budgets
@@ -227,29 +250,15 @@ turn"*, and those go back through the same bounded search.
 So the honest statement is that this route **narrows i-4 rather than dissolving
 it**, and does so without a new language, a new kernel or a new solver.
 
-**Dokimasia confirms that mechanism and bounds it twice**, read at dokimasia
-`1eeae9b`, and the second bound is a correction telos should carry rather than
-soften. `i-4` is a claim about the **procedure**, so removing one recursion
-source for the compiled rules leaves its termination status exactly where it
-was — *"a procedure with no termination argument that now needs the budget less
-often still has no termination argument."* And the budget is spent per
-reconstruction rather than per rule, so six compiled rules are a smaller
-constant and *"a smaller constant is not an argument."* **This cuts both ways
-for telos.** It weakens the branch as a rebuttal of I3, because the branch does
-not retire the obligation telos claims to discharge by construction; and it
-weakens I3's own framing, because *narrowed* and *dissolved* read alike in a
-design note and only one of them is a termination argument. What I3 would have
-to deliver is the argument, not a smaller constant.
-
-**Dokimasia also names a gain that is not I3's.** For a rule compiled into the
-rewriter, the RARE rule and the generated C++ stop being two statements of one
-fact, so
-[i-17](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#the-register)'s
-*established only by runtime search* does not describe it — the strongest form
-of the test its pages call `E1`, arriving as a by-product. The cost is that the
-recorded rule is a trust step, trusted when made and reconstructed afterwards,
-which moves the work into its `trust` census. **That by-product is bounded by
-the marker**, which is the six rules counted below and not the technique.
+**Dokimasia confirms that mechanism and bounds it**, in `dokimasia-D13` at
+dokimasia `1eeae9b`; the parent's
+[`approaches.md`](../../../docs/approaches.md#rewriter-maintenance) records the
+bounds. The one telos should carry is that `i-4` is a claim about the
+**procedure**: *"a procedure with no termination argument that now needs the
+budget less often still has no termination argument."* That cuts both ways. The
+branch does not retire the obligation I3 claims to discharge, and I3 must
+deliver a termination argument, not a smaller constant. The implementation
+uses fuel, so it has not delivered one either.
 
 **Read the branch's own caution, which is the part telos should take most
 seriously.** Three things it says about itself:
@@ -282,17 +291,16 @@ path: a rewrite implemented by hand is deleted in favour of the RARE rule"*.
 **That single deletion is the existence proof**, and it is worth more to this
 argument than the other five together.
 
-**What it does to telos.** I3's claim was never that proofs-with-rewrites is
-the only route to dissolving i-4; it was that a dependently typed host makes it
-cheap. This branch is a competing bid on cost, from inside a working solver,
-with no rewrite of anything. Telos's claim survives only if elaboration in a
-dependently typed host is cheaper *per rule* than marking a rule `:exec` and
-regenerating — and `:exec` is one token. **That is now the number T2 has to
-beat**, and it is a much harder target than the FMCAD paper alone set.
+**What it does to telos.** This branch is a competing bid on cost, from inside
+a working solver, with no rewrite of anything. Marking a rule `:exec` is one
+token. The implementation's answer is that it also needs no work per rule,
+because its rules come from CPC. But it needed a port of every strategy and a
+verified Lean development, which the branch does not. Which costs less, per rule
+and in total, is **the comparison T2 still has to run**.
 
-**What would make it wrong.** This is the inversion most likely to be wrong,
-and it should be tested before anything else is built on it. Four ways it
-fails:
+**What would make it wrong.** Four ways it could fail, as written before the
+implementation. The first was sidestepped, the second and third were met by
+once-proved steps, and the fourth is unmeasured:
 
 - the elaboration is not as free as claimed, and generating the justification
   turns out to need per-rule manual work — in which case the FMCAD objection
@@ -309,16 +317,18 @@ fails:
   nobody wanted to pay. This is the failure mode with a working prototype
   behind it, and it is the one to test against.
 
-**The cheapest test:** implement a proof-producing rewriter for one theory, in a fragment
-where cvc5's RARE coverage is already good, and measure both the rule-authoring
-cost and the runtime against generated rewriting in the hybrid `:exec`
-prototype and the proof-reconstructing baseline. Include the hybrid's remaining
-handwritten work and reconstruction costs. The experiment does not require a
-solver.
+**The remaining test:** measure the implementation's authoring cost and runtime
+against generated rewriting in the hybrid `:exec` prototype and the
+proof-reconstructing baseline, including the hybrid's remaining handwritten
+work and reconstruction costs. The experiment does not require a solver.
 
 ---
 
 ## I4 — Safe mode is a type, not a list
+
+**Tested:** no. The implementation takes cvc5's safe-mode fragment as its
+porting scope, so unsafe features are absent because they were never ported.
+That is a scoping decision, not the type-level configuration proposed here.
 
 **What cvc5 does, and why.** `--safe-mode=safe` promises no feature "that does
 not have full proof and model support", and delivers it at *runtime*:
@@ -365,6 +375,12 @@ not a better one.
 ---
 
 ## I5 — Soundness is the kernel's job; completeness is the type system's
+
+**Tested:** in the form the rewriter allows. Rule selection, the strategies and
+the matcher are untrusted, and a bug in them can lose a rewrite but not break
+equivalence. The static and semantic steps are verified code, which places part
+of the implementation on [`cvc6`](../../cvc6/README.md)'s side of the line.
+They justify individual steps, however, and do not verify the strategy.
 
 This is the one that makes the other four affordable, and it is a restatement of
 dokimasia's own stance rather than a new idea.

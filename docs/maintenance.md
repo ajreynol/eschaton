@@ -17,8 +17,8 @@ which kanon's status audit reads to omit it from the default listing.
 `--all-children` still includes it and explains the declaration. The parent
 README compares approaches without naming or linking the child projects; keep
 their names and links out of the parent's documentation index and reports too.
-They remain research notes with no implementation, isolated from the parent's
-code and CI. The rewriter terms name shared techniques rather than child
+They remain research notes, isolated from the parent's code and CI; any
+implementation lives in its own repository. The rewriter terms name shared techniques rather than child
 projects.
 
 Correspondence follows

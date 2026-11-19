@@ -5,7 +5,10 @@ solver. **Rust** named in advance as the escape hatch for a search core that
 needs to be fast, entering through the certificate interface so that nothing
 verified is lost when it is used.
 
-This page states the provisional choice and the tradeoffs of the alternatives.
+This page states the choice and the tradeoffs of the alternatives. The
+implementation in [`ajreynol/telos`](https://github.com/ajreynol/telos) is in
+Lean 4 and consumes Logos as a library, which confirms the choice for
+simplification. Search has not been tested.
 
 [Logos](logos.md) supplies an existing Lean checker, so interoperability is the
 main reason for this provisional choice. Its source measurements here cover
@@ -110,6 +113,12 @@ It loses on 1, 2 and 3 together:
   **an argument a reader can check**. [dokimasia's kernel wishue](https://github.com/ajreynol/dokimasia/blob/main/docs/README.md#a-kernel-you-can-argue-about)
   measures success as "how long the argument is and how much of it a reader can
   check", and "Z3 said so" is a short argument that a reader cannot check.
+
+**These are arguments against Verus for telos, not against Verus.**
+[`cvc6`](../../cvc6/README.md) takes the other side: it ports cvc5 to Rust and
+verifies the code itself. Requirement 1 does not apply there, because it does
+not rely on certificates, and its Verus proofs concern program properties rather
+than a calculus's metatheory. The third point still applies to it.
 
 **Where it comes back.** When the search is the bottleneck, write it in Rust,
 leave it untrusted, and have it emit a certificate the Lean kernel checks. That
