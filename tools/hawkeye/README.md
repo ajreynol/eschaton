@@ -50,6 +50,15 @@ If the answer is to come with a certificate, that commitment lives in
 rather than added afterwards — which is the exact mistake telos exists to point
 at.
 
+**Starting from a proof-producing solver changes this.** An agent that ports
+cvc5 into Lean against CPC and Logos has a specification, a verified checker and
+a reference to test against. Its output can be trusted within the checker's
+guarantee. That route is [`telos`](../telos/README.md#why-this-is-promising)'s,
+not this one's: it keeps cvc5's calculus, and this proposal keeps nothing.
+[`ajreynol/telos`](https://github.com/ajreynol/telos), a verified Lean port of
+cvc5's rewriter written by agents under human supervision, shows that agent
+authorship and verification need not conflict.
+
 **Nor whether it would be fast.** Competitive SMT performance is the part
 everybody underestimates.
 

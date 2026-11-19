@@ -9,7 +9,10 @@ kernel that is already verified.
 **Keeps from cvc5:** the proof calculus and parts of the internal proof
 checker, which [dokimasia](https://github.com/ajreynol/dokimasia) is the
 authority on — not the search.
-**Written by:** people.
+**Written by:** agents, under human supervision —
+[`ajreynol/telos`](https://github.com/ajreynol/telos) was written that way. The
+calculus and checker are fixed, so the writer need not be trusted; see
+[why this is promising](#why-this-is-promising).
 **Dies if:** a proof-producing rewriter costs too much, or a hybrid using
 generated rules closes the same gap more cheaply.
 
@@ -33,6 +36,27 @@ cvc5, or should be quoted as though it did.
 [`ajreynol/telos`](https://github.com/ajreynol/telos), which keeps its own
 documentation, trusted base and CI. Everything here is prose, and deleting it
 would leave this repository exactly as functional as it is now.
+
+## Why this is promising
+
+**A proof-producing solver is a strong basis for an AI agent to write a
+verified one in Lean.** cvc5 gives such an agent a specification for each step
+(CPC's rules), a verified checker for that specification (Logos), and a
+reference implementation to test against (cvc5 itself). The agent ports control
+flow, which is untrusted. The trusted parts, the rules and the checker, are
+maintained elsewhere and do not change while it works. The rewriter below,
+[`ajreynol/telos`](https://github.com/ajreynol/telos), was written by agents
+under human supervision and follows this pattern. It writes no rule of its own, a wrong strategy cannot
+return a non-equivalent term, and differential fuzzing against cvc5 measures
+what the theorem does not.
+
+That makes telos the meeting point of two bets the parent keeps separate.
+[`hawkeye`](../hawkeye/README.md) asks whether agents can write a solver, and
+lacks a reason to believe the result. telos supplies that reason. What is still
+open is whether the pattern extends from rewriting to search, theory
+combination and conflict explanation, where the porting is harder and runtime
+cost matters. This is the current preference: promising, and untested beyond
+the rewriter.
 
 ## What was built
 
@@ -157,7 +181,7 @@ the existing design kept and its upkeep mechanized. Its question is whether
 automated maintenance closes proof gaps more cheaply than a new design.
 Both proposals are untested. [`approaches.md`](../../docs/approaches.md)
 compares them, with telos
-as the current, provisional preference.
+as the current preference and a promising direction.
 
 ## The foothold: Logos
 

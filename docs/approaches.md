@@ -13,15 +13,18 @@ so a reader who finds them disagreeing should take the README's.*
 ## Broader solver approaches
 
 Three bets on how to get a better SMT solver than the ones we have. **Proof-first
-design is the current preference; none has been tested here.** Its existing
-verified checker in Logos and concrete next experiment make it the most promising
-path to explore. They differ on what they keep from cvc5 and on who does the writing;
+design is the current preference and a promising direction; no solver has been
+tested here.** It has a verified checker in Logos and a concrete next
+experiment. It also has a third advantage, described
+[below](#why-a-proof-producing-solver-is-a-basis-for-agents): an existing
+proof-producing solver gives an AI agent enough structure to write a verified
+one in Lean. They differ on what they keep from cvc5 and on who does the writing;
 what already exists in public for each is
 [`related-work.md`](related-work.md).
 
 | | keeps from cvc5 | written by | the bet | dies if |
 | --- | --- | --- | --- | --- |
-| Proof-first design | the calculus, and parts of the internal proof checker | people | designing proof production with search may reduce reconstruction gaps | a proof-producing rewriter costs too much, **or a hybrid using generated rules closes the same gap more cheaply** |
+| Proof-first design | the calculus, and parts of the internal proof checker | agents under human supervision, against a fixed calculus and a verified checker | designing proof production with search may reduce reconstruction gaps | a proof-producing rewriter costs too much, **or a hybrid using generated rules closes the same gap more cheaply** |
 | Automated maintenance | all of it | agents | the design is the asset; mechanize the upkeep and the build order stops mattering | upkeep does not outrun accumulation |
 | Agent-built solver | nothing | agents | solvers are scarce because people are, so make architecture cheap to vary | the hard parts are exactly the parts that do not automate |
 
@@ -39,6 +42,37 @@ correctness — which is also its weakness: nothing in it
 produces a reason to believe the output. The LLM2SMT study reports
 competitive QF_UF solving with much more limited certification; see the
 [source summary](related-work.md#agent-built-solvers).
+
+### Why a proof-producing solver is a basis for agents
+
+**The weakness above is answered when an agent ports a proof-producing solver
+into a verified framework,** within the limits of the checker's correctness
+statement. It is not answered when the agent starts from nothing. cvc5 already provides three things such an agent can use:
+
+- **A specification for each step.** CPC's rules state what every rewrite and
+  inference may conclude, so the agent ports control flow and does not invent
+  rules.
+- **A verified checker for that specification.** Logos checks CPC steps in
+  Lean, so a port can prove once that any sequence of accepted steps is sound,
+  instead of trusting the agent's code.
+- **A reference implementation.** cvc5's output allows differential testing of
+  completeness and behaviour, which the checker does not cover.
+
+In a rewriter built this way, an agent's errors can lose rewrites or differ from
+cvc5, but they cannot produce a non-equivalent term. The calculus and checker, which are the trusted parts, are
+maintained independently of the agent. A verified Lean port of cvc5's Boolean
+and arithmetic rewriter, written by agents under human supervision outside
+this repository, follows this pattern: it
+writes no rules of its own and checks each step with Logos. It is evidence about
+a rewriter and says nothing yet about a solver's search, theory combination or
+performance.
+
+**This changes the "written by" column more than the bet.** Proof-first design
+still bets that designing proof production with search is the cheaper route.
+What changes is that the authoring can be done by agents without giving up the
+reason to believe the output. Agent-built solving from nothing remains a
+separate bet, and a weaker one: it lacks a specification, an oracle and a
+checker for the agent to work against.
 
 ## Three approaches to rewriter maintenance
 

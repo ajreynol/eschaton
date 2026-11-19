@@ -189,7 +189,11 @@ that a new SMT producer will be easy to build.
 
 **Proof-first from line one, built by agents.** The list does not settle the
 authoring cost or runtime cost of designing a solver around proof production.
-That is an experiment to run, not a claim that no such work exists.
+A verified Lean port of cvc5's rewriter, written by agents under human
+supervision outside this repository against CPC and Logos, is evidence that an existing proof-producing solver is a strong
+basis for this. It is not yet evidence about search, theory combination or
+runtime cost. Those remain experiments to run, not claims that no such work
+exists.
 
 **How a proof-producing rewriter compares with a generated rewriter.** The
 `rdbExec` branch above uses generation in a hybrid at prototype scale, inside

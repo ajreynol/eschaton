@@ -17,8 +17,21 @@ the proof-producing solver as the main work. Logos's
 concerns parsed assumptions under its own semantics; its parser and the match
 to the original problem remain outside the theorem. Its
 [SMT-LIB conformance limits](https://github.com/cvc5/logos/blob/56c7b4098a8c5e7b170ab506fc88d18a913d3cb6/docs/smt-lib-conformance.md)
-also constrain the fragment we could claim. This is a provisional research
-preference; none of these approaches has been implemented or tested here.
+also constrain the fragment we could claim.
+
+**An existing proof-producing solver is a strong basis for an AI agent to write
+a verified one in Lean.** cvc5 already supplies the three things such an agent
+needs. Its proof calculus is a written specification for every step. Logos is a
+verified checker for that calculus, so each step can be checked against it.
+cvc5 itself can serve as a reference for differential testing. The agent then
+ports search and strategy, which are untrusted, while the rule set and the
+checker stay fixed and are maintained by other people. This combines the
+proof-first and agent-built approaches below: the agent supplies the writing,
+and the proof supplies the reason to believe the result. A verified Lean port
+of cvc5's Boolean and arithmetic rewriter, written by agents under human
+supervision outside this repository, is
+the first evidence for this route; it covers the rewriter, not a solver.
+This remains a research preference. No solver has been built or tested here.
 
 | Approach | What we would build | Main question |
 | --- | --- | --- |
