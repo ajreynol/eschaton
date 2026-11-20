@@ -15,7 +15,7 @@ worth trying, and what would each cost?**
 | Approach | What we would build | Main question |
 | --- | --- | --- |
 | **Proof-first port** | A port of cvc5 to Lean, written by agents, with every step justified in cvc5's proof calculus and that justification verified once in Lean, on the verified [Logos](https://github.com/cvc5/logos) checker. Search stays untrusted. | Does the approach extend from rewriting and preprocessing to search and theory combination, at acceptable runtime cost? |
-| **Verified Rust port** | A port of cvc5 to Rust, written by agents with the C++ as a general guide, then refactored step by step until [Verus](https://github.com/verus-lang/verus) can verify it. | Can the port be brought into a shape Verus can verify without losing the performance that justified Rust? |
+| **Verified Rust port** | A fast port of cvc5 to Rust, written by agents with the C++ as a general guide, then refactored until it can be verified — with [Verus](https://github.com/verus-lang/verus), or by translating it to Lean with [Charon](https://github.com/AeneasVerif/charon) and [Aeneas](https://github.com/AeneasVerif/aeneas) and proving it against Logos's definitions. | Can the port be brought into a verifiable shape without losing the performance that justified Rust? |
 | **Agent-built solver** | A new SMT solver built from scratch, written mostly by autonomous agents. | Can agents handle theory reasoning, correctness and performance with no existing solver to follow? |
 
 **The proof-first port is the current preference, and a promising one.** An
@@ -45,7 +45,17 @@ constrain the fragment that could be claimed.
 **All three approaches now involve agents.** They differ in where the guarantee
 lives. The proof-first port relies on certificates checked against a fixed
 calculus. The Rust port relies on proofs about its own code. The agent-built
-solver has neither until it adds one. The full comparison is in
+solver has neither until it adds one.
+
+**The first two may converge.** [Pathos](https://github.com/daniel-larraz/pathos)
+is the closest analogy for the checker side: an agent-written Rust
+reimplementation of Ethos, kept equal to it by differential testing, and
+reported to be faster. Its compiled CPC checker is written so that Charon and
+Aeneas translate it to Lean, where pilot proofs relate it to Logos. The same
+bridge suggests working backwards: take the verified Lean port as the
+specification, and derive a fast Rust implementation that Aeneas relates to it.
+
+The full comparison is in
 [`docs/approaches.md`](docs/approaches.md), and existing public work is in
 [`docs/related-work.md`](docs/related-work.md).
 

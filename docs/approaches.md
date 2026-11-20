@@ -11,7 +11,7 @@ approach is in [`related-work.md`](related-work.md).
 | | keeps from cvc5 | written by | where the guarantee lives | dies if |
 | --- | --- | --- | --- | --- |
 | Proof-first port | the proof calculus, and the C++ as the behaviour to match | agents under human supervision, in Lean | certificates in cvc5's calculus, checked or proved sound once against Logos; search untrusted | the approach does not extend past simplification, or runtime cost is prohibitive |
-| Verified Rust port | the design, with the C++ as a general guide | agents under human supervision, in Rust | Verus proofs about the code itself | refactoring for Verus costs the performance, or the verified part stays small |
+| Verified Rust port | the design, with the C++ as a general guide | agents under human supervision, in Rust | proofs about the code itself, in Verus or in Lean through Aeneas | refactoring for verification costs the performance, or the verified part stays small |
 | Agent-built solver | nothing | agents | none, unless added | the hard parts are exactly the parts that do not automate |
 
 **The proof-first port is the current preference.** It is the only approach
@@ -67,8 +67,57 @@ verification demands is the kind of work agents are good at. That claim is
 untested.
 
 **The two could combine.** A Rust port that keeps cvc5's proof production
-emits certificates that Ethos and Logos can check before any Verus proof
-exists. Verification could then move into the code one component at a time.
+emits certificates that Ethos and Logos can check before any proof about its
+code exists. Verification could then move into the code one component at a
+time.
+
+### Pathos: the analogy on the checker side
+
+[Pathos](https://github.com/daniel-larraz/pathos), read at `af0fe49`, has done
+for Ethos roughly what the Rust port proposes for cvc5. It reports the
+following; nothing here was re-run:
+
+- **An agent-written port.** An AI model wrote it milestone by milestone
+  against a brief, with a second instance reviewing each milestone. It is a
+  drop-in Rust replacement for the `ethos` checker and for `ethos-eoc`.
+- **The original as the reference.** It is kept equal to Ethos by differential
+  testing on Ethos's six CI platforms, covering verdicts, error messages and
+  compiler output byte for byte.
+- **Faster than the original.** On cvc5's proofs it reports about 44% of
+  Ethos's time and much less memory.
+- **A bridge to Lean.** Its separate CPC checker is compiled from the
+  signature by Ethos's `rust-meta` stage. It is written so that
+  [Charon](https://github.com/AeneasVerif/charon) and
+  [Aeneas](https://github.com/AeneasVerif/aeneas) translate it to Lean. Pilot
+  proofs relate the translation of the five-rule CpcMini checker to Logos's
+  definitions. There is no theorem about the CPC checker yet.
+
+**What it shows for the Rust port.** An agent can port a C++ proof tool to
+Rust, keep it equal to the original and make it faster. A route also exists
+from that Rust to Lean proofs against the same specification Logos uses. That
+route matters because it avoids the objection to Verus that its proofs end in
+an SMT solver. **What it does not show** is anything about a solver's search,
+or that Aeneas scales from a generated checker to hand-shaped solver code.
+
+### Working backwards from the Lean port
+
+In pathos's pilot, the Lean that Logos proves sound and the Rust that pathos
+runs come from one signature and one compiler. Aeneas translates the Rust back
+to Lean, and the proofs relate that translation to Logos's definitions. A solver could be built the same way, in the opposite order
+from the Rust port:
+
+1. **Port cvc5 to Lean first**, verified, as the proof-first port is doing.
+2. **Derive the Rust from the Lean port**, with agents, keeping cvc5's C++ only
+   as a guide to performance.
+3. **Relate the two with Aeneas**, proving that the Rust computes what the
+   verified Lean computes, so that the Lean theorems carry over to the fast
+   implementation.
+
+This makes the verified Lean port the specification for the Rust one, so the
+two approaches become stages of one plan rather than rivals. It has costs. The
+Lean port's representation choices would constrain the Rust, and the
+refinement proof grows with the code, as pathos's pilot is starting to measure.
+Untested.
 
 ### The agent-built solver
 
@@ -133,6 +182,9 @@ Each approach has an experiment that could kill it:
 - **Verified Rust port:** port one cvc5 subsystem to Rust, refactor it until
   Verus verifies a meaningful property, and measure the cost and the
   performance relative to the C++.
+- **Working backwards:** derive a Rust version of one verified Lean component,
+  such as the Boolean rewriter, and prove it equivalent to the Lean through
+  Aeneas. Pathos's CpcMini pilot is the nearest precedent.
 - **Agent-built solver:** a new theory solver that passes somebody else's
   benchmark set with checkable output.
 

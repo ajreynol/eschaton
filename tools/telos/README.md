@@ -53,6 +53,14 @@ instead of the steps. The open question is whether the approach extends from
 rewriting and preprocessing to search, theory combination and conflict
 explanation, where porting is harder and runtime cost matters.
 
+**telos could also be the specification for a fast port.** A Rust
+implementation derived from telos and proved equivalent to it through Charon
+and Aeneas would inherit telos's theorems. That is the order
+[pathos](https://github.com/daniel-larraz/pathos)'s pilot follows on the
+checker side, and [`cvc6`](../cvc6/README.md#working-backwards-from-telos)
+develops it. It would answer telos's runtime question without giving up its
+guarantee. It is untested.
+
 ## What was built
 
 At `5661141`, according to its

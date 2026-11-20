@@ -123,9 +123,17 @@ than a calculus's metatheory. The third point still applies to it.
 **Where it comes back.** When the search is the bottleneck, write it in Rust,
 leave it untrusted, and have it emit a certificate the Lean kernel checks. That
 is I5 working as designed: swapping the search implementation changes nothing
-about what is verified. Plan for this rather than resisting it — and note that
-Aeneas can lift a pure Rust subset into Lean if some part of it later wants
-proving.
+about what is verified. Plan for this rather than resisting it.
+
+**Aeneas makes Rust provable in Lean.** Charon and Aeneas translate a subset
+of Rust into Lean definitions, so Rust code can be proved against the same
+Logos specification telos uses. [Pathos](https://github.com/daniel-larraz/pathos),
+read at `af0fe49`, reports a CPC checker generated as Rust in that subset,
+faster than its first version, with pilot Lean proofs relating the five-rule
+CpcMini checker to Logos. That turns the escape hatch into a possible second
+stage: port a verified telos component to Rust and prove the two equivalent.
+[`cvc6`](../../cvc6/README.md#working-backwards-from-telos) records the
+proposal.
 
 ### F\* → C (Low\*, KaRaMeL) — the serious third option
 

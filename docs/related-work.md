@@ -44,6 +44,19 @@ whose proofs contain trust steps; those findings are its own, and
 proof coverage. This is the evidence for the proof-first port. It concerns
 simplification, not search.
 
+**[Pathos](https://github.com/daniel-larraz/pathos)**, read at `af0fe49`. A
+Rust reimplementation of Ethos and `ethos-eoc`, written by an AI model
+milestone by milestone with a second instance reviewing. It is kept equal to
+Ethos by differential testing on six platforms, and reports about 44% of
+Ethos's time on cvc5's proofs. Its separate CPC checker, compiled from the
+signature by Ethos's `rust-meta` stage, is the subject of pilot Lean proofs
+through Charon and Aeneas against Logos's definitions, on the five-rule
+CpcMini calculus; there is no theorem about the full checker yet. Kanon
+registers it as a candidate associate. This is the closest analogy for the
+verified Rust port: an agent-written port of a C++ proof tool that is faster
+than the original and has a route to Lean proofs. It concerns a checker, not a
+solver.
+
 ## The verified Rust port
 
 **[Verus](https://github.com/verus-lang/verus)** verifies Rust programs
@@ -53,6 +66,14 @@ Linear Ghost Types* (OOPSLA 2023) and *Verus: A Practical Foundation for
 Systems Verification* (SOSP 2024). These are evidence that Verus handles
 systems code. Nothing here establishes that it can carry an SMT solver's theory
 reasoning.
+
+**[Charon](https://github.com/AeneasVerif/charon) and
+[Aeneas](https://github.com/AeneasVerif/aeneas)** translate a subset of safe
+Rust into a pure functional model in a proof assistant, Lean among them.
+Charon extracts the program, and Aeneas produces the definitions proofs are
+written about. This is the route that would let a Rust solver be proved against
+Logos's semantics in Lean rather than through an SMT solver, and that pathos's
+pilot uses.
 
 **Refactoring by agents** bears on the second phase of the Rust port, which
 refactors a working port until it is verifiable.
@@ -168,9 +189,14 @@ agents can port simplification against a verified calculus. Nothing here shows
 the cost of doing the same for CDCL(T), theory combination or conflict
 explanation, or the runtime cost against cvc5.
 
-**Whether Verus can verify a solver.** No source here establishes it for
-theory reasoning, and none measures what refactoring towards verification does
-to a solver's performance.
+**Whether Verus or Aeneas can verify a solver.** No source here establishes it
+for theory reasoning, and none measures what refactoring towards verification
+does to a solver's performance. Pathos's pilot is the first measurement of the
+Aeneas route, on a generated checker.
+
+**Whether the verified Lean port can be the specification for a Rust one.**
+Deriving Rust from a verified Lean component and relating the two through
+Aeneas has precedent only in pathos's pilot, which starts from generated code.
 
 **How a generated rewriter compares with a proof-producing one.** The `rdbExec`
 branch uses generation at prototype scale inside a solver nobody rewrote.

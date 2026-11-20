@@ -17,6 +17,7 @@ much work it represents.
 | **T2** | a proof-producing rewriter for one theory | **[I3](design.md#i3--rewrites-prove-themselves-as-they-fire)** | built, for many theories; comparisons not run | the answer to whether telos's central claim holds |
 | **T7** | one piece of search, ported the same way | whether the approach extends beyond simplification | not started | the evidence the proposal now most needs |
 | **T8** | runtime cost against cvc5 | whether certification is affordable | not started; performance work has begun | the number that decides usefulness |
+| **T9** | a Rust version of one telos component, proved equivalent through Aeneas | whether telos can be the specification for a fast port | not started | a runtime answer that keeps the guarantee |
 | **T3** | a CPC corpus, run through **both** Ethos and Logos | nothing — it is an oracle | not started | agreement data, and the first `incomplete` census |
 | **T4** | the static `incomplete` question | nothing | not started | a dokimasia-shaped analysis of a Lean development |
 | **T5** | differential-test Ethos's evaluator against Logos's compiled semantics | nothing here — but it may find a real defect | not started | possibly a soundness finding, for somebody else's register |
@@ -95,6 +96,17 @@ termination proofs. Measure rewriting and preprocessing time against cvc5 on
 the fuzzing corpora and on benchmark preprocessing, and separately the cost of
 proof printing. Telos's profiling script reports where rewriting time goes;
 that is a starting point, not a comparison.
+
+## T9 — A Rust version of one component, related through Aeneas
+
+Derive a Rust implementation of one verified telos component — the Boolean
+rewriter is the smallest — keeping inside the Rust subset that Charon and
+Aeneas translate. Prove its translation equivalent to telos's Lean, so that
+`Telos.rewrite_correct` carries over, and measure its speed against telos and
+against cvc5. [Pathos](https://github.com/daniel-larraz/pathos)'s CpcMini pilot,
+at `af0fe49`, is the nearest precedent and the place to learn what the
+translation forbids. This is [`cvc6`](../../cvc6/README.md#working-backwards-from-telos)'s
+backwards route, tried at the smallest scale.
 
 ## T3 — A CPC corpus, through both checkers
 
